@@ -28,7 +28,7 @@ composer install partitech/php-mistral
 
 To use the client in your PHP application, you need to import the package and initialize a new client instance with your API key.
 
-#### Chat message without stream with La plateforme
+#### Chat message with La plateforme
 
 ```php
     use Partitech\PhpMistral\Client;
@@ -65,7 +65,7 @@ To get the same with Lama.cpp local inference :
 ```
 
 
-#### Chat message with stream with La plateforme
+#### Chat with streamed response with La plateforme
 ```php
         use Partitech\PhpMistral\Client;
         use Partitech\PhpMistral\Messages;
@@ -79,7 +79,7 @@ To get the same with Lama.cpp local inference :
             echo $chunk->getChunk();
         }
 ```
-#### chat message in stream mode with Lama.cpp
+#### Chat with streamed response with Lama.cpp
 ```php
         use Partitech\PhpMistral\LamaCppClient;
         use Partitech\PhpMistral\Messages;
