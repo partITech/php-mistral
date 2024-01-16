@@ -67,7 +67,7 @@ To get the same with Lama.cpp local inference :
 
 #### Chat message with stream with La plateforme
 ```php
-        use Partitech\PhpMistral\LamaCppClient;
+        use Partitech\PhpMistral\Client;
         use Partitech\PhpMistral\Messages;
         
         $mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
