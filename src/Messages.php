@@ -3,7 +3,6 @@
 namespace Partitech\PhpMistral;
 
 use ArrayObject;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class Messages
 {
