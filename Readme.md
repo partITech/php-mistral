@@ -1,6 +1,6 @@
 # Mistral PHP Client
 
-The Mistral PHP Client is a comprehensive PHP library designed to interface with the Mistral AI API.
+The Mistral PHP Client is a comprehensive PHP library designed to interface with the [Mistral AI API](https://docs.mistral.ai/api/).
 
 This client support Mistral : La plateforme and Lama.cpp for local testing and development purpose. 
 
