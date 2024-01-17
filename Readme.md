@@ -21,7 +21,7 @@ To begin using the Mistral PHP Client in your project, ensure you have PHP insta
 To install the Mistral PHP Client, run the following command:
 
 ```bash
-composer install partitech/php-mistral
+composer require partitech/php-mistral
 ```
 
 ### Usage
