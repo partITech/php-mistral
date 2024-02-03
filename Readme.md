@@ -2,7 +2,7 @@
 
 The Mistral PHP Client is a comprehensive PHP library designed to interface with the [Mistral AI API](https://docs.mistral.ai/api/).
 
-This client support Mistral : La plateforme and Lama.cpp for local testing and development purpose. 
+This client support Mistral : La plateforme and Lama.cpp for local testing and development purpose.
 
 Api is the same as the main Mistral api :
 
@@ -39,7 +39,15 @@ $client = new Client($mistralApiKey);
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
-$result = $client->chat($messages);
+$result = $client->chat($messages,
+    [
+        'temperature' => 0.7,
+        'top_p' => 1,
+        'max_tokens' => 16,
+        'safe_prompt' => false,
+        'random_seed' => null
+    ]
+);
 print_r($result->getMessage());
 ```
 Note that you can populate chat discussion with :
@@ -75,7 +83,14 @@ $client = new Client($mistralApiKey, 'http://localhost:8080');
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
-foreach ($client->chatStream($messages) as $chunk) {
+$params = [
+        'temperature' => 0.7,
+        'top_p' => 1,
+        'max_tokens' => 16,
+        'safe_prompt' => false,
+        'random_seed' => null
+];
+foreach ($client->chatStream($messages, $params)) as $chunk) {
     echo $chunk->getChunk();
 }
 ```
@@ -103,7 +118,7 @@ $client = new Client($mistralApiKey);
 $embeddings = $client->embeddings($strings);
 print_r($embeddings);
 ```
-Result : 
+Result :
 ```console
 Array
 (
@@ -195,8 +210,8 @@ Array
 )
 ```
 ## Lama.cpp inference
-[MistralAi La plateforme](https://console.mistral.ai/) is really cheap you should consider subscribing to it instead of running 
-a local Lama.cpp instance. This bundle cost us only 0.02€ during our tests. If you really feel you need a local server, here is a 
+[MistralAi La plateforme](https://console.mistral.ai/) is really cheap you should consider subscribing to it instead of running
+a local Lama.cpp instance. This bundle cost us only 0.02€ during our tests. If you really feel you need a local server, here is a
 docker-compose you can use for example:
 
 ```yaml
@@ -215,7 +230,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 ```
-with a .env file 
+with a .env file
 ```dotenv
 MISTRAL_API_KEY=that_is_a_very_mysterious_key
 CHAT_MODEL=mistral-7b-instruct-v0.2.Q4_K_M.gguf
