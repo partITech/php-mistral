@@ -41,6 +41,7 @@ $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
 $result = $client->chat($messages,
     [
+        'model' => 'mistral-tiny'
         'temperature' => 0.7,
         'top_p' => 1,
         'max_tokens' => 16,
@@ -84,6 +85,7 @@ $client = new Client($mistralApiKey, 'http://localhost:8080');
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
 $params = [
+        'model' => 'mistral-tiny'
         'temperature' => 0.7,
         'top_p' => 1,
         'max_tokens' => 16,
