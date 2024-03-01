@@ -17,7 +17,7 @@ use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 
 class Client
 {
-    const string DEFAULT_MODEL = 'mistral-tiny';
+    const string DEFAULT_MODEL = 'open-mistral-7b';
 
     const array RETRY_STATUS_CODES = [
             429,
