@@ -2,49 +2,40 @@
 
 namespace Partitech\PhpMistral\Tests;
 
-use Partitech\PhpMistral\LamaCppClient;
-use Partitech\PhpMistral\Response;
+use Partitech\PhpMistral\LamaCppMistralClient;
+use Partitech\PhpMistral\MistralClientException;
 use PHPUnit\Framework\TestCase;
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\MistralClient;
 use ReflectionException;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 class LamaCppClientTest extends TestCase
 {
 
-    private Client $client;
+    private MistralClient $client;
     private string $apiKey = 'testKey';
 
     protected function setUp(): void
     {
-        $this->client = new LamaCppClient($this->apiKey);
+        $this->client = new LamaCppMistralClient($this->apiKey);
     }
 
 
     public function testConstruct(): void
     {
-        $this->assertInstanceOf(LamaCppClient::class, $this->client);
-        $client = new LamaCppClient($this->apiKey);
+        $this->assertInstanceOf(LamaCppMistralClient::class, $this->client);
+        $client = new LamaCppMistralClient($this->apiKey);
         $reflection = new \ReflectionClass($client);
         $apiKeyProperty = $reflection->getProperty('apiKey');
         $endpointProperty = $reflection->getProperty('url');
         $this->assertEquals($this->apiKey, $apiKeyProperty->getValue($client));
-        $this->assertEquals(Client::ENDPOINT, $endpointProperty->getValue($client));
+        $this->assertEquals(MistralClient::ENDPOINT, $endpointProperty->getValue($client));
     }
 
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws MistralClientException
      */
     public function testListModels(): void
     {
@@ -54,7 +45,7 @@ class LamaCppClientTest extends TestCase
 
         $httpClientMock = new MockHttpClient($responses);
 
-        $client = new LamaCppClient('your_api_key', 'http://test.endpoint');
+        $client = new LamaCppMistralClient('your_api_key', 'http://test.endpoint');
         $client->setHttpClient($httpClientMock);
 
         $models = $client->listModels();

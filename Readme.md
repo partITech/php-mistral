@@ -28,20 +28,21 @@ composer require partitech/php-mistral
 
 To use the client in your PHP application, you need to import the package and initialize a new client instance with your API key.
 
+You can see full example in the [examples](examples) directory.
 #### Chat message with La plateforme
 
 ```php
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\Messages;
 
-$mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
-$client = new Client($mistralApiKey);
+$apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
+$client = new MistralClient($apiKey);
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
 $result = $client->chat($messages,
     [
-        'model' => 'mistral-large-latest'
+        'model' => 'mistral-large-latest',
         'temperature' => 0.7,
         'top_p' => 1,
         'max_tokens' => 16,
@@ -60,12 +61,13 @@ $messages->addAssistantMessage('Any response');
 ```
 
 To get the same with Lama.cpp local inference :
+
 ```php
-use Partitech\PhpMistral\LamaCppClient;
+use Partitech\PhpMistral\LamaCppMistralClient;
 use Partitech\PhpMistral\Messages;
 
-$mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
-$client = new LamaCppClient($mistralApiKey, 'http://localhost:8080');
+$apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
+$client = new LamaCppMistralClient($apiKey, 'http://localhost:8080');
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
@@ -75,17 +77,18 @@ print_r($result->getMessage());
 
 
 #### Chat with streamed response with La plateforme
+
 ```php
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\Messages;
 
-$mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
-$client = new Client($mistralApiKey, 'http://localhost:8080');
+$apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
+$client = new MistralClient($apiKey, 'http://localhost:8080');
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
 $params = [
-        'model' => 'mistral-large-latest'
+        'model' => 'mistral-large-latest',
         'temperature' => 0.7,
         'top_p' => 1,
         'max_tokens' => 16,
@@ -97,12 +100,13 @@ foreach ($client->chatStream($messages, $params)) as $chunk) {
 }
 ```
 #### Chat with streamed response with Lama.cpp
+
 ```php
-use Partitech\PhpMistral\LamaCppClient;
+use Partitech\PhpMistral\LamaCppMistralClient;
 use Partitech\PhpMistral\Messages;
 
-$mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
-$client = new LamaCppClient($mistralApiKey, 'http://localhost:8080');
+$apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
+$client = new LamaCppMistralClient($apiKey, 'http://localhost:8080');
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
@@ -113,10 +117,10 @@ foreach ($client->chatStream($messages) as $chunk) {
 
 #### Embeddings with La plateform
 ```php
-$mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
+$apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
 $strings = ['Hello', 'World', 'Hello World'];
 
-$client = new Client($mistralApiKey);
+$client = new Client($apiKey);
 $embeddings = $client->embeddings($strings);
 print_r($embeddings);
 ```
@@ -182,10 +186,10 @@ Array
 
 #### Embeddings with Lama.cpp server
 ```php
-$mistralApiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
+$apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
 $strings = ['Hello', 'World', 'Hello World'];
 
-$client = new LamaCppClient($mistralApiKey, 'http://localhost:8080');
+$client = new LamaCppClient($apiKey, 'http://localhost:8080');
 $embeddings = $client->embeddings($strings);
 print_r($embeddings);
 ```
