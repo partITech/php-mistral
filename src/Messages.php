@@ -23,17 +23,17 @@ class Messages
         return $this->messages;
     }
 
-    public function format(string $format=Client::CHAT_ML): string|array|null
+    public function format(string $format=MistralClient::CHAT_ML): string|array|null
     {
-        if(Client::CHAT_ML === $format){
+        if(MistralClient::CHAT_ML === $format) {
             $messages = [];
-            foreach($this->getMessages() as $message){
+            foreach($this->getMessages() as $message) {
                 $messages[] = $message->toArray();
             }
             return $messages;
         }
 
-        if(Client::COMPLETION === $format){
+        if(MistralClient::COMPLETION === $format) {
             $messages = null;
 
             $collection = $this->getMessages();
@@ -61,13 +61,13 @@ class Messages
 
             $prevType='system';
             /** @var Message $message */
-            foreach($between as $message){
-                if($message->getRole() === 'system' || $message->getRole() === 'user'){
+            foreach($between as $message) {
+                if($message->getRole() === 'system' || $message->getRole() === 'user') {
                     $prevType='system';
                     $messages .= '<s> [INST] ' . $message->getContent() . '[/INST]';
                 }
 
-                if($message->getRole() === 'assistant' && $prevType === 'system' ){
+                if($message->getRole() === 'assistant' && $prevType === 'system') {
                     $prevType='assistant';
                     $messages .= ' ' . $message->getContent() . '</s> ';
                 }
@@ -120,5 +120,4 @@ class Messages
         $this->addMessage($message);
         return $this;
     }
-
 }

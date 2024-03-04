@@ -1,6 +1,6 @@
 {
     "name": "partitech/php-mistral",
-    "description": "Connect to MistralAi inference or to Llamacpp",
+    "description": "Connect to MistralAi inference or to Llama.cpp",
     "license": "MIT",
     "autoload": {
         "psr-4": {

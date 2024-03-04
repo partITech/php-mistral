@@ -3,15 +3,11 @@
 namespace Partitech\PhpMistral\Tests;
 
 use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Response;
 use PHPUnit\Framework\TestCase;
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\MistralClient;
 use ReflectionException;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -19,32 +15,28 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class ClientTest extends TestCase
 {
 
-    private Client $client;
+    private MistralClient $client;
     private string $apiKey = 'testKey';
     protected function setUp(): void
     {
-        $this->client = new Client($this->apiKey);
+        $this->client = new MistralClient($this->apiKey);
     }
 
 
     public function testConstruct(): void
     {
-        $this->assertInstanceOf(Client::class, $this->client);
-        $client = new Client($this->apiKey);
+        $this->assertInstanceOf(MistralClient::class, $this->client);
+        $client = new MistralClient($this->apiKey);
         $reflection = new \ReflectionClass($client);
         $apiKeyProperty = $reflection->getProperty('apiKey');
         $endpointProperty = $reflection->getProperty('url');
         $this->assertEquals($this->apiKey, $apiKeyProperty->getValue($client));
-        $this->assertEquals(Client::ENDPOINT, $endpointProperty->getValue($client));
+        $this->assertEquals(MistralClient::ENDPOINT, $endpointProperty->getValue($client));
     }
 
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws MistralClientException
      */
     public function testListModels(): void
     {
@@ -54,7 +46,7 @@ class ClientTest extends TestCase
 
         $httpClientMock = new MockHttpClient($responses);
 
-        $client = new Client('your_api_key', 'http://test.endpoint');
+        $client = new MistralClient('your_api_key', 'http://test.endpoint');
         $client->setHttpClient($httpClientMock);
 
         $models = $client->listModels();
@@ -69,7 +61,7 @@ class ClientTest extends TestCase
         $json_response = '{"key":"value"}';
         $responses = [new MockResponse($json_response)];
         $mockHttpClient = new MockHttpClient($responses);
-        $client = new Client('testApiKey');
+        $client = new MistralClient('testApiKey');
         $client->setHttpClient($mockHttpClient);
         $reflection = new \ReflectionClass($client);
         $method = $reflection->getMethod('request');
@@ -80,21 +72,17 @@ class ClientTest extends TestCase
 
     public function testSetHttpClient()
     {
-        $client = new Client('api-key');
+        $client = new MistralClient('api-key');
 
         $httpClientMock = $this->createMock(HttpClientInterface::class);
         $result = $client->setHttpClient($httpClientMock);
 
-        $this->assertInstanceOf(Client::class, $result);
+        $this->assertInstanceOf(MistralClient::class, $result);
     }
 
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws MistralClientException
      */
     public function testChat()
     {
@@ -102,7 +90,7 @@ class ClientTest extends TestCase
         $responses = [new MockResponse($jsonResponse)];
         $mockHttpClient = new MockHttpClient($responses);
 
-        $client = new Client('your-api-key');
+        $client = new MistralClient('your-api-key');
         $client->setHttpClient($mockHttpClient);
 
         $messages = new Messages();
@@ -113,11 +101,7 @@ class ClientTest extends TestCase
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws MistralClientException
      */
     public function testChatStream()
     {
@@ -125,7 +109,7 @@ class ClientTest extends TestCase
         $responses = [new MockResponse($jsonResponse)];
         $mockHttpClient = new MockHttpClient($responses);
 
-        $client = new Client('your-api-key');
+        $client = new MistralClient('your-api-key');
         $client->setHttpClient($mockHttpClient);
 
         $messages = new Messages();
@@ -137,11 +121,7 @@ class ClientTest extends TestCase
 
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @throws MistralClientException
      */
     public function testEmbeddings()
     {
@@ -149,7 +129,7 @@ class ClientTest extends TestCase
         $responses = [new MockResponse($jsonResponse)];
         $mockHttpClient = new MockHttpClient($responses);
 
-        $client = new Client('your-api-key');
+        $client = new MistralClient('your-api-key');
         $client->setHttpClient($mockHttpClient);
 
         $datas = [];
@@ -187,7 +167,7 @@ class ClientTest extends TestCase
      */
     public function testMakeChatCompletionRequest()
     {
-        $client = new Client('testApiKey');
+        $client = new MistralClient('testApiKey');
         $reflection = new \ReflectionClass($client);
         $method = $reflection->getMethod('makeChatCompletionRequest');
 

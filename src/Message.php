@@ -4,9 +4,10 @@ namespace Partitech\PhpMistral;
 
 class Message
 {
-    private ?string $role = null;
-    private ?string $content = null;
-    private ?string $chunk = null;
+    private ?string $role     = null;
+    private ?string $content  = null;
+    private ?string $chunk    = null;
+    private ?array $toolCalls = null;
 
     /**
      * @return ?string
@@ -72,5 +73,27 @@ class Message
             'role' => $this->getRole(),
             'content' => $this->getContent()
         ];
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getToolCalls(): ?array
+    {
+        return $this->toolCalls;
+    }
+
+    /**
+     * @param array|null $toolCalls
+     * @return Message
+     */
+    public function setToolCalls(?array $toolCalls): Message
+    {
+        foreach($toolCalls as &$toolCall) {
+            $toolCall['function']['arguments'] = json_decode($toolCall['function']['arguments'], true);
+        }
+
+        $this->toolCalls = $toolCalls;
+        return $this;
     }
 }
