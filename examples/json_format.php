@@ -10,7 +10,7 @@ $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
 
 $messages = new Messages();
-$messages->addUserMessage('What is the best French cheese?');
+$messages->addUserMessage('What is the best French cheese? Return the product and produce location in JSON format');
 
 $params = [
     'model' => 'mistral-large-latest',
