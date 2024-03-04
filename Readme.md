@@ -120,7 +120,7 @@ foreach ($client->chatStream($messages) as $chunk) {
 $apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
 $strings = ['Hello', 'World', 'Hello World'];
 
-$client = new Client($apiKey);
+$client = new MistralClient($apiKey);
 $embeddings = $client->embeddings($strings);
 print_r($embeddings);
 ```
