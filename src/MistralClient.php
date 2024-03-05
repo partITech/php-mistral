@@ -14,6 +14,9 @@ use Throwable;
 class MistralClient
 {
     const string DEFAULT_MODEL = 'open-mistral-7b';
+    const string TOOL_CHOICE_ANY = 'any';
+    const string TOOL_CHOICE_AUTO = 'auto';
+    const string TOOL_CHOICE_NONE = 'none';
 
     const array RETRY_STATUS_CODES = [429, 500 => GenericRetryStrategy::IDEMPOTENT_METHODS, 502, 503, 504 => GenericRetryStrategy::IDEMPOTENT_METHODS];
     protected const string END_OF_STREAM = "[DONE]";
@@ -140,6 +143,10 @@ class MistralClient
 
         if (!$stream && isset($params['tools']) && is_array($params['tools'])) {
             $return['tools'] = $params['tools'];
+        }
+
+        if (isset($return['tools']) && isset($params['tool_choice'])) {
+            $return['tool_choice'] = $params['tool_choice'];
         }
 
         return $return;

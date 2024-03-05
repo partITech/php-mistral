@@ -12,7 +12,7 @@ $model = 'mistral-small-latest';
 
 // export MISTRAL_API_KEY=your_api_key
 $apiKey = getenv('MISTRAL_API_KEY');
-$client = new MistralClient($apiKey);
+$client = new MistralClient(apiKey: $apiKey);
 
 // Assuming we have the following data
 $data = [
@@ -88,21 +88,26 @@ $namesToFunctions = [
 ];
 
 // Create the tools definition
-$transactionIdParam = new Parameter(type: Parameter::STRING_TYPE, name: 'transactionId', description: 'The transaction id.', required: true);
+$transactionIdParam = new Parameter(
+    type: Parameter::STRING_TYPE,
+    name: 'transactionId',
+    description: 'The transaction id.',
+    required: true
+);
 
 $retrievePaymentStatusFunction = new FunctionTool(
-    'retrievePaymentStatus',
-    'Get payment status of a transaction id',
-    [
+    name: 'retrievePaymentStatus',
+    description: 'Get payment status of a transaction id',
+    parameters: [
         $transactionIdParam
     ]
 );
 
 
 $retrievePaymentDateFunction = new FunctionTool(
-    'retrievePaymentDate',
-    'Get payment date of a transaction id',
-    [
+    name: 'retrievePaymentDate',
+    description: 'Get payment date of a transaction id',
+    parameters: [
         $transactionIdParam
     ]
 );
@@ -156,14 +161,15 @@ $tools = [
 //]
 
 $messages = new Messages();
-$messages->addUserMessage('What\'s the status of my transaction?');
+$messages->addUserMessage(content: "What's the status of my transaction?");
 
 try {
     $chatResponse = $client->chat(
         messages: $messages,
         params: [
             'model' => $model,
-            'tools' => $tools
+            'tools' => $tools,
+            'tool_choice' => MistralClient::TOOL_CHOICE_AUTO
         ]
     );
 } catch (MistralClientException $e) {
@@ -183,12 +189,19 @@ try {
 
 
 // Push response to history
-$messages->addAssistantMessage($chatResponse->getMessage());
+$messages->addAssistantMessage(content: $chatResponse->getMessage());
 // Add customer response
-$messages->addUserMessage('My transaction ID is T1001.');
+$messages->addUserMessage(content: 'My transaction ID is T1001.');
 
 try {
-    $chatResponse = $client->chat(messages: $messages, params: ['model' => $model, 'tools' => $tools]);
+    $chatResponse = $client->chat(
+        messages: $messages,
+        params: [
+            'model' => $model,
+            'tools' => $tools,
+            'tool_choice' => MistralClient::TOOL_CHOICE_AUTO
+        ]
+    );
 } catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
@@ -202,3 +215,7 @@ $functionParams = $toolCall[0]['function']['arguments'];
 $functionResult = $namesToFunctions[$functionName]($functionParams);
 
 print_r($functionResult);
+//    Array
+//    (
+//        [status] => Paid
+//    )
