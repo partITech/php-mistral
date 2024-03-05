@@ -63,11 +63,11 @@ $messages->addAssistantMessage('Any response');
 To get the same with Lama.cpp local inference :
 
 ```php
-use Partitech\PhpMistral\LamaCppMistralClient;
+use Partitech\PhpMistral\LamaCppClient;
 use Partitech\PhpMistral\Messages;
 
 $apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
-$client = new LamaCppMistralClient($apiKey, 'http://localhost:8080');
+$client = new LamaCppClient($apiKey, 'http://localhost:8080');
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');
@@ -102,11 +102,11 @@ foreach ($client->chatStream($messages, $params)) as $chunk) {
 #### Chat with streamed response with Lama.cpp
 
 ```php
-use Partitech\PhpMistral\LamaCppMistralClient;
+use Partitech\PhpMistral\LamaCppClient;
 use Partitech\PhpMistral\Messages;
 
 $apiKey = 'YOUR_PRIVATE_MISTRAL_KEY';
-$client = new LamaCppMistralClient($apiKey, 'http://localhost:8080');
+$client = new LamaCppClient($apiKey, 'http://localhost:8080');
 
 $messages = new Messages();
 $messages->addUserMessage('What is the best French cheese?');

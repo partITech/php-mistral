@@ -2,7 +2,7 @@
 
 namespace Partitech\PhpMistral\Tests;
 
-use Partitech\PhpMistral\LamaCppMistralClient;
+use Partitech\PhpMistral\LamaCppClient;
 use Partitech\PhpMistral\MistralClientException;
 use PHPUnit\Framework\TestCase;
 use Partitech\PhpMistral\MistralClient;
@@ -18,14 +18,14 @@ class LamaCppClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->client = new LamaCppMistralClient($this->apiKey);
+        $this->client = new LamaCppClient($this->apiKey);
     }
 
 
     public function testConstruct(): void
     {
-        $this->assertInstanceOf(LamaCppMistralClient::class, $this->client);
-        $client = new LamaCppMistralClient($this->apiKey);
+        $this->assertInstanceOf(LamaCppClient::class, $this->client);
+        $client = new LamaCppClient($this->apiKey);
         $reflection = new \ReflectionClass($client);
         $apiKeyProperty = $reflection->getProperty('apiKey');
         $endpointProperty = $reflection->getProperty('url');
@@ -45,7 +45,7 @@ class LamaCppClientTest extends TestCase
 
         $httpClientMock = new MockHttpClient($responses);
 
-        $client = new LamaCppMistralClient('your_api_key', 'http://test.endpoint');
+        $client = new LamaCppClient('your_api_key', 'http://test.endpoint');
         $client->setHttpClient($httpClientMock);
 
         $models = $client->listModels();
