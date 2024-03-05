@@ -2,7 +2,7 @@
 
 namespace Partitech\PhpMistral;
 
-class LamaCppMistralClient extends MistralClient
+class LamaCppClient extends MistralClient
 {
     public function __construct(string $apiKey, string $url = self::ENDPOINT)
     {
