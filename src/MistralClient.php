@@ -160,12 +160,12 @@ class MistralClient
             $return['n'] = $params['n'];
         }
 
-        if (isset($params['presence_penalty']) && is_int($params['presence_penalty']) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
-            $return['presence_penalty'] = $params['presence_penalty'];
+        if (isset($params['presence_penalty']) && is_numeric($params['presence_penalty']) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
+            $return['presence_penalty'] = (float) $params['presence_penalty'];
         }
 
-        if (isset($params['frequency_penalty']) && is_int($params['frequency_penalty'])) {
-            $return['frequency_penalty'] = $params['frequency_penalty'];
+        if (isset($params['frequency_penalty']) && is_numeric($params['frequency_penalty'])) {
+            $return['frequency_penalty'] = (float) $params['frequency_penalty'];
         }
 
         if (isset($params['best_of']) && is_int($params['best_of'])) {
