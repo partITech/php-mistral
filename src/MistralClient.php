@@ -1,6 +1,7 @@
 <?php
 
 namespace Partitech\PhpMistral;
+
 ini_set('default_socket_timeout', '-1');
 
 use Generator;
@@ -121,6 +122,12 @@ class MistralClient
             $return['top_p'] = $params['top_p'];
         }
 
+
+        if (isset($params['top_k']) && is_int($params['top_k'])) {
+            $return['top_k'] = $params['top_k'];
+        }
+
+
         if (isset($params['random_seed']) && is_int($params['random_seed'])) {
             $return['random_seed'] = $params['random_seed'];
         }
@@ -159,6 +166,22 @@ class MistralClient
 
         if (isset($params['frequency_penalty']) && is_int($params['frequency_penalty'])) {
             $return['frequency_penalty'] = $params['frequency_penalty'];
+        }
+
+        if (isset($params['best_of']) && is_int($params['best_of'])) {
+            $return['best_of'] = $params['best_of'];
+        }
+
+        if (isset($params['ignore_eos']) && is_bool($params['ignore_eos'])) {
+            $return['ignore_eos'] = $params['ignore_eos'];
+        }
+
+        if (isset($params['use_beam_search']) && is_bool($params['use_beam_search'])) {
+            $return['use_beam_search'] = $params['use_beam_search'];
+        }
+
+        if (isset($params['skip_special_tokens']) && is_bool($params['skip_special_tokens'])) {
+            $return['skip_special_tokens'] = $params['skip_special_tokens'];
         }
 
 
