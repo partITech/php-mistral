@@ -149,6 +149,19 @@ class MistralClient
             $return['tool_choice'] = $params['tool_choice'];
         }
 
+        if (isset($params['n']) && is_int($params['n'])) {
+            $return['n'] = $params['n'];
+        }
+
+        if (isset($params['presence_penalty']) && is_int($params['presence_penalty']) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
+            $return['presence_penalty'] = $params['presence_penalty'];
+        }
+
+        if (isset($params['frequency_penalty']) && is_int($params['frequency_penalty'])) {
+            $return['frequency_penalty'] = $params['frequency_penalty'];
+        }
+
+
         return $return;
     }
 
