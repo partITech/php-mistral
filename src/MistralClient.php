@@ -19,7 +19,13 @@ class MistralClient
     const string TOOL_CHOICE_AUTO = 'auto';
     const string TOOL_CHOICE_NONE = 'none';
 
-    const array RETRY_STATUS_CODES = [429, 500 => GenericRetryStrategy::IDEMPOTENT_METHODS, 502, 503, 504 => GenericRetryStrategy::IDEMPOTENT_METHODS];
+    const array RETRY_STATUS_CODES = [
+        429,
+        500 => GenericRetryStrategy::IDEMPOTENT_METHODS,
+        502,
+        503,
+        504 => GenericRetryStrategy::IDEMPOTENT_METHODS
+    ];
     protected const string END_OF_STREAM = "[DONE]";
     const string ENDPOINT = 'https://api.mistral.ai';
     public const string CHAT_ML = 'mistral';
@@ -33,7 +39,10 @@ class MistralClient
 
     public function __construct(string $apiKey, string $url = self::ENDPOINT)
     {
-        $this->httpClient = new RetryableHttpClient(HttpClient::create(), new GenericRetryStrategy(self::RETRY_STATUS_CODES, 500, 2));
+        $this->httpClient = new RetryableHttpClient(
+            HttpClient::create(),
+            new GenericRetryStrategy(self::RETRY_STATUS_CODES, 500, 2)
+        );
         $this->apiKey = $apiKey;
         $this->url = $url;
         $this->mode = self::CHAT_ML;
@@ -60,10 +69,18 @@ class MistralClient
     /**
      * @throws MistralClientException
      */
-    protected function request(string $method, string $path, array $request = [], bool $stream = false): array|ResponseInterface
-    {
+    protected function request(
+        string $method,
+        string $path,
+        array $request = [],
+        bool $stream = false
+    ): array|ResponseInterface {
         try {
-            $response = $this->httpClient->request($method, $this->url . '/' . $path, ['json' => $request, 'headers' => ['Authorization' => 'Bearer ' . $this->apiKey,], 'buffer' => $stream,]);
+            $response = $this->httpClient->request(
+                $method,
+                $this->url . '/' . $path,
+                ['json' => $request, 'headers' => ['Authorization' => 'Bearer ' . $this->apiKey,], 'buffer' => $stream,]
+            );
         } catch (Throwable $e) {
             throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
         }
@@ -73,7 +90,6 @@ class MistralClient
         } catch (Throwable $e) {
             throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
         }
-
     }
 
     /**
@@ -160,12 +176,14 @@ class MistralClient
             $return['n'] = $params['n'];
         }
 
-        if (isset($params['presence_penalty']) && is_numeric($params['presence_penalty']) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
-            $return['presence_penalty'] = (float) $params['presence_penalty'];
+        if (isset($params['presence_penalty']) && is_numeric(
+                $params['presence_penalty']
+            ) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
+            $return['presence_penalty'] = (float)$params['presence_penalty'];
         }
 
         if (isset($params['frequency_penalty']) && is_numeric($params['frequency_penalty'])) {
-            $return['frequency_penalty'] = (float) $params['frequency_penalty'];
+            $return['frequency_penalty'] = (float)$params['frequency_penalty'];
         }
 
         if (isset($params['best_of']) && is_int($params['best_of'])) {
@@ -184,6 +202,13 @@ class MistralClient
             $return['skip_special_tokens'] = $params['skip_special_tokens'];
         }
 
+        if (isset($params['guided_json']) && is_string($params['guided_json'])) {
+            $return['guided_json'] = $params['guided_json'];
+        }
+
+        if (isset($params['guided_json']) && is_object($params['guided_json'])) {
+            $return['guided_json'] = json_encode($params['guided_json']);
+        }
 
         return $return;
     }
