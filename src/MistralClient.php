@@ -5,6 +5,7 @@ namespace Partitech\PhpMistral;
 ini_set('default_socket_timeout', '-1');
 
 use Generator;
+use KnpLabs\JsonSchema\ObjectSchema;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
@@ -207,6 +208,9 @@ class MistralClient
         }
 
         if (isset($params['guided_json']) && is_object($params['guided_json'])) {
+            if ($params['guided_json'] instanceof ObjectSchema) {
+                $params['guided_json'] = $params['guided_json']->jsonSerialize();
+            }
             $return['guided_json'] = json_encode($params['guided_json']);
         }
 
