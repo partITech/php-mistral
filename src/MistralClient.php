@@ -155,6 +155,10 @@ class MistralClient
             $return['safe_prompt'] = $params['safe_prompt'];
         }
 
+        if (isset($params['safe_mode']) && is_bool($params['safe_mode'])) {
+            $return['safe_prompt'] = $params['safe_prompt'];
+        }
+
         if (isset($params['tool_choice']) && is_array($params['tool_choice'])) {
             $return['tool_choice'] = $params['tool_choice'];
         }
