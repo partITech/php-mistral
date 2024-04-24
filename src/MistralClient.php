@@ -20,6 +20,8 @@ class MistralClient
     const string TOOL_CHOICE_AUTO = 'auto';
     const string TOOL_CHOICE_NONE = 'none';
 
+    const int RESPONSE_FORMAT_JSON = 0;
+
     const array RETRY_STATUS_CODES = [
         429,
         500 => GenericRetryStrategy::IDEMPOTENT_METHODS,
@@ -178,8 +180,8 @@ class MistralClient
         }
 
         if (isset($params['presence_penalty']) && is_numeric(
-                $params['presence_penalty']
-            ) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
+            $params['presence_penalty']
+        ) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
             $return['presence_penalty'] = (float)$params['presence_penalty'];
         }
 
@@ -212,6 +214,12 @@ class MistralClient
                 $params['guided_json'] = $params['guided_json']->jsonSerialize();
             }
             $return['guided_json'] = json_encode($params['guided_json']);
+        }
+
+        if(isset($params['response_format']) && $params['response_format'] === self::RESPONSE_FORMAT_JSON) {
+            $return['response_format'] = [
+                'type' => 'json_object'
+            ];
         }
 
         return $return;
