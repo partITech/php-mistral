@@ -242,6 +242,220 @@ MISTRAL_API_KEY=that_is_a_very_mysterious_key
 CHAT_MODEL=mistral-7b-instruct-v0.2.Q4_K_M.gguf
 ```
 
+## About the Response object
+
+`$client->chat()` method return a `Partitech\PhpMistral\Response` object.
+
+```php
+$client = new MistralClient($apiKey);
+$result = $client->chat(
+        $messages,
+        [
+            'model' => 'mistral-large-latest',
+            'temperature' => 0.7,
+            'top_p' => 1,
+            'max_tokens' => 250,
+            'safe_prompt' => false,
+            'random_seed' => null
+        ]
+    );
+```
+Available methods are :
+```php
+$result->getChunk()
+$result->getId()
+$result->getChoices()
+$result->getCreated()
+$result->getGuidedMessage()
+$result->getModel()
+$result->getObject()
+$result->getObject()
+$result->getToolCalls()
+$result->getUsage()
+```
+All of theses methods are accessors to basic response from the server : 
+```json
+{
+    "id": "cmpl-e5cc70bb28c444948073e77776eb30ef",
+    "object": "chat.completion",
+    "created": 1702256327,
+    "model": "mistral-large-latest",
+    "choices":
+    [
+        {
+            "index": 0,
+            "message":
+            {
+                "role": "assistant",
+                "content": "",
+                "tool_calls":
+                [
+                    {
+                        "function":
+                        {
+                            "name": "get_current_weather",
+                            "arguments": "{\"location\": \"Paris, 75\"}"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "tool_calls"
+        }
+    ],
+    "usage":
+    {
+        "prompt_tokens": 118,
+        "completion_tokens": 35,
+        "total_tokens": 153
+    }
+}
+```
+
+Method's names and response json are understandable, but here is a basic explanation :
+
+
+ - Get the last message response from the server. In fact, it gets the last message from the Messages class, which is a list of messages.
+
+
+```php
+$result->getMessage()
+```
+example: 
+```text
+France is known for its diverse and high-quality cheeses, so it's challenging to single out one as the "best" because it largely depends on personal preference. However, some French cheeses are particularly renowned ...
+```
+ - When using streamed response, it get the last chunk of the message yelded by the server.
+```php
+foreach ($client->chatStream($messages, $params) as $chunk) {
+    echo $chunk->getChunk();
+}
+```
+example:
+```text
+France is known 
+```
+- Get the id's response from the server
+
+```php
+$result->getId()
+```
+example:
+```text
+cmpl-e5cc70bb28c444948073e77776eb30ef
+```
+
+- Get array object with choices responses from the server
+```php
+$result->getChoices()
+```
+example:
+```text
+ArrayObject Object
+(
+    [storage:ArrayObject:private] => Array
+        (
+            [0] => Partitech\PhpMistral\Message Object
+                (
+                    [role:Partitech\PhpMistral\Message:private] => assistant
+                    [content:Partitech\PhpMistral\Message:private] => France is known for its diverse and high-quality cheeses, so it's challenging to single out one as the "best" because it largely depends on personal preference. However, some French cheeses are particularly renowned:
+
+1. Comté: This is a hard cheese made from unpasteurized cow's milk in the Franche-Comté region of eastern France. It has a nutty, slightly sweet flavor.
+
+2. Brie de Meaux: Often just called Brie, this is a soft cheese with a white, edible rind. It's known for its creamy texture and mild, slightly earthy flavor.
+
+3. Roquefort: This is a blue cheese made from sheep's milk. It has a strong, tangy flavor and is crumbly in texture.
+
+4. Camembert: This is another soft cheese with a white, edible rind. It's similar to Brie but has a stronger, more pungent flavor.
+
+5. Reblochon: This is a soft, washed-rind cheese from the Savoie region of France. It has a nutty
+                    [chunk:Partitech\PhpMistral\Message:private] => 
+                    [toolCalls:Partitech\PhpMistral\Message:private] => 
+                )
+
+        )
+
+)
+
+```
+
+- Get the created response's date  (integer timestamp)
+```php
+$result->getCreated()
+```
+example:
+```text
+1702256327
+```
+
+- Get the guided message object. This is the json_decoded message returned from the vllm server. Only used with vllm server.
+
+```php
+$result->getGuidedMessage()
+```
+example:
+```php
+object(stdClass)#1 (1) {
+  ["foo"]=>
+  string(3) "bar"
+}
+```
+
+- Get the model used, from the server response.
+```php
+$result->getModel()
+```
+example:
+```text
+mistral-large-latest
+```
+
+- Get the object index, from the server response.
+```php
+$result->getObject()
+```
+
+example:
+```text
+chat.completion
+```
+
+- get the tool_calls value from the server's response.
+This is an associative array with the json_decoded response from the server.
+
+```php
+$result->getToolCalls()
+```
+example:
+```php
+$toolCall = $chatResponse->getToolCalls();
+$functionName = $toolCall[0]['function']['name'];
+$functionParams = $toolCall[0]['function']['arguments'];
+
+// Call the proper function
+$functionResult = $namesToFunctions[$functionName]($functionParams);
+
+print_r($functionResult);
+//    Array
+//    (
+//        [status] => Paid
+//    )
+```
+
+- Get the usage response from the server.
+```php
+$result->getUsage() 
+```
+example:
+```text
+(
+    [prompt_tokens] => 10
+    [total_tokens] => 260
+    [completion_tokens] => 250
+)
+```
+
+
+
 ## Documentation
 
 For detailed documentation on the Mistral AI API and the available endpoints, please refer to the [Mistral AI API Documentation](https://docs.mistral.ai).
