@@ -5,9 +5,11 @@ namespace Partitech\PhpMistral;
 class Message
 {
     private ?string $role     = null;
-    private ?string $content  = null;
+    private null|string|array $content  = null;
     private ?string $chunk    = null;
     private ?array $toolCalls = null;
+    private ?string $toolCallId = null;
+    private ?string $name = null;
 
     /**
      * @return ?string
@@ -26,17 +28,17 @@ class Message
     }
 
     /**
-     * @return ?string
+     * @return array|string|null
      */
-    public function getContent(): ?string
+    public function getContent(): null|array|string
     {
         return $this->content;
     }
 
     /**
-     * @param string $content
+     * @param string|array $content
      */
-    public function setContent(string $content): void
+    public function setContent(string|array $content): void
     {
         $this->content = $content;
     }
@@ -69,18 +71,37 @@ class Message
 
     public function toArray(): array
     {
-        return [
+        $payLoad = [
             'role' => $this->getRole(),
             'content' => $this->getContent()
         ];
+
+        if($this->getRole() === 'tool') {
+            $payLoad['content'] = json_encode($this->getContent());
+            $payLoad['name'] = $this->getName();
+            $payLoad['tool_call_id'] = $this->getToolCallId();
+        }
+
+        if ($this->getRole() === 'assistant' && !is_null($this->getToolCalls())){
+            $payLoad['tool_calls'] = $this->getToolCalls(true);
+        }
+
+        return $payLoad;
     }
 
     /**
+     * @param bool|null $payload
      * @return array|null
      */
-    public function getToolCalls(): ?array
+    public function getToolCalls(?bool $payload = false): ?array
     {
-        return $this->toolCalls;
+        $response = $this->toolCalls;
+        if($payload){
+            foreach($response as &$toolCall){
+                $toolCall['function']['arguments'] = json_encode($toolCall['function']['arguments']);
+            }
+        }
+        return $response;
     }
 
     /**
@@ -89,11 +110,40 @@ class Message
      */
     public function setToolCalls(?array $toolCalls): Message
     {
+        if(null === $toolCalls){
+            return $this;
+        }
+
         foreach($toolCalls as &$toolCall) {
+            if(is_array($toolCall['function']['arguments'])){
+                continue;
+            }
             $toolCall['function']['arguments'] = json_decode($toolCall['function']['arguments'], true);
         }
 
         $this->toolCalls = $toolCalls;
         return $this;
+    }
+
+    public function setName(?string $name): Message
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setToolCallId(?string $toolCallId): Message
+    {
+        $this->toolCallId = $toolCallId;
+        return $this;
+    }
+
+    public function getToolCallId(): ?string
+    {
+        return $this->toolCallId;
     }
 }

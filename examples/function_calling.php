@@ -8,9 +8,9 @@ use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
 
-$model = 'mistral-small-latest';
+$model = 'mistral-large-latest';
 
-// export MISTRAL_API_KEY=your_api_key
+// export MISTRAL_API_KEY=
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient(apiKey: $apiKey);
 
@@ -207,15 +207,68 @@ try {
     exit(1);
 }
 
-$toolCall = $chatResponse->getToolCalls();
-$functionName = $toolCall[0]['function']['name'];
-$functionParams = $toolCall[0]['function']['arguments'];
+$toolCallResponse = $chatResponse->getToolCalls();
+$toolCall = $toolCallResponse[0];
+$functionName = $toolCall['function']['name'];
+$functionParams = $toolCall['function']['arguments'];
 
 // Call the proper function
 $functionResult = $namesToFunctions[$functionName]($functionParams);
+
+print_r($toolCall);
+//Array
+//(
+//    [id] => 1b9Ds90lR
+//    [function] => Array
+//        (
+//            [name] => retrievePaymentStatus
+//            [arguments] => Array
+//                (
+//                    [transactionId] => T1001
+//                )
+//
+//        )
+//
+//)
 
 print_r($functionResult);
 //    Array
 //    (
 //        [status] => Paid
 //    )
+
+print_r($functionParams);
+//Array
+//(
+//    [transactionId] => T1001
+//)
+
+// Add the last assistant message to messages history
+$messages->addAssistantMessage(
+    content: $chatResponse->getMessage(),
+    toolCalls: $chatResponse->getToolCalls()
+);
+
+// Add the tool message to query mistral for a message
+$messages->addToolMessage(
+    name: $toolCall['function']['name'],
+    content: $namesToFunctions[$functionName]($functionParams),
+    toolCallId: $toolCall['id']
+);
+
+try {
+    $chatResponse = $client->chat(
+        messages: $messages,
+        params: [
+            'model' => $model,
+            'tools' => $tools,
+            'tool_choice' => MistralClient::TOOL_CHOICE_AUTO
+        ]
+    );
+} catch (MistralClientException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+print_r($chatResponse->getMessage());
+// The status of your transaction with ID T1001 is 'Paid'. Is there anything else you need help with?
