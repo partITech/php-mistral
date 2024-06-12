@@ -112,11 +112,23 @@ class Messages
         return $this;
     }
 
-    public function addAssistantMessage(string $content): self
+    public function addToolMessage(string $name, array $content, string $toolCallId): self
+    {
+        $message = new Message();
+        $message->setRole('tool');
+        $message->setContent($content);
+        $message->setName($name);
+        $message->setToolCallId($toolCallId);
+        $this->addMessage($message);
+        return $this;
+    }
+
+    public function addAssistantMessage(string $content, null|array $toolCalls = null): self
     {
         $message = new Message();
         $message->setRole('assistant');
         $message->setContent($content);
+        $message->setToolCalls($toolCalls);
         $this->addMessage($message);
         return $this;
     }
