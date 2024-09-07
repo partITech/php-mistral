@@ -260,7 +260,7 @@ services:
       --enforce-eager
       --enable-auto-tool-choice
       --tool-call-parser mistral
-      --chat-template /tool_chat_template_mistral.jinja
+      --chat-template /config/tool_chat_template_mistral.jinja
     environment:
       - HUGGING_FACE_HUB_TOKEN=*****
       - NVIDIA_VISIBLE_DEVICES=0,1
