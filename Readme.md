@@ -246,6 +246,7 @@ CHAT_MODEL=mistral-7b-instruct-v0.2.Q4_K_M.gguf
 Starting to v0.6.0 vLLM is fully compatible with the tools/tool_choice from mistral's plateforme.
 To get an ISO instance locally you will need to specify the template: [examples/tool_chat_template_mistral.jinja](https://github.com/vllm-project/vllm/blob/main/examples/tool_chat_template_mistral.jinja) . Here is a docker-compose you can use for example:
 
+
 ```yaml
 services:
   mistral:
@@ -260,7 +261,7 @@ services:
       --enforce-eager
       --enable-auto-tool-choice
       --tool-call-parser mistral
-      --chat-template /tool_chat_template_mistral.jinja
+      --chat-template /config/tool_chat_template_mistral.jinja
     environment:
       - HUGGING_FACE_HUB_TOKEN=*****
       - NVIDIA_VISIBLE_DEVICES=0,1
