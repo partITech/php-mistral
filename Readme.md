@@ -221,7 +221,6 @@ a local Lama.cpp instance. This bundle cost us only 0.02€ during our tests. If
 docker-compose you can use for example:
 
 ```yaml
-version: '3.8'
 services:
   server:
     image: ghcr.io/ggerganov/llama.cpp:full
@@ -241,6 +240,51 @@ with a .env file
 MISTRAL_API_KEY=that_is_a_very_mysterious_key
 CHAT_MODEL=mistral-7b-instruct-v0.2.Q4_K_M.gguf
 ```
+
+## vLLM inference
+[vLLM](https://github.com/vllm-project/vllm) is the official inference alternative to [MistralAi La plateforme](https://console.mistral.ai/).
+Starting to v0.6.0 vLLM is fully compatible with the tools/tool_choice from mistral's plateforme.
+To get an ISO instance locally you will need to specify the template: [examples/tool_chat_template_mistral.jinja](https://github.com/vllm-project/vllm/blob/main/examples/tool_chat_template_mistral.jinja) . Here is a docker-compose you can use for example:
+
+```yaml
+services:
+  mistral:
+    image: vllm/vllm-openai:v0.6.0
+    command: |
+      --model mistralai/Mistral-Nemo-Instruct-2407
+      --served-model-name nemo
+      --max-model-len 32000
+      --tensor-parallel-size 2
+      --gpu-memory-utilization 1
+      --trust-remote-code
+      --enforce-eager
+      --enable-auto-tool-choice
+      --tool-call-parser mistral
+      --chat-template /tool_chat_template_mistral.jinja
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=*****
+      - NVIDIA_VISIBLE_DEVICES=0,1
+    volumes:
+      - /path_to_config/:/config
+      - /path_to_cache/.cache/huggingface:/root/.cache/huggingface
+    ports:
+      - "40001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    runtime: nvidia
+    ipc: host
+    networks:
+      - llm_1x2_network
+networks:
+  llm_1x2_network:
+    driver: bridge
+```
+
+
 
 ## About the Response object
 

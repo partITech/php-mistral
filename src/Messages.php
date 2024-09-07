@@ -123,7 +123,7 @@ class Messages
         return $this;
     }
 
-    public function addAssistantMessage(string $content, null|array $toolCalls = null): self
+    public function addAssistantMessage(null|string $content, null|array $toolCalls = null): self
     {
         $message = new Message();
         $message->setRole('assistant');

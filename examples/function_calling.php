@@ -8,7 +8,8 @@ use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
 
-$model = 'mistral-large-latest';
+$model = 'open-mistral-nemo';
+$temperature = 0.3;
 
 // export MISTRAL_API_KEY=
 $apiKey = getenv('MISTRAL_API_KEY');
@@ -167,6 +168,7 @@ try {
     $chatResponse = $client->chat(
         messages: $messages,
         params: [
+            'temperature' => $temperature,
             'model' => $model,
             'tools' => $tools,
             'tool_choice' => MistralClient::TOOL_CHOICE_AUTO
@@ -197,6 +199,7 @@ try {
     $chatResponse = $client->chat(
         messages: $messages,
         params: [
+            'temperature' => $temperature,
             'model' => $model,
             'tools' => $tools,
             'tool_choice' => MistralClient::TOOL_CHOICE_AUTO

@@ -189,6 +189,10 @@ class MistralClient
             $return['presence_penalty'] = (float)$params['presence_penalty'];
         }
 
+        if (isset($params['min_tokens']) && is_numeric($params['min_tokens'])) {
+            $return['min_tokens'] = (int)$params['min_tokens'];
+        }
+
         if (isset($params['frequency_penalty']) && is_numeric($params['frequency_penalty'])) {
             $return['frequency_penalty'] = (float)$params['frequency_penalty'];
         }
