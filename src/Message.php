@@ -36,9 +36,9 @@ class Message
     }
 
     /**
-     * @param string|array $content
+     * @param string|array|null $content
      */
-    public function setContent(string|array $content): void
+    public function setContent(null|string|array $content): void
     {
         $this->content = $content;
     }
