@@ -33,6 +33,7 @@ class Messages
             return $messages;
         }
 
+        /** @deprecated since v0.0.16. Will be removed in the future version. */
         if(MistralClient::COMPLETION === $format) {
             $messages = null;
 

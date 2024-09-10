@@ -15,7 +15,8 @@ use Throwable;
 
 class MistralClient
 {
-    const string DEFAULT_MODEL = 'open-mistral-7b';
+    const string DEFAULT_CHAT_MODEL = 'open-mistral-7b';
+    const string DEFAULT_FIM_MODEL = 'codestral-2405';
     const string TOOL_CHOICE_ANY = 'any';
     const string TOOL_CHOICE_AUTO = 'auto';
     const string TOOL_CHOICE_NONE = 'none';
@@ -31,9 +32,12 @@ class MistralClient
     ];
     protected const string END_OF_STREAM = "[DONE]";
     const string ENDPOINT = 'https://api.mistral.ai';
+    /** @deprecated since v0.0.16. Will be removed in the future version. */
     public const string CHAT_ML = 'mistral';
+    /** @deprecated since v0.0.16. Will be removed in the future version. */
     public const string COMPLETION = 'completion';
-    protected string $completionEndpoint = 'v1/chat/completions';
+    protected string $chatCompletionEndpoint = 'v1/chat/completions';
+    protected string $fimCompletionEndpoint = 'v1/fim/completions';
     protected string $promptKeyword = 'messages';
     protected string $apiKey;
     protected string $url;
@@ -75,9 +79,10 @@ class MistralClient
     protected function request(
         string $method,
         string $path,
-        array $request = [],
-        bool $stream = false
-    ): array|ResponseInterface {
+        array  $request = [],
+        bool   $stream = false
+    ): array|ResponseInterface
+    {
         try {
             $response = $this->httpClient->request(
                 $method,
@@ -101,10 +106,96 @@ class MistralClient
     public function chat(Messages $messages, array $params = []): Response
     {
         $params = $this->makeChatCompletionRequest($messages, $params, false);
-        $result = $this->request('POST', $this->completionEndpoint, $params);
+        $result = $this->request('POST', $this->chatCompletionEndpoint, $params);
         return Response::createFromArray($result);
     }
 
+    /**
+     * @throws MistralClientException
+     */
+    public function fim(string $prompt, ?string $suffix, array $params = []): Response
+    {
+        $request = $this->makeFimCompletionRequest(
+            prompt: $prompt,
+            suffix: $suffix,
+            params: $params,
+            stream: false
+        );
+
+        $result = $this->request('POST', $this->fimCompletionEndpoint, $request);
+        return Response::createFromArray($result);
+    }
+
+    /**
+     * @throws MistralClientException
+     */
+    public function fimStream(string $prompt, ?string $suffix, array $params = []): Generator
+    {
+        $request = $this->makeFimCompletionRequest(
+            prompt: $prompt,
+            suffix: $suffix,
+            params: $params,
+            stream: true
+        );
+
+        $stream = $this->request('POST', $this->fimCompletionEndpoint, $request, true);
+        return $this->getStream($stream);
+    }
+
+    protected function makeFimCompletionRequest(string $prompt, ?string $suffix = null, array $params = [], bool $stream = false): array
+    {
+        $return = [];
+
+        $return['stream'] = $stream;
+        $return['prompt'] = $prompt;
+
+        if (!is_null($suffix)) {
+            $return['suffix'] = $suffix;
+        } else {
+            $return['suffix'] = '';
+        }
+
+
+        if (isset($params['model']) && is_string($params['model'])) {
+            $return['model'] = $params['model'];
+        } else {
+            $return['model'] = self::DEFAULT_FIM_MODEL;
+        }
+
+        if (isset($params['temperature']) && is_float($params['temperature'])) {
+            $return['temperature'] = $params['temperature'];
+        }
+
+        if (isset($params['top_p']) && is_float($params['top_p'])) {
+            $return['top_p'] = $params['top_p'];
+        }
+
+        if (isset($params['max_tokens']) && is_int($params['max_tokens'])) {
+            $return['max_tokens'] = $params['max_tokens'];
+        } else {
+            $return['max_tokens'] = null;
+        }
+
+        if (isset($params['min_tokens']) && is_numeric($params['min_tokens'])) {
+            $return['min_tokens'] = (int)$params['min_tokens'];
+        } else {
+            $return['min_tokens'] = null;
+        }
+
+        if (isset($params['stop']) && is_string($params['stop'])) {
+            $return['stop'] = (string)$params['stop'];
+        }
+
+        if (isset($params['min_tokens']) && is_numeric($params['min_tokens'])) {
+            $return['min_tokens'] = (int)$params['min_tokens'];
+        }
+
+        if (isset($params['random_seed']) && is_int($params['random_seed'])) {
+            $return['random_seed'] = $params['random_seed'];
+        }
+
+        return $return;
+    }
 
     /**
      * @param Messages $messages
@@ -121,7 +212,7 @@ class MistralClient
         if (isset($params['model']) && is_string($params['model'])) {
             $return['model'] = $params['model'];
         } else {
-            $return['model'] = self::DEFAULT_MODEL;
+            $return['model'] = self::DEFAULT_CHAT_MODEL;
         }
 
         if ($this->mode === self::CHAT_ML) {
@@ -184,8 +275,8 @@ class MistralClient
         }
 
         if (isset($params['presence_penalty']) && is_numeric(
-            $params['presence_penalty']
-        ) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
+                $params['presence_penalty']
+            ) && $params['presence_penalty'] >= -2 && $params['presence_penalty'] <= 2) {
             $return['presence_penalty'] = (float)$params['presence_penalty'];
         }
 
@@ -224,7 +315,7 @@ class MistralClient
             $return['guided_json'] = json_encode($params['guided_json']);
         }
 
-        if(isset($params['response_format']) && $params['response_format'] === self::RESPONSE_FORMAT_JSON) {
+        if (isset($params['response_format']) && $params['response_format'] === self::RESPONSE_FORMAT_JSON) {
             $return['response_format'] = [
                 'type' => 'json_object'
             ];
@@ -240,8 +331,23 @@ class MistralClient
     public function chatStream(Messages $messages, array $params = []): Generator
     {
         $request = $this->makeChatCompletionRequest($messages, $params, true);
-        $stream = $this->request('POST', $this->completionEndpoint, $request, true);
+        $stream = $this->request('POST', $this->chatCompletionEndpoint, $request, true);
+        return $this->getStream($stream);
+    }
 
+
+    /**
+     * @throws MistralClientException
+     */
+    public function embeddings(array $datas): array
+    {
+        $request = ['model' => 'mistral-embed', 'input' => $datas,];
+        return $this->request('POST', 'v1/embeddings', $request);
+    }
+
+
+    public function getStream($stream): Generator
+    {
         $response = null;
         foreach ($this->httpClient->stream($stream) as $chunk) {
             try {
@@ -271,15 +377,5 @@ class MistralClient
                 yield $response;
             }
         }
-    }
-
-
-    /**
-     * @throws MistralClientException
-     */
-    public function embeddings(array $datas): array
-    {
-        $request = ['model' => 'mistral-embed', 'input' => $datas,];
-        return $this->request('POST', 'v1/embeddings', $request);
     }
 }

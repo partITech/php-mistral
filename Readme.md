@@ -11,6 +11,7 @@ Api is the same as the main Mistral api :
 - **Chat Completions**: Generate conversational responses and complete dialogue prompts using Mistral's language models.
 - **Chat Completions Streaming**: Establish a real-time stream of chat completions, ideal for applications requiring continuous interaction.
 - **Embeddings**: Obtain numerical vector representations of text, enabling semantic search, clustering, and other machine learning applications.
+- **Fill in the Middle**: Automatically generate code by setting a starting prompt and an optional suffix, allowing the model to complete the code in between. Ideal for creating specific code segments within predefined boundaries.
 
 ## Getting Started
 
@@ -215,6 +216,72 @@ Array
    
 )
 ```
+
+
+#### Fill in the middle
+```php
+$prompt  = "Write response in php:\n";
+$prompt .= "/** Calculate date + n days. Returns \DateTime object */";
+$suffix  = 'return $datePlusNdays;\n}';
+
+try {
+    $result = $client->fim(
+        prompt: $prompt,
+        suffix: $suffix,
+        params:[
+            'model' => $model_name,
+            'temperature' => 0.7,
+            'top_p' => 1,
+            'max_tokens' => 200,
+            'min_tokens' => 0,
+            'stop' => 'string',
+            'random_seed' => 0
+        ]
+    );
+} catch (MistralClientException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+```
+Result :
+```console
+function datePlusNdays(\DateTime $date, $n) {
+ $datePlusNdays = clone $date;
+ $datePlusNdays->add(new \DateInterval('P'.abs($n).'D'));
+```
+
+#### Fill in the middle in stream mode
+```php
+try {
+    $result = $client->fimStream(
+        prompt: $prompt,
+        suffix: $suffix,
+        params:[
+            'model' => $model_name,
+            'temperature' => 0.7,
+            'top_p' => 1,
+            'max_tokens' => 200,
+            'min_tokens' => 0,
+            'stop' => 'string',
+            'random_seed' => 0
+        ]
+    );
+    foreach ($result as $chunk) {
+        echo $chunk->getChunk();
+    }
+} catch (MistralClientException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+```
+Result :
+```console
+function datePlusNdays(\DateTime $date, $n) {
+ $datePlusNdays = clone $date;
+ $datePlusNdays->add(new \DateInterval('P'.abs($n).'D'));
+```
+
+
 ## Lama.cpp inference
 [MistralAi La plateforme](https://console.mistral.ai/) is really cheap you should consider subscribing to it instead of running
 a local Lama.cpp instance. This bundle cost us only 0.02€ during our tests. If you really feel you need a local server, here is a
