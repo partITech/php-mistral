@@ -566,8 +566,6 @@ example:
 )
 ```
 
-
-
 ## Documentation
 
 For detailed documentation on the Mistral AI API and the available endpoints, please refer to the [Mistral AI API Documentation](https://docs.mistral.ai).
