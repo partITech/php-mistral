@@ -314,7 +314,6 @@ Result :
 Dans cette image, on voit une famille de cinq personnes posant pour une photo. Ils sont tous vêtus de chemises rouges assorties et sont allongés sur le ventre sur une surface blanche devant un fond blanc. Les membres de la famille sourient et semblent être dans une pose détendue et joyeuse, les mains jointes devant eux. La famille semble former un groupe uni et heureux, et l'ambiance générale de la photo est chaleureuse et accueillante.
 ```
 
-
 ## Lama.cpp inference
 [MistralAi La plateforme](https://console.mistral.ai/) is really cheap you should consider subscribing to it instead of running
 a local Lama.cpp instance. This bundle cost us only 0.02€ during our tests. If you really feel you need a local server, here is a
