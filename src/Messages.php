@@ -28,7 +28,12 @@ class Messages
         if(MistralClient::CHAT_ML === $format) {
             $messages = [];
             foreach($this->getMessages() as $message) {
-                $messages[] = $message->toArray();
+                if(!is_array($message)) {
+                    $messageArray = $message->toArray();
+                }else{
+                    $messageArray = $message;
+                }
+                $messages[] = $messageArray;
             }
             return $messages;
         }
@@ -111,6 +116,22 @@ class Messages
         $message->setContent($content);
         $this->addMessage($message);
         return $this;
+    }
+
+    public function addMixedContentUserMessage(array $contents): void
+    {
+        $messageContent = [];
+        foreach ($contents as $content) {
+            if (isset($content['type']) && $content['type'] === 'text') {
+                $messageContent[] = ['type' => 'text', 'text' => $content['text']];
+            } elseif (isset($content['type']) && $content['type'] === 'image_url') {
+                $messageContent[] = ['type' => 'image_url', 'image_url' => ['url' => $content['image_url']]];
+            }
+        }
+        $this->messages[] = [
+            'role' => 'user',
+            'content' => $messageContent
+        ];
     }
 
     public function addToolMessage(string $name, array $content, string $toolCallId): self

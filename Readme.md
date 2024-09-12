@@ -281,6 +281,39 @@ function datePlusNdays(\DateTime $date, $n) {
  $datePlusNdays->add(new \DateInterval('P'.abs($n).'D'));
 ```
 
+#### Pixtral request
+```php
+
+$contents = [
+    ['type' => 'text', 'text' => 'Describe this image in detail please.'],
+    ['type' => 'image_url', 'image_url' => 'https://s3.amazonaws.com/cms.ipressroom.com/338/files/201808/5b894ee1a138352221103195_A680%7Ejogging-edit/A680%7Ejogging-edit_hero.jpg'],
+    ['type' => 'text', 'text' => 'and this one as well. Answer in French.'],
+    ['type' => 'image_url', 'image_url' => 'https://www.wolframcloud.com/obj/resourcesystem/images/a0e/a0ee3983-46c6-4c92-b85d-059044639928/6af8cfb971db031b.png']
+];
+
+$messages = new Messages();
+$messages->addMixedContentUserMessage($contents);
+
+try {
+    $result = $client->chat(
+        $messages,
+        [
+            'model' => 'Pixtral-12B-2409',
+            'max_tokens' => 1024,
+        ]
+    );
+} catch (MistralClientException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+print($result->getMessage());
+```
+Result :
+```console
+Dans cette image, on voit une famille de cinq personnes posant pour une photo. Ils sont tous vêtus de chemises rouges assorties et sont allongés sur le ventre sur une surface blanche devant un fond blanc. Les membres de la famille sourient et semblent être dans une pose détendue et joyeuse, les mains jointes devant eux. La famille semble former un groupe uni et heureux, et l'ambiance générale de la photo est chaleureuse et accueillante.
+```
+
 
 ## Lama.cpp inference
 [MistralAi La plateforme](https://console.mistral.ai/) is really cheap you should consider subscribing to it instead of running
@@ -313,7 +346,7 @@ CHAT_MODEL=mistral-7b-instruct-v0.2.Q4_K_M.gguf
 Starting to v0.6.0 vLLM is fully compatible with the tools/tool_choice from mistral's plateforme.
 To get an ISO instance locally you will need to specify the template: [examples/tool_chat_template_mistral.jinja](https://github.com/vllm-project/vllm/blob/main/examples/tool_chat_template_mistral.jinja) . Here is a docker-compose you can use for example:
 
-
+vLLM inference for tool_call
 ```yaml
 services:
   mistral:
@@ -332,6 +365,7 @@ services:
     environment:
       - HUGGING_FACE_HUB_TOKEN=*****
       - NVIDIA_VISIBLE_DEVICES=0,1
+      - VLLM_WORKER_MULTIPROC_METHOD=spawn
     volumes:
       - /path_to_config/:/config
       - /path_to_cache/.cache/huggingface:/root/.cache/huggingface
@@ -351,6 +385,48 @@ networks:
   llm_1x2_network:
     driver: bridge
 ```
+vLLM inference for Pixtral
+```yaml
+services:
+  mistral:
+    image: vllm/vllm-openai:v0.6.1
+    command: |
+      --model mistralai/Pixtral-12B-2409 
+      --tokenizer_mode mistral 
+      --limit_mm_per_prompt 'image=4' 
+      --max_num_batched_tokens 16384
+      --served-model-name Pixtral-12B-2409 
+      --max-model-len 16384
+      --tensor-parallel-size 2
+      --gpu-memory-utilization 1
+      --trust-remote-code
+      --enforce-eager
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=*****
+      - NVIDIA_VISIBLE_DEVICES=0,1
+      - VLLM_WORKER_MULTIPROC_METHOD=spawn
+    volumes:
+      - /path_to_config/:/config
+      - /path_to_cache/.cache/huggingface:/root/.cache/huggingface
+    ports:
+      - "40001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    runtime: nvidia
+    ipc: host
+    networks:
+      - llm_1x2_network
+networks:
+  llm_1x2_network:
+    driver: bridge
+```
+
+
+
 
 
 
