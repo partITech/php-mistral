@@ -6,9 +6,11 @@ ini_set('default_socket_timeout', '-1');
 
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Throwable;
@@ -43,9 +45,11 @@ class MistralClient
     protected string $url;
     private HttpClientInterface $httpClient;
     private string $mode;
+    private null|int|float $timeout = null; // null = default_socket_timeout
 
-    public function __construct(string $apiKey, string $url = self::ENDPOINT)
+    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float $timeout = null)
     {
+        $this->setTimeout($timeout);
         $this->httpClient = new RetryableHttpClient(
             HttpClient::create(),
             new GenericRetryStrategy(self::RETRY_STATUS_CODES, 500, 2)
@@ -83,11 +87,21 @@ class MistralClient
         bool   $stream = false
     ): array|ResponseInterface
     {
+        $params = [
+            'json' => $request,
+            'headers' => ['Authorization' => 'Bearer ' . $this->apiKey,],
+            'buffer' => $stream,
+        ];
+
+        if(!is_null($this->getTimeout())){
+            $params['timeout'] = $this->getTimeout();
+        }
+
         try {
             $response = $this->httpClient->request(
                 $method,
                 $this->url . '/' . $path,
-                ['json' => $request, 'headers' => ['Authorization' => 'Bearer ' . $this->apiKey,], 'buffer' => $stream,]
+                $params
             );
         } catch (Throwable $e) {
             throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
@@ -127,7 +141,7 @@ class MistralClient
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|TransportExceptionInterface
      */
     public function fimStream(string $prompt, ?string $suffix, array $params = []): Generator
     {
@@ -327,6 +341,7 @@ class MistralClient
 
     /**
      * @throws MistralClientException
+     * @throws TransportExceptionInterface
      */
     public function chatStream(Messages $messages, array $params = []): Generator
     {
@@ -346,10 +361,17 @@ class MistralClient
     }
 
 
+    /**
+     * @throws MistralClientException
+     * @throws TransportExceptionInterface
+     */
     public function getStream($stream): Generator
     {
         $response = null;
         foreach ($this->httpClient->stream($stream) as $chunk) {
+            if ($chunk->isTimeout()) {
+                throw new TransportException('Stream is closed');
+            }
             try {
                 $chunk = trim($chunk->getContent());
             } catch (Throwable $e) {
@@ -377,5 +399,17 @@ class MistralClient
                 yield $response;
             }
         }
+    }
+
+    public function setTimeout(null|int|float $timeout): self
+    {
+        $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    public function getTimeout(): null|int|float
+    {
+        return $this->timeout;
     }
 }
