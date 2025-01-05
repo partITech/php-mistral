@@ -3,17 +3,19 @@
 namespace Partitech\PhpMistral;
 
 use ArrayObject;
+use DateMalformedStringException;
+use DateTimeZone;
 
 class Response
 {
-    private string $id;
-    private string $object;
+    private ?string $id=null;
+    private string $object='chat.completion';
     private int $created;
     private string $model;
     private ArrayObject $choices;
 
 
-    private array $usage;
+    private array $usage=[];
 
     public function __construct()
     {
@@ -26,6 +28,20 @@ class Response
         return self::updateFromArray($response, $data);
     }
 
+    public static function createFromJson(string $json, bool $stream = false): ?self
+    {
+        if(json_validate($json)) {
+            $datas = json_decode($json, true);
+            $datas['stream'] = $stream;
+            return self::createFromArray($datas);
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
     public static function updateFromArray(self $response, array $data): self
     {
         if (isset($data['id'])) {
@@ -40,15 +56,35 @@ class Response
             $response->setCreated($data['created']);
         }
 
+        if (isset($data['created_at'])) {
+            if(is_string($data['created_at'])) {
+                $data['created_at'] = self::isoToTimestamp($data['created_at']);
+            }
+            $response->setCreated($data['created_at']);
+        }
+
         if (isset($data['model'])) {
             $response->setModel($data['model']);
         }
 
 
-        $message = $response->getChoices()->count() > 0 ? $response->getChoices()[$response->getChoices()->count(
-        ) - 1] : new Message();
-        // Llama.cpp response
-        if (isset($data['content'])) {
+        $message = $response->getChoices()->count() > 0 ? $response->getChoices()[$response->getChoices()->count() - 1] : new Message();
+
+        // Ollama response
+        if (isset($data['message'])) {
+            $message->setRole('assistant');
+            if (isset($data['stream']) && $data['stream'] === true) {
+                $message->updateContent($data['message']['content']);
+                $message->setChunk($data['message']['content']);
+            } else {
+                $message->setContent($data['message']['content']);
+            }
+            $response->addMessage($message);
+        }
+
+
+        // Llama.cpp responses
+        if (isset($data['content']) ) {
             $message->setRole('assistant');
             if (isset($data['stream']) && $data['stream'] === true) {
                 $message->updateContent($data['content']);
@@ -115,6 +151,9 @@ class Response
 
     public function getId(): string
     {
+        if(is_null($this->id)) {
+            $this->id = uniqid();
+        }
         return $this->id;
     }
 
@@ -195,5 +234,14 @@ class Response
     public function getMessage(): ?string
     {
         return $this->choices->count() === 0 ? null : $this->getLastMessage()->getContent();
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public static function isoToTimestamp($isoDateString) {
+        // ISO 8601
+        $dateTime = new DateTime($isoDateString, new DateTimeZone('UTC'));
+        return $dateTime->getTimestamp();
     }
 }

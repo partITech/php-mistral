@@ -41,10 +41,18 @@ class MistralClient
     protected string $chatCompletionEndpoint = 'v1/chat/completions';
     protected string $fimCompletionEndpoint = 'v1/fim/completions';
     protected string $promptKeyword = 'messages';
+    protected string $guidedJsonKeyword = 'guided_json';
+
+    public const GUIDED_JSON_TYPE_JSON_ENCODE  = 'json_encode';
+    public const GUIDED_JSON_TYPE_ARRAY  = 'array';
+    public const GUIDED_JSON_TYPE_HUGGINGFACE  = 'huggingface';
+    public const GUIDED_JSON_TYPE_MISTRAL  = 'mistral';
+    private bool|string $explicitlyForceJsonFormat=false;
+    protected string $guidedJsonEncodeType = self::GUIDED_JSON_TYPE_MISTRAL;
+    protected ?string $chunkPrefixKey = 'data: ';
     protected string $apiKey;
     protected string $url;
     private HttpClientInterface $httpClient;
-    private string $mode;
     private null|int|float $timeout = null; // null = default_socket_timeout
 
     public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float $timeout = null)
@@ -56,7 +64,6 @@ class MistralClient
         );
         $this->apiKey = $apiKey;
         $this->url = $url;
-        $this->mode = self::CHAT_ML;
     }
 
     /**
@@ -229,11 +236,6 @@ class MistralClient
             $return['model'] = self::DEFAULT_CHAT_MODEL;
         }
 
-        if ($this->mode === self::CHAT_ML) {
-            $return[$this->promptKeyword] = $messages->format(self::CHAT_ML);
-        }
-
-
         if (isset($params['temperature']) && is_float($params['temperature'])) {
             $return['temperature'] = $params['temperature'];
         }
@@ -318,6 +320,12 @@ class MistralClient
             $return['skip_special_tokens'] = $params['skip_special_tokens'];
         }
 
+        if (isset($params['response_format']) && $params['response_format'] === self::RESPONSE_FORMAT_JSON) {
+            $return['response_format'] = [
+                'type' => 'json_object'
+            ];
+        }
+
         if (isset($params['guided_json']) && is_string($params['guided_json'])) {
             $return['guided_json'] = $params['guided_json'];
         }
@@ -326,14 +334,32 @@ class MistralClient
             if ($params['guided_json'] instanceof ObjectSchema) {
                 $params['guided_json'] = $params['guided_json']->jsonSerialize();
             }
-            $return['guided_json'] = json_encode($params['guided_json']);
+            if($this->guidedJsonEncodeType === self::GUIDED_JSON_TYPE_JSON_ENCODE){
+                $return[$this->guidedJsonKeyword] = json_encode($params['guided_json']);
+            }else if($this->guidedJsonEncodeType === self::GUIDED_JSON_TYPE_ARRAY){
+                $return[$this->guidedJsonKeyword] = $params['guided_json'];
+            }else if($this->guidedJsonEncodeType === self::GUIDED_JSON_TYPE_HUGGINGFACE){
+                $return['response_format'] = [
+                    'type' => 'json',
+                    'value'=> $params['guided_json']
+                ];
+            }else if($this->guidedJsonEncodeType === self::GUIDED_JSON_TYPE_MISTRAL){
+                $return['response_format'] = ['type' => 'json_object'];
+                $jsonExample = json_encode($params['guided_json']);
+                $messages->prependLastMessage("
+Return your answer in JSON format. 
+Additionnaly, here is a JSON Schema example to follow:
+<json_schema>
+{$jsonExample}
+</json_schema>
+                ");
+
+            }
+
+            $return['temperature'] = 0;
         }
 
-        if (isset($params['response_format']) && $params['response_format'] === self::RESPONSE_FORMAT_JSON) {
-            $return['response_format'] = [
-                'type' => 'json_object'
-            ];
-        }
+        $return[$this->promptKeyword] = $messages->format();
 
         return $return;
     }
@@ -378,11 +404,26 @@ class MistralClient
                 throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
             }
 
-            if (empty($chunk) || !str_contains($chunk, 'data: ')) {
+            if (empty($chunk)) {
                 continue;
             }
 
-            $datas = explode('data: ', $chunk);
+            if(!is_null($this->chunkPrefixKey)){
+                if(!str_contains($chunk, $this->chunkPrefixKey)){
+                    continue;
+                }
+
+                $datas = explode($this->chunkPrefixKey, $chunk);
+            }else {
+                $datas = $chunk;
+            }
+
+            if(is_string($datas)){
+                if(json_validate($datas)){
+                    yield $response = Response::createFromJson($datas, true);
+                }
+                continue;
+            }
             foreach ($datas as $data) {
                 $data = trim($data);
                 if (empty($data) || $data === self::END_OF_STREAM) {
@@ -411,5 +452,30 @@ class MistralClient
     public function getTimeout(): null|int|float
     {
         return $this->timeout;
+    }
+
+    public function setGuidedJsonKeyword(string $guidedJsonKeyword): self
+    {
+        $this->guidedJsonKeyword = $guidedJsonKeyword;
+
+        return $this;
+    }
+
+    public function setChatCompletionEndPoint(string $chatCompletionEndpoint): self
+    {
+        $this->chatCompletionEndpoint = $chatCompletionEndpoint;
+
+        return $this;
+    }
+
+    public function setGuidedJsonEncodeType(string $type): self
+    {
+        $this->guidedJsonEncodeType = $type;
+        return $this;
+    }
+    public function setChunkPrefixKey(?string $prefix): self
+    {
+        $this->chunkPrefixKey = $prefix;
+        return $this;
     }
 }

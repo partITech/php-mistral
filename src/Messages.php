@@ -23,67 +23,18 @@ class Messages
         return $this->messages;
     }
 
-    public function format(string $format=MistralClient::CHAT_ML): string|array|null
+    public function format(): string|array
     {
-        if(MistralClient::CHAT_ML === $format) {
-            $messages = [];
-            foreach($this->getMessages() as $message) {
-                if(!is_array($message)) {
-                    $messageArray = $message->toArray();
-                }else{
-                    $messageArray = $message;
-                }
-                $messages[] = $messageArray;
+        $messages = [];
+        foreach($this->getMessages() as $message) {
+            if(!is_array($message)) {
+                $messageArray = $message->toArray();
+            }else{
+                $messageArray = $message;
             }
-            return $messages;
+            $messages[] = $messageArray;
         }
-
-        /** @deprecated since v0.0.16. Will be removed in the future version. */
-        if(MistralClient::COMPLETION === $format) {
-            $messages = null;
-
-            $collection = $this->getMessages();
-            $iterator = $collection->getIterator();
-
-            $first = $iterator->current();
-            $iterator->seek($collection->count() - 1);
-            $last = $iterator->current();
-            $between = new ArrayObject();
-
-            if ($collection->count() > 2) {
-                $iterator->rewind();
-                $iterator->next(); // pass the first
-                while ($iterator->valid()) {
-                    // do not get the last
-                    if ($iterator->key() < $collection->count() - 1) {
-                        $between->append($iterator->current());
-                    }
-                    $iterator->next();
-                }
-            }
-
-
-            $messages .= '<s> [INST] ' . $first->getContent() . ' [/INST] </s> ';
-
-            $prevType='system';
-            /** @var Message $message */
-            foreach($between as $message) {
-                if($message->getRole() === 'system' || $message->getRole() === 'user') {
-                    $prevType='system';
-                    $messages .= '<s> [INST] ' . $message->getContent() . '[/INST]';
-                }
-
-                if($message->getRole() === 'assistant' && $prevType === 'system') {
-                    $prevType='assistant';
-                    $messages .= ' ' . $message->getContent() . '</s> ';
-                }
-            }
-
-            $messages .= ' [INST] ' . $last->getContent() . ' [/INST]';
-            return $messages;
-        }
-
-        return null;
+        return $messages;
     }
 
     /**
@@ -154,4 +105,25 @@ class Messages
         $this->addMessage($message);
         return $this;
     }
+
+    public function prependLastMessage(string $msg): self
+    {
+        $messages = $this->getMessages()->getArrayCopy();
+
+        if (!empty($messages)) {
+            $lastIndex = count($messages) - 1;
+
+            /** @var Message $lastMessage */
+            $lastMessage = $messages[$lastIndex];
+
+            if ($lastMessage->getRole() === 'user') {
+                $lastMessage->setContent($lastMessage->getContent() . PHP_EOL . $msg);
+                $messages[$lastIndex] = $lastMessage;
+                $this->setMessages(new ArrayObject($messages));
+            }
+        }
+
+        return $this;
+    }
+
 }
