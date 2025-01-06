@@ -241,7 +241,7 @@ class Response
      */
     public static function isoToTimestamp($isoDateString) {
         // ISO 8601
-        $dateTime = new DateTime($isoDateString, new DateTimeZone('UTC'));
+        $dateTime = new \DateTime($isoDateString, new DateTimeZone('UTC'));
         return $dateTime->getTimestamp();
     }
 }
