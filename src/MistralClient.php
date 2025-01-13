@@ -473,9 +473,15 @@ Additionnaly, here is a JSON Schema example to follow:
         $this->guidedJsonEncodeType = $type;
         return $this;
     }
+
     public function setChunkPrefixKey(?string $prefix): self
     {
         $this->chunkPrefixKey = $prefix;
         return $this;
+    }
+
+    public function getUrl(): string
+    {
+        return $this->url;
     }
 }
