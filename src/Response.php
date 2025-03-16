@@ -13,6 +13,7 @@ class Response
     private int $created;
     private string $model;
     private ArrayObject $choices;
+    private ?array $pages;
 
 
     private array $usage=[];
@@ -124,8 +125,18 @@ class Response
                 }
             }
         }
+
+        // chat response
         if (isset($data['usage'])) {
             $response->setUsage($data['usage']);
+        }
+
+        // ocr response
+        if (isset($data['usage_info'])) {
+            $response->setUsage($data['usage_info']);
+        }
+        if (isset($data['pages'])) {
+            $response->setPages($data['pages']);
         }
 
         return $response;
@@ -244,4 +255,16 @@ class Response
         $dateTime = new \DateTime($isoDateString, new DateTimeZone('UTC'));
         return $dateTime->getTimestamp();
     }
+
+    public function setPages(array $pages): self
+    {
+        $this->pages = $pages;
+        return $this;
+    }
+
+    public function getPages(): ?array
+    {
+        return $this->pages;
+    }
+
 }

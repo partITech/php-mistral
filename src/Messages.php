@@ -6,8 +6,13 @@ use ArrayObject;
 
 class Messages
 {
+    public const string ROLE_USER='user';
+    public const string ROLE_ASSISTANT='assistant';
+    public const string ROLE_TOOL='tool';
+    public const string ROLE_SYSTEM='system';
 
     private ArrayObject $messages;
+    private ?array $document=null;
 
     public function __construct()
     {
@@ -54,7 +59,7 @@ class Messages
     public function addSystemMessage(string $content): self
     {
         $message = new Message();
-        $message->setRole('system');
+        $message->setRole(self::ROLE_SYSTEM);
         $message->setContent($content);
         $this->addMessage($message);
         return $this;
@@ -63,7 +68,7 @@ class Messages
     public function addUserMessage(string $content): self
     {
         $message = new Message();
-        $message->setRole('user');
+        $message->setRole(self::ROLE_USER);
         $message->setContent($content);
         $this->addMessage($message);
         return $this;
@@ -71,6 +76,10 @@ class Messages
 
     public function addMixedContentUserMessage(array $contents): void
     {
+//        $message = new Message();
+//        $message->addContent(type: Message::MESSAGE_TYPE_TEXT, content: "")
+
+
         $messageContent = [];
         foreach ($contents as $content) {
             if (isset($content['type']) && $content['type'] === 'text') {
@@ -80,7 +89,7 @@ class Messages
             }
         }
         $this->messages[] = [
-            'role' => 'user',
+            'role' => self::ROLE_USER,
             'content' => $messageContent
         ];
     }
@@ -88,7 +97,7 @@ class Messages
     public function addToolMessage(string $name, array $content, string $toolCallId): self
     {
         $message = new Message();
-        $message->setRole('tool');
+        $message->setRole(self::ROLE_TOOL);
         $message->setContent($content);
         $message->setName($name);
         $message->setToolCallId($toolCallId);
@@ -99,7 +108,7 @@ class Messages
     public function addAssistantMessage(null|string $content, null|array $toolCalls = null): self
     {
         $message = new Message();
-        $message->setRole('assistant');
+        $message->setRole(self::ROLE_ASSISTANT);
         $message->setContent($content);
         $message->setToolCalls($toolCalls);
         $this->addMessage($message);
@@ -116,7 +125,7 @@ class Messages
             /** @var Message $lastMessage */
             $lastMessage = $messages[$lastIndex];
 
-            if ($lastMessage->getRole() === 'user') {
+            if ($lastMessage->getRole() === self::ROLE_USER) {
                 $lastMessage->setContent($lastMessage->getContent() . PHP_EOL . $msg);
                 $messages[$lastIndex] = $lastMessage;
                 $this->setMessages(new ArrayObject($messages));
@@ -124,6 +133,21 @@ class Messages
         }
 
         return $this;
+    }
+
+    public function addDocumentMessage(string $type, string $content): self
+    {
+        $this->document = [
+            'type' => $type,
+            $type => $content
+        ];
+
+        return $this;
+    }
+
+    public function getDocumentMessage(): ?array
+    {
+        return $this->document;
     }
 
 }

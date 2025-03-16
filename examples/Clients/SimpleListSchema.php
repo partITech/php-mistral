@@ -1,6 +1,6 @@
 <?php
 
-use KnpLabs\JsonSchema\JsonSchema;
+use Partitech\PhpMistral\JsonSchema\JsonSchema;
 use KnpLabs\JsonSchema\ObjectSchema;
 
 class SimpleListSchema extends ObjectSchema

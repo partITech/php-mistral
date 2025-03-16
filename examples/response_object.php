@@ -32,7 +32,7 @@ try {
 
     echo PHP_EOL.'##################### $result->getChunk()";'.PHP_EOL;
     /*
-     * When using streamed response, it get the las chunk of the message yelded by the server.
+     * When using streamed response, it get the last chunk of the message yelded by the server.
      */
     print_r($result->getChunk());
     echo PHP_EOL.'##################### $result->getId()";'.PHP_EOL;

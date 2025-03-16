@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Partitech\PhpMistral\Client;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\MistralClientException;
@@ -8,7 +9,7 @@ use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
 
-$model = 'open-mistral-nemo';
+$model = 'ministral-8b-latest';
 $temperature = 0.3;
 
 // export MISTRAL_API_KEY=
@@ -171,7 +172,7 @@ try {
             'temperature' => $temperature,
             'model' => $model,
             'tools' => $tools,
-            'tool_choice' => MistralClient::TOOL_CHOICE_AUTO
+            'tool_choice' => Client::TOOL_CHOICE_AUTO
         ]
     );
 } catch (MistralClientException $e) {
@@ -265,7 +266,7 @@ try {
         params: [
             'model' => $model,
             'tools' => $tools,
-            'tool_choice' => MistralClient::TOOL_CHOICE_AUTO
+            'tool_choice' => Client::TOOL_CHOICE_AUTO
         ]
     );
 } catch (MistralClientException $e) {

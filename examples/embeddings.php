@@ -21,4 +21,6 @@ try {
     exit(1);
 }
 
-echo  'Embeddings Batch: ' . PHP_EOL . print_r($embeddingsBatchResponse['data'], true);
+//echo  'Embeddings Batch: ' . PHP_EOL . print_r($embeddingsBatchResponse['data'], true);
+print_r($embeddingsBatchResponse);
+

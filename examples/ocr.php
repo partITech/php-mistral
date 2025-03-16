@@ -4,23 +4,21 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Message;
 
 // export MISTRAL_API_KEY=your_api_key
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
 
 $messages = new Messages();
-$messages->addUserMessage('What is the best French cheese?');
+$messages->addDocumentMessage(type: Message::MESSAGE_TYPE_DOCUMENT_URL,    content: 'https://arxiv.org/pdf/1805.04770');
+
 try {
-    $result = $client->chat(
+    $result = $client->ocr(
         $messages,
         [
-            'model' => 'ministral-3b-latest',
-            'temperature' => 0.7,
-            'top_p' => 1,
-            'max_tokens' => 250,
-            'safe_prompt' => false,
-            'random_seed' => null
+            'model' => 'mistral-ocr-latest',
+            'include_image_base64' => true
         ]
     );
 } catch (MistralClientException $e) {
@@ -28,5 +26,7 @@ try {
     exit(1);
 }
 
+print_r($result->getPages());
+/*
 
-print_r($result->getMessage());
+*/
