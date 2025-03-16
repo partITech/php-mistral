@@ -10,22 +10,9 @@ $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
 
 $messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? Answer in JSON.');
+$messages->addUserMessage('What are the ingredients that make up roast beef');
 
-/**
- * /!\ guided_json do not exist with La plateforme.
- * MistralClient will convert it with a
- * $params['response_format'] = ['type' => 'json_object'];
- * And add
- * ******
- * Return your answer in JSON format.
- * Additionnaly, here is a JSON Schema example to follow:
- * <json_schema>
- * {$jsonExample}
- * </json_schema>
- * ******
- * to your last user message.
- */
+
 $params = [
     'model' => 'ministral-3b-latest',
     'temperature' => 0.7,
@@ -33,6 +20,7 @@ $params = [
     'max_tokens' => null,
     'safe_prompt' => false,
     'random_seed' => null,
+    'presence_penalty' => 1,
     'guided_json' => new SimpleListSchema()
 ];
 
