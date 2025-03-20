@@ -1,10 +1,5 @@
 ### OCR
 
-### Upload file
-
-Upload a file that can be used across various endpoints.
-The size of individual files can be a maximum of 512 MB. The Fine-tuning API only supports .jsonl files.
-
 #### Parameters
 `\Partitech\PhpMistral\Messages ` object with a Document Message. 
 ```php
