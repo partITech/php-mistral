@@ -195,21 +195,108 @@ class Message
                 throw new InvalidArgumentException("Le fichier spécifié est introuvable ou illisible : {$content}");
             }
 
-            // Obtenir le type MIME du fichier
-            $mimeType = mime_content_type($content);
-            if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif'])) {
-                throw new InvalidArgumentException("Type d'image non supporté : {$mimeType}");
+            $fileType = $this->getFileTypeInfo($content);
+
+            if (isset($fileType['error'])) {
+                throw new InvalidArgumentException($fileType['error']);
             }
 
-            // Lire et encoder l'image en base64
             $base64Data = base64_encode(file_get_contents($content));
-
             $this->content[] = [
-                'type' => 'image_url',
-                'image_url' => "data:{$mimeType};base64,{$base64Data}"
+                'type' => $fileType['api_key'],
+                $fileType['api_key'] => ['url' => "data:{$fileType['mime']};base64,{$base64Data}"]
             ];
         }
 
         return $this;
     }
+
+
+    function getFileTypeInfo($filePath): array
+    {
+        if (!file_exists($filePath)) {
+            return ["error" => "The file does not exist."];
+        }
+
+        $mimeType = mime_content_type($filePath);
+
+        if (!$mimeType) {
+            return ["error" => "Unable to determine the MIME type."];
+        }
+
+        // Split the MIME type into main type and subtype
+        [$type, $subtype] = explode('/', $mimeType) + [null, null];
+
+        $api_key = null;
+        if($type === 'image'){
+            $api_key = 'image_url';
+        }else if($type === 'audio'){
+            $api_key = 'audio_url';
+        }elseif($type === 'video'){
+            $api_key = 'video_url';
+        }
+
+        return [
+            'api_key' => $api_key,
+            'type' => $type, // e.g., image, audio, video
+            'subtype' => $subtype, // e.g., jpeg, mp4, wav
+            'mime' => $mimeType,
+            'extension' => $this->getExtensionFromMime($mimeType),
+        ];
+    }
+
+    function getExtensionFromMime($mimeType): string
+    {
+        $mimeMap = [
+            // Image formats
+            "image/jpeg" => "jpg",
+            "image/pjpeg" => "jpg",
+            "image/png" => "png",
+            "image/gif" => "gif",
+            "image/bmp" => "bmp",
+            "image/x-ms-bmp" => "bmp",
+            "image/webp" => "webp",
+            "image/svg+xml" => "svg",
+            "image/tiff" => "tiff",
+            "image/x-icon" => "ico",
+            "image/heif" => "heif",
+            "image/heif-sequence" => "heifs",
+            "image/heic" => "heic",
+            "image/heic-sequence" => "heics",
+
+            // Audio formats
+            "audio/mpeg" => "mp3",
+            "audio/x-mpeg" => "mp3",
+            "audio/mp4" => "m4a",
+            "audio/x-wav" => "wav",
+            "audio/wav" => "wav",
+            "audio/x-aac" => "aac",
+            "audio/aac" => "aac",
+            "audio/ogg" => "ogg",
+            "audio/x-flac" => "flac",
+            "audio/flac" => "flac",
+            "audio/x-ms-wma" => "wma",
+            "audio/webm" => "weba",
+            "audio/amr" => "amr",
+            "audio/midi" => "midi",
+            "audio/x-midi" => "midi",
+
+            // Video formats
+            "video/mp4" => "mp4",
+            "video/x-m4v" => "m4v",
+            "video/mpeg" => "mpeg",
+            "video/ogg" => "ogv",
+            "video/webm" => "webm",
+            "video/x-msvideo" => "avi",
+            "video/quicktime" => "mov",
+            "video/x-ms-wmv" => "wmv",
+            "video/x-flv" => "flv",
+            "video/3gpp" => "3gp",
+            "video/3gpp2" => "3g2",
+            "video/x-matroska" => "mkv",
+        ];
+
+        return $mimeMap[$mimeType] ?? "unknown";
+    }
+
 }

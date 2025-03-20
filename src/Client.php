@@ -377,4 +377,47 @@ class Client extends Psr17Factory implements ClientInterface
 
         return $this;
     }
+
+    public function downloadToTmp(string $url): string|false
+    {
+        $tmpDir = sys_get_temp_dir();
+
+        // Extract the file extension from the original URL
+        $pathInfo = pathinfo(parse_url($url, PHP_URL_PATH));
+        $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
+
+        // Generate a random filename
+        $fileName = bin2hex(random_bytes(16)) . $extension;
+        $filePath = $tmpDir . DIRECTORY_SEPARATOR . $fileName;
+
+        try {
+            // Create and send the request
+            $request = $this->request->createRequest('GET', $url);
+            $response = $this->client->sendRequest($request);
+
+            // Check if the response is valid
+            if (!$response instanceof ResponseInterface || $response->getStatusCode() !== 200) {
+                return false;
+            }
+
+            // Write the response body to the file
+            $stream = $response->getBody();
+            $fileHandle = fopen($filePath, 'w');
+
+            if (!$fileHandle) {
+                return false;
+            }
+
+            while (!$stream->eof()) {
+                fwrite($fileHandle, $stream->read(8192));
+            }
+
+            fclose($fileHandle);
+
+            return file_exists($filePath) ? $filePath : false;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
 }

@@ -5,8 +5,7 @@ You will need to specify an image model like `pixtral-12b-2409` and construct a 
 
 This Message object can have `text`, `url` and `base64`.
 
-here is a concrete example: 
-
+here is a concrete example:
 
 ```php
 use Partitech\PhpMistral\Messages;
