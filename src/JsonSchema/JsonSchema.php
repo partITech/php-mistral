@@ -8,7 +8,7 @@ class JsonSchema extends \KnpLabs\JsonSchema\JsonSchema
     {
         return [
             'type' => 'string',
-            // minLength is unsuported on Mistral "La plateforme".
+            // minLength is unsupported on Mistral "La plateforme".
             // 'minLength' => 1,
         ];
     }
