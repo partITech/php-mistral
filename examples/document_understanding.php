@@ -28,12 +28,12 @@ try {
             'document_page_limit'   => 64
         ]
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print($result->getPages());
+print($result->getMessage());
 /*
 ### Resume of the Document
 

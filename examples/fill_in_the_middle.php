@@ -2,9 +2,8 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
 
 // export MISTRAL_API_KEY=your_api_key
 $apiKey = getenv('MISTRAL_API_KEY');
@@ -18,10 +17,10 @@ $suffix  = 'return $datePlusNdays;\n}';
 
 try {
     $result = $client->fim(
-        prompt: $prompt,
-        suffix: $suffix,
         params:[
+            'prompt' =>$prompt,
             'model' => $model_name,
+            'suffix' => $suffix,
             'temperature' => 0.7,
             'top_p' => 1,
             'max_tokens' => 200,
@@ -30,7 +29,7 @@ try {
             'random_seed' => 0
         ]
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
@@ -46,25 +45,26 @@ print_r($result->getMessage());
 ###############################################
 ##### Fill in the meddle with streaming  ######
 ###############################################
-
 try {
-    $result = $client->fimStream(
-        prompt: $prompt,
-        suffix: $suffix,
+    $result = $client->fim(
         params:[
+            'prompt' =>$prompt,
             'model' => $model_name,
+            'suffix' => $suffix,
             'temperature' => 0.7,
             'top_p' => 1,
             'max_tokens' => 200,
             'min_tokens' => 0,
             'stop' => 'string',
             'random_seed' => 0
-        ]
+        ],
+        stream: true
     );
+    /** @var Message $chunk */
     foreach ($result as $chunk) {
         echo $chunk->getChunk();
     }
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

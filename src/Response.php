@@ -4,7 +4,9 @@ namespace Partitech\PhpMistral;
 
 use ArrayObject;
 use DateMalformedStringException;
+use DateTime;
 use DateTimeZone;
+use Throwable;
 
 class Response
 {
@@ -23,10 +25,19 @@ class Response
         $this->choices = new ArrayObject();
     }
 
+    /**
+     * @throws MistralClientException
+     */
     public static function createFromArray(array $data): self
     {
         $response = new self();
-        return self::updateFromArray($response, $data);
+        try{
+            $self = self::updateFromArray($response, $data);
+        }catch(Throwable $e){
+            throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $self;
     }
 
     public static function createFromJson(string $json, bool $stream = false): ?self
@@ -34,7 +45,11 @@ class Response
         if(json_validate($json)) {
             $datas = json_decode($json, true);
             $datas['stream'] = $stream;
-            return self::createFromArray($datas);
+            try{
+                return self::createFromArray($datas);
+            }catch(Throwable $e){
+                new MistralClientException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         return null;
@@ -118,6 +133,11 @@ class Response
 
                 if (isset($choice['message']['tool_calls'])) {
                     $message->setToolCalls($choice['message']['tool_calls']);
+                }
+
+                if (isset($choice['text'])) {
+                    $message->setContent($choice['text']);
+                    $message->setChunk($choice['text']);
                 }
 
                 if ($response->getChoices()->count() === 0) {
@@ -236,7 +256,7 @@ class Response
     public function getGuidedMessage(?bool $associative = null): null|object|array
     {
         if (is_string($this->getMessage()) && json_validate($this->getMessage())) {
-            return json_decode($this->getMessage($associative));
+            return json_decode($this->getMessage(), $associative);
         }
 
         return null;
@@ -250,9 +270,10 @@ class Response
     /**
      * @throws DateMalformedStringException
      */
-    public static function isoToTimestamp($isoDateString) {
+    public static function isoToTimestamp($isoDateString): int
+    {
         // ISO 8601
-        $dateTime = new \DateTime($isoDateString, new DateTimeZone('UTC'));
+        $dateTime = new DateTime($isoDateString, new DateTimeZone('UTC'));
         return $dateTime->getTimestamp();
     }
 

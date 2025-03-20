@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Messages;
@@ -18,14 +19,15 @@ $params = [
         'top_p' => 1,
         'max_tokens' => null,
         'safe_prompt' => false,
-        'random_seed' => null
+        'random_seed' => 0
 ];
 
 try {
-    foreach ($client->chatStream($messages, $params) as $chunk) {
+    /** @var Message $chunk */
+    foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
         echo $chunk->getChunk();
     }
-} catch (MistralClientException $e) {
+} catch (MistralClientException|DateMalformedStringException $e) {
     echo $e->getMessage();
     exit(1);
 }

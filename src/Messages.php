@@ -74,12 +74,9 @@ class Messages
         return $this;
     }
 
+    // deprecated
     public function addMixedContentUserMessage(array $contents): void
     {
-//        $message = new Message();
-//        $message->addContent(type: Message::MESSAGE_TYPE_TEXT, content: "")
-
-
         $messageContent = [];
         foreach ($contents as $content) {
             if (isset($content['type']) && $content['type'] === 'text') {

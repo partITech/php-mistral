@@ -13,9 +13,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use Ramsey\Uuid\UuidInterface;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpClient\Exception\TransportException;
 use Throwable;
 
 class Client extends Psr17Factory implements ClientInterface
@@ -33,11 +31,9 @@ class Client extends Psr17Factory implements ClientInterface
 
     protected const string END_OF_STREAM = "[DONE]";
     const string ENDPOINT = 'https://api.mistral.ai';
-    /** @deprecated since v0.0.16. Will be removed in the future version. */
-    public const string CHAT_ML = 'mistral';
-    /** @deprecated since v0.0.16. Will be removed in the future version. */
-    public const string COMPLETION = 'completion';
+
     protected string $chatCompletionEndpoint = 'v1/chat/completions';
+    protected string $completionEndpoint = 'v1/completions';
     protected string $ocrCompletionEndpoint = 'v1/ocr';
     protected string $fimCompletionEndpoint = 'v1/fim/completions';
     protected string $promptKeyword = 'messages';
@@ -57,7 +53,9 @@ class Client extends Psr17Factory implements ClientInterface
     protected ?string $chunkPrefixKey = 'data: ';
     protected string $apiKey;
     protected string $url;
-    private null|int|float $timeout = null; // null = default_socket_timeout
+    public const string ENCODING_FORMAT_FLOAT='float';
+    public const string ENCODING_FORMAT_BASE64='base64';
+    protected bool $messageMultiModalUrlTypeArray=false;
 
     public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float $timeout = null)
     {
@@ -65,8 +63,6 @@ class Client extends Psr17Factory implements ClientInterface
         $this->client = Psr18ClientDiscovery::find();
         $this->request = Psr17FactoryDiscovery::findRequestFactory();
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
-        $this->setTimeout($timeout);
-
         $this->apiKey = $apiKey;
         $this->url = $url;
     }
@@ -81,7 +77,7 @@ class Client extends Psr17Factory implements ClientInterface
      */
     public function listModels(): array
     {
-        return $this->request('GET', 'v1/models');
+        throw new MistralClientException('Not implemented', 500);
     }
 
     public function isMultipart(array $parameters): bool
@@ -110,12 +106,11 @@ class Client extends Psr17Factory implements ClientInterface
 
         $request = $this->request->createRequest($method, $uri)->withHeader('Authorization', 'Bearer ' . $this->apiKey);
 
-        if (isset($parameters['query'])) {
+        if (isset($parameters['query']) && $method=='GET') {
             $uri = $request->getUri()->withQuery(http_build_query($parameters['query']));
             $request = $request->withUri($uri);
             unset($parameters['query']);
         }
-
 
         // File multipart building if ressource is in the parameter's list.
         if(is_array($parameters) && $this->isMultipart($parameters)){
@@ -123,6 +118,9 @@ class Client extends Psr17Factory implements ClientInterface
             $request = $request->withBody($this->streamFactory->createStream($multipartStream->build()));
             $request = $request->withHeader('Content-Type', 'multipart/form-data; boundary=' . $multipartStream->getBoundary());
         }else if(count($parameters)>1){
+            if($stream){
+                $parameters['stream'] = true;
+            }
             $request = $request->withBody($this->streamFactory->createStream(json_encode($parameters)));
             $request = $request->withHeader('Content-Type', 'application/json');
         }
@@ -157,129 +155,20 @@ class Client extends Psr17Factory implements ClientInterface
             }else{
                 $multipartStream = $multipartStream->addResource($name, $parameter);
             }
-
         }
 
         return $multipartStream;
     }
 
-    /**
-     * @throws MistralClientException
-     */
-    public function chat(Messages $messages, array $params = []): Response
-    {
-        $params = $this->makeChatCompletionRequest($messages, $params, false);
-        $result = $this->request('POST', $this->chatCompletionEndpoint, $params);
-        return Response::createFromArray($result);
-    }
-
-    /**
-     * @throws MistralClientException
-     */
-    public function ocr(Messages $messages, array $params = []): Response
-    {
-        $params = $this->makeChatCompletionRequest(messages: $messages, params: $params, stream: false);
-        $result = $this->request('POST', $this->ocrCompletionEndpoint, $params);
-        return Response::createFromArray($result);
-    }
-
-
-    /**
-     * @throws MistralClientException
-     */
-    public function fim(string $prompt, ?string $suffix, array $params = []): Response
-    {
-        $request = $this->makeFimCompletionRequest(
-            prompt: $prompt,
-            suffix: $suffix,
-            params: $params,
-            stream: false
-        );
-
-        $result = $this->request('POST', $this->fimCompletionEndpoint, $request);
-        return Response::createFromArray($result);
-    }
-
-    /**
-     * @throws MistralClientException|DateMalformedStringException
-     */
-    public function fimStream(string $prompt, ?string $suffix, array $params = []): Generator
-    {
-        $request = $this->makeFimCompletionRequest(
-            prompt: $prompt,
-            suffix: $suffix,
-            params: $params,
-            stream: true
-        );
-
-        $stream = $this->request('POST', $this->fimCompletionEndpoint, $request, true);
-        return $this->getStream($stream);
-    }
-
-    protected function makeFimCompletionRequest(string $prompt, ?string $suffix = null, array $params = [], bool $stream = false): array
-    {
-        $return = [];
-
-        $return['stream'] = $stream;
-        $return['prompt'] = $prompt;
-
-        if (!is_null($suffix)) {
-            $return['suffix'] = $suffix;
-        } else {
-            $return['suffix'] = '';
-        }
-
-
-        if (isset($params['model']) && is_string($params['model'])) {
-            $return['model'] = $params['model'];
-        } else {
-            $return['model'] = self::DEFAULT_FIM_MODEL;
-        }
-
-        if (isset($params['temperature']) && is_float($params['temperature'])) {
-            $return['temperature'] = $params['temperature'];
-        }
-
-        if (isset($params['top_p']) && is_float($params['top_p'])) {
-            $return['top_p'] = $params['top_p'];
-        }
-
-        if (isset($params['max_tokens']) && is_int($params['max_tokens'])) {
-            $return['max_tokens'] = $params['max_tokens'];
-        } else {
-            $return['max_tokens'] = null;
-        }
-
-        if (isset($params['min_tokens']) && is_numeric($params['min_tokens'])) {
-            $return['min_tokens'] = (int)$params['min_tokens'];
-        } else {
-            $return['min_tokens'] = null;
-        }
-
-        if (isset($params['stop']) && is_string($params['stop'])) {
-            $return['stop'] = (string)$params['stop'];
-        }
-
-        if (isset($params['min_tokens']) && is_numeric($params['min_tokens'])) {
-            $return['min_tokens'] = (int)$params['min_tokens'];
-        }
-
-        if (isset($params['random_seed']) && is_int($params['random_seed'])) {
-            $return['random_seed'] = $params['random_seed'];
-        }
-
-        return $return;
-    }
-
-    protected function makeChatCompletionRequest(Messages $messages, array $params, bool $stream = false): array
+    protected function makeChatCompletionRequest(array $definition, ?Messages $messages=null, array $params=[], bool $stream = false): array
     {
         $return = [
             'stream' => $stream,
-            'model' => $params['model'] ?? self::DEFAULT_CHAT_MODEL,
+            'model' => $params['model']
         ];
 
         foreach($params as $key => $val){
-            if(($verifiedParam = $this->checkType($key, $val)) !== false){
+            if(($verifiedParam = $this->checkType($definition, $key, $val)) !== false){
                 $return[$key] = $verifiedParam;
             }
         }
@@ -289,10 +178,11 @@ class Client extends Psr17Factory implements ClientInterface
             $this->handleTools($return, $params);
             $this->handleResponseFormat($return, $params);
         }
-//
-//        if (isset($params['guided_json']) && ($params['guided_json'] instanceof ObjectSchema || is_string($params['guided_json']))) {
-//            $this->handleGuidedJson($return, $params, $messages);
-//        }
+
+        if(is_null($messages)){
+            return $return;
+        }
+
         if (!$stream) {
             if (isset($params['guided_json']) && ($params['guided_json'] instanceof ObjectSchema || is_string($params['guided_json']))) {
                 $this->handleGuidedJson($return, $params['guided_json'], $messages);
@@ -335,38 +225,14 @@ class Client extends Psr17Factory implements ClientInterface
         }
     }
 
-    protected function handleGuidedJson(array &$return, Wrapper|string $json, Messages $messages): void
+    protected function handleGuidedJson(array &$return,string $json, Messages $messages): void
     {
         return;
     }
 
 
-
-    /**
-     * @throws MistralClientException
-     * @throws TransportExceptionInterface
-     */
-    public function chatStream(Messages $messages, array $params = []): Generator
-    {
-        $request = $this->makeChatCompletionRequest($messages, $params, true);
-        $stream = $this->request('POST', $this->chatCompletionEndpoint, $request, true);
-        return $this->getStream($stream);
-    }
-
-
-    /**
-     * @throws MistralClientException
-     */
-    public function embeddings(array $datas, string $model = 'mistral-embed'): array
-    {
-        $request = ['model' => $model, 'input' => $datas,];
-        return $this->request('POST', 'v1/embeddings', $request);
-    }
-
-
     /**
      * @throws DateMalformedStringException
-     * @throws TransportExceptionInterface
      * @throws MistralClientException
      */
     public function getStream(ResponseInterface $stream): Generator
@@ -376,9 +242,7 @@ class Client extends Psr17Factory implements ClientInterface
 
         while(!$body->eof()){
             $chunk = $body->read(8192);
-//            if ($response->) {
-//                throw new TransportException('Stream is closed');
-//            }
+
             try {
                 $chunk = trim($chunk);
             } catch (Throwable $e) {
@@ -423,18 +287,6 @@ class Client extends Psr17Factory implements ClientInterface
         }
     }
 
-    public function setTimeout(null|int|float $timeout): self
-    {
-        $this->timeout = $timeout;
-
-        return $this;
-    }
-
-    public function getTimeout(): null|int|float
-    {
-        return $this->timeout;
-    }
-
     public function setGuidedJsonKeyword(string $guidedJsonKeyword): self
     {
         $this->guidedJsonKeyword = $guidedJsonKeyword;
@@ -466,28 +318,35 @@ class Client extends Psr17Factory implements ClientInterface
         return $this->url;
     }
 
-    private function checkType(string $param, $val ): mixed
+    protected array $params = [];
+
+    private function checkType(array $definition, string $param, $val ): int|bool|float|string|array
     {
         if(in_array($param , [
-            'guided_json',
-            'model',
-            'tools',
-            'tool_choice',
-            'stream',
-            'messages',
-            'response_format',
-            'prediction']
+                'guided_json',
+                'model',
+                'tools',
+                'tool_choice',
+                'stream',
+                'messages',
+                'response_format',
+                'prediction']
         ) ){
             return false;
         }
 
-        if(!isset($this->params[$param])){
-            return false;
-        }
-        $type = $this->params[$param];
+        $type = $definition[$param];
 
-        if(is_string($val) && gettype($val) == 'double' && is_numeric($val) ){
+        if(is_string($type) && gettype($val) == 'array' && is_array($val) ){
+            return $val;
+        }
+
+        if(is_string($type) && gettype($val) == 'double' && is_numeric($val) ){
             return (float) $val;
+        }
+
+        if(is_string($type) && gettype($val) == 'string' && is_string($val) ){
+            return (string) $val;
         }
 
         if($type === 'boolean' && gettype($val) == 'boolean' ){
@@ -509,211 +368,13 @@ class Client extends Psr17Factory implements ClientInterface
             return (float) $val;
         }
 
-
-
         return false;
     }
 
-    protected array $params = [
-        'temperature'        => ['numeric', [0, 0.7]],
-        'max_tokens'         => 'integer',
-        'top_p'              => 'double',
-        'top_k'              => 'integer',
-        'random_seed'        => 'integer',
-        'safe_prompt'        => 'boolean',
-        'safe_mode'          => 'boolean',
-        'tool_choice'        => 'array',
-        'n'                  => 'integer',
-        'min_tokens'         => 'integer',
-        'best_of'            => 'integer',
-        'ignore_eos'         => 'boolean',
-        'use_beam_search'    => 'boolean',
-        'skip_special_tokens'=> 'boolean',
-        'guided_json'        => ['string', ObjectSchema::class],
-        'presence_penalty'   => ['numeric', [-2, 2]],
-        'frequency_penalty'  => 'numeric',
-        'id'                 => 'string',
-        'document'           => 'array',
-        'pages'              => 'integer',
-        'include_image_base64' => 'boolean',
-        'image_limit'        => 'integer',
-        'image_min_size'     => 'integer',
-    ];
-
-
-    /**
-     * Send a DELETE request to the Mistral API.
-     *
-     * @throws MistralClientException
-     */
-    public function delete(string $path): array|ResponseInterface
+    public function setClient(ClientInterface $client): self
     {
-        return $this->request('DELETE', $path);
-    }
+        $this->client = $client;
 
-    /**
-     * Upload a file to Mistral.
-     *
-     * @throws MistralClientException
-     */
-    public function uploadFile(string $path, string $purpose = self::FILE_PURPOSE_BATCH): File|false
-    {
-        if (!file_exists($path)) {
-            throw new MistralClientException(message: "File not found: " . $path, code:404);
-        }
-
-        try{
-            $response = $this->request('POST', 'v1/files', [
-                    'purpose' => $purpose,
-                    'file' => fopen($path, 'r'),
-                ]
-            );
-
-
-//            $response = $this->request('POST', 'v1/files', [
-//                'body'  => [
-//                    'purpose' => $purpose,
-//                    'file' => fopen($path, 'r'),
-//                ]
-//            ]);
-            return (new File())->fromResponse($response);
-        }catch (\Throwable $e){
-            new MistralClientException(message: $e->getMessage(), code: 500);
-        }
-
-        return false;
-    }
-
-    /**
-     * List all files.
-     *
-     * @throws MistralClientException
-     */
-    public function listFiles(array $query=[]): Files
-    {
-        $parameters = [];
-        if(isset($query['page']) && is_int($query['page'])){
-            $parameters['page'] = $query['page'];
-        }
-
-        if(isset($query['page_size']) && is_int($query['page_size'])){
-            $parameters['page_size'] = $query['page_size'];
-        }
-
-        if(isset($query['sample_type']) && is_array($query['sample_type']) &&  count($query['sample_type']) > 0){
-            $parameters['sample_type'] = $query['sample_type'];
-        }
-
-        if(isset($query['source']) && is_array($query['source']) &&  count($query['source']) > 0){
-            $parameters['source'] = $query['source'];
-        }
-
-        if(!empty($query['search']) && is_string($query['search']) ){
-            $parameters['search'] = $query['search'];
-        }
-
-        if(!empty($query['purpose']) && is_string($query['purpose'])){
-            $parameters['purpose'] = $query['purpose'];
-        }
-
-        $list = $this->request(method: 'GET', path: 'v1/files', parameters: ['query' => $parameters]);
-        $files = new Files();
-
-        if(!isset($list['data']) ||  !is_array($list['data'])){
-            return $files;
-        }
-
-        foreach($list['data'] as $file){
-            try{
-                $files->addFile((new File())->fromResponse($file));
-            } catch (\Throwable $e){
-                // avoid error ?
-            }
-        }
-
-        return $files;
-    }
-
-    /**
-     * Get details of a specific file.
-     *
-     * @throws MistralClientException|DateMalformedStringException
-     */
-    public function retrieveFile(string|UuidInterface $uuid): File
-    {
-        if($uuid instanceof UuidInterface){
-            $uuid = $uuid->toString();
-        }
-
-        try{
-            $infos = $this->request(method: 'GET', path: 'v1/files/'. $uuid);
-        }catch (Throwable $e){
-            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
-        }
-
-        return (new File())->fromResponse($infos);
-    }
-
-    /**
-     * Delete a file.
-     *
-     * @throws MistralClientException
-     */
-    public function deleteFile(string|UuidInterface $uuid): bool
-    {
-        if($uuid instanceof UuidInterface){
-            $uuid = $uuid->toString();
-        }
-
-        try{
-            $infos = $this->request(method: 'DELETE', path: 'v1/files/'. $uuid);
-        }catch (Throwable $e){
-            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
-        }
-
-        return $infos['deleted']??false;
-    }
-
-    /**
-     * Download a file.
-     *
-     * @throws MistralClientException
-     */
-    public function downloadFile(string|UuidInterface $uuid, ?string $destination = null): string
-    {
-        if($uuid instanceof UuidInterface){
-            $uuid = $uuid->toString();
-        }
-
-        try{
-            $request = $this->request(method: 'GET', path: 'v1/files/'. $uuid . '/content', stream: true);
-            $content = $request->getContent();
-        }catch (Throwable $e){
-            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
-        }
-
-        if(!is_null($destination)){
-            file_put_contents($destination, $content);
-        }
-        return $content;
-    }
-
-    /**
-     * @throws MistralClientException
-     */
-    public function getSignedUrl(string|UuidInterface $uuid, int $expiry = 24): string
-    {
-        if($uuid instanceof UuidInterface){
-            $uuid = $uuid->toString();
-        }
-
-        try{
-            $request = $this->request(method: 'GET', path: 'v1/files/'. $uuid . '/url', parameters: [ 'query' => ['expiry' => $expiry] ]);
-            $url = $request['url'];
-        }catch (Throwable $e){
-            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
-        }
-
-        return $url;
+        return $this;
     }
 }

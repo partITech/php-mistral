@@ -16,7 +16,7 @@ $message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'Describe this
 $message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://s3.amazonaws.com/cms.ipressroom.com/338/files/201808/5b894ee1a138352221103195_A680%7Ejogging-edit/A680%7Ejogging-edit_hero.jpg');
 $message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'and theses two images as well. Answer in French.');
 $message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://www.wolframcloud.com/obj/resourcesystem/images/a0e/a0ee3983-46c6-4c92-b85d-059044639928/6af8cfb971db031b.png');
-$message->addContent(type: Message::MESSAGE_TYPE_BASE64, content: realpath('./images/pixtral_image_example_charts.jpeg'));
+$message->addContent(type: Message::MESSAGE_TYPE_BASE64, content: realpath('./medias/pixtral_image_example_charts.jpeg'));
 $messages = new Messages();
 $messages->addMessage($message);
 

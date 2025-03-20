@@ -27,6 +27,3 @@ try {
 }
 
 print_r($result->getPages());
-/*
-
-*/

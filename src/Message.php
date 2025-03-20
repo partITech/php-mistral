@@ -8,8 +8,12 @@ class Message
 {
     public const string MESSAGE_TYPE_TEXT = 'text';
     public const string MESSAGE_TYPE_IMAGE_URL = 'image_url';
+    public const string MESSAGE_TYPE_VIDEO_URL = 'video_url';
+    public const string MESSAGE_TYPE_INPUT_AUDIO = 'input_audio';
+    public const string MESSAGE_TYPE_AUDIO_URL = 'audio_url';
     public const string MESSAGE_TYPE_BASE64 = 'base64_image';
     public const string MESSAGE_TYPE_DOCUMENT_URL = 'document_url';
+    private bool $urlAsArray=false;
 
 
     private ?string $role     = null;
@@ -155,7 +159,7 @@ class Message
         return $this->toolCallId;
     }
 
-    public function addContent(string $type, string $content): Message
+    public function addContent(string $type, string $content, bool $urlAsArray=false): Message
     {
         if(!is_array($this->content)){
             $this->content = [];
@@ -168,7 +172,17 @@ class Message
         }else if($type === self::MESSAGE_TYPE_IMAGE_URL){
             $this->content[] = [
                 'type' => 'image_url',
-                'image_url' => $content
+                'image_url' => ['url'=> $content ]
+            ];
+        }else if($type === self::MESSAGE_TYPE_VIDEO_URL){
+            $this->content[] = [
+                'type' => 'video_url',
+                'video_url' => ['url'=> $content ]
+            ];
+        }else if($type === self::MESSAGE_TYPE_AUDIO_URL){
+            $this->content[] = [
+                'type' => 'audio_url',
+                'audio_url' => ['url'=> $content ]
             ];
         }else if($type === self::MESSAGE_TYPE_DOCUMENT_URL){
             $this->content[] = [
@@ -198,5 +212,4 @@ class Message
 
         return $this;
     }
-
 }

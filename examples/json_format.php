@@ -34,4 +34,13 @@ try {
     exit(1);
 }
 
-print_r(json_decode($chatResponse->getMessage()));
+$auto = $chatResponse->getGuidedMessage();
+$object = $chatResponse->getGuidedMessage(associative: false);
+$array = $chatResponse->getGuidedMessage(associative:true);
+
+var_dump($auto);
+var_dump($object);
+var_dump($array);
+
+echo $chatResponse->getMessage();
+var_dump(json_decode($chatResponse->getMessage()));

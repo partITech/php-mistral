@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Messages;
 
 // export MISTRAL_API_KEY=your_api_key
@@ -23,7 +22,7 @@ try {
             'random_seed' => null
         ]
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

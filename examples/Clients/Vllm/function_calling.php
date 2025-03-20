@@ -1,20 +1,22 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Client;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
+use Partitech\PhpMistral\VllmClient;
 
-$model = 'ministral-8b-latest';
 $temperature = 0.3;
 
 // export MISTRAL_API_KEY=
-$apiKey = getenv('MISTRAL_API_KEY');
-$client = new MistralClient(apiKey: $apiKey);
+$apiKey = getenv('VLLM_API_KEY');   // "personal_token"
+$model  = getenv('VLLM_API_MODEL'); // "Mistral-Nemo-Instruct-2407"
+$url    =  getenv('VLLM_API_URL');  // "http://localhost:40001"
+
+$client = new VllmClient(apiKey: (string) $apiKey, url:  $url);
 
 // Assuming we have the following data
 $data = [
@@ -273,4 +275,5 @@ try {
 }
 
 print_r($chatResponse->getMessage());
-// The status of your transaction with ID T1001 is 'Paid'. Is there anything else you need help with?
+//The status of your transaction T1001 is:
+//paid
