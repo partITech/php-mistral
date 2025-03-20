@@ -3,9 +3,6 @@
 > 
 > It is still under development.
 
-()
-
-
 ### Current Status
 ✅ The platform is operational.  
 ✅ VLLM is fully implemented.  
