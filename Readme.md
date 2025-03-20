@@ -1,8 +1,13 @@
 > [!WARNING]
-> This branch is the psr18 implementation.
-> 
-> La plateforme should be ok
-> 
-> Vllm should be ok (unless audio still in developpment)
-> 
-> llama.cpp, huggingface, grok, anthropic should come next.
+> ⚠️ This branch contains the PSR-18 implementation. It is still under development.
+
+### Current Status
+✅ The platform is operational.  
+✅ VLLM is fully implemented.  
+🚧 Hugging Face integration is currently in development.
+
+### Next Steps
+🔜 **Upcoming integrations:**
+- llama.cpp
+- Grok
+- Anthropic  
