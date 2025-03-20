@@ -1,0 +1,26 @@
+projectName: "Mistral PHP Client"
+defaultDoc: "Basics/quick_start.md"
+logoUrl: "/images/logo.svg"
+logoHref: "https://www.partitech.com/"
+projectSource: "https://github.com/partITech/php-mistral"
+jumbotronSourceLinkCodeLink: "https://github.com/partITech/php-mistral"
+enableSearch: false
+jumbotron: true
+jumbotronHeader: "Mistral API, Vllm, Ollama, llama.cpp, HuggingFace inference client"
+jumbotronTextLine: "Connect with or without streaming, FIM, function calling, Mixed content, Json format"
+jumbotronGetStartedLabel: "Get started"
+jumbotronGetStartedLink: "#main-content"
+jumbotronSourceLinkCodeLabel: "View on GitHub"
+jumbotronCodeLang: "php"
+jumbotronCodeContent: |
+  use Partitech\PhpMistral\MistralClient;
+  use Partitech\PhpMistral\Messages;
+  
+  $client = new MistralClient(getenv('TOKEN'));
+  
+  $messages = new Messages();
+  $messages->addUserMessage('What is the best French cheese?');
+  
+  $response = $client->chat($messages, [
+    'model' => 'mistral-large-latest',
+  ])"
