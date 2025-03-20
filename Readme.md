@@ -1,5 +1,7 @@
 > [!WARNING]
-> ⚠️ This branch contains the PSR-18 implementation. It is still under development.
+> ⚠️ This branch contains the PSR-18 implementation. 
+> 
+> It is still under development.
 
 ### Current Status
 ✅ The platform is operational.  
