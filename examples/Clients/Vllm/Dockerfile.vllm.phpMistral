@@ -1,0 +1,5 @@
+# Utiliser l'image de base de vLLM
+FROM vllm/vllm-openai:v0.7.3
+
+# Installer les dépendances supplémentaires
+RUN pip install vllm[audio] vllm[video]

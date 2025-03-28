@@ -136,6 +136,9 @@ class Response
                 }
 
                 if (isset($choice['text'])) {
+                    if(is_null($message->getRole())){
+                        $message->setRole(Message::MESSAGE_TYPE_TEXT);
+                    }
                     $message->setContent($choice['text']);
                     $message->setChunk($choice['text']);
                 }
@@ -145,6 +148,30 @@ class Response
                 }
             }
         }
+
+        // TGI generate
+        if(isset($data[0]['generated_text'])) {
+            $message->updateContent($data[0]['generated_text']);
+            $message->setChunk($data[0]['generated_text']);
+            if ($response->getChoices()->count() === 0) {
+                $response->addMessage($message);
+            }
+        }
+        if(isset($data['generated_text'])) {
+            $message->updateContent($data['generated_text']);
+            $message->setChunk($data['generated_text']);
+            if ($response->getChoices()->count() === 0) {
+                $response->addMessage($message);
+            }
+        }
+        if(isset($data['token']) && is_array($data['token']) && isset($data['token']['text'])) {
+            $message->updateContent($data['token']['text']);
+            $message->setChunk($data['token']['text']);
+            if ($response->getChoices()->count() === 0) {
+                $response->addMessage($message);
+            }
+        }
+
 
         // chat response
         if (isset($data['usage'])) {

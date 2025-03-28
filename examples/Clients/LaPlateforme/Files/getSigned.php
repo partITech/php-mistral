@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Client;
 use Partitech\PhpMistral\MistralClient;
@@ -17,7 +17,7 @@ echo "uploaded file : " . $fileId->toString(). PHP_EOL;
 
 
 try {
-    $result = $client->downloadFile(uuid:$fileId, destination: realpath('.') . "/downloaded.pdf" );
+    $result = $client->getSignedUrl(uuid:$fileId, expiry: 1);
     print_r($result);
 } catch (Throwable $e) {
     echo $e->getMessage();

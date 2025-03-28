@@ -1,0 +1,115 @@
+services:
+  #  audio:
+  #    build:
+  #      context: .
+  #      dockerfile: Dockerfile.vllm.phpMistral
+  #    image: vllm-php-mistral:v0.7.3
+  #    command: |
+  #      --model fixie-ai/ultravox-v0_5-llama-3_2-1b
+  #      --max_num_batched_tokens 8192
+  #      --served-model-name fixie-ai/ultravox-v0_5-llama-3_2-1b
+  #      --max-model-len 8192
+  #      --trust-remote-code
+  #      --api-key token-abc123
+  #      --pipeline-parallel-size=1
+  #    environment:
+  #      - HUGGING_FACE_HUB_TOKEN=hf_*****
+  #      - MODEL
+  #      - SERVED_MODEL_NAME
+  #      - MAX_MODEL_LEN
+  #      - VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+  #      - VLLM_AUDIO_FETCH_TIMEOUT=120
+  #      #- NVIDIA_VISIBLE_DEVICES=0,1
+  #      - NVIDIA_VISIBLE_DEVICES=0,1
+  #    volumes:
+  #      - /llm:/llm
+  #      - /Data:/Data
+  #      - /llm/.cache/huggingface:/root/.cache/huggingface
+  #    ports:
+  #      - "40001:8000"
+  #    deploy:
+  #      resources:
+  #        reservations:
+  #          devices:
+  #            - driver: nvidia
+  #              device_ids: ['0,1']
+  #              capabilities: [gpu]
+  #    runtime: nvidia
+  #    ipc: host
+  video:
+    build:
+      context: .
+      dockerfile: Dockerfile.vllm.phpMistral
+    image: vllm-php-mistral:v0.7.3
+    command: |
+      --model llava-hf/llava-onevision-qwen2-0.5b-ov-hf
+      --max_num_batched_tokens 8192
+      --served-model-name llava-hf/llava-onevision-qwen2-0.5b-ov-hf
+      --max-model-len 8192
+      --trust-remote-code
+      --api-key token-abc123
+      --pipeline-parallel-size=1
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=hf_****
+      - MODEL
+      - SERVED_MODEL_NAME
+      - MAX_MODEL_LEN
+      - VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+      - VLLM_AUDIO_FETCH_TIMEOUT=120
+      #- NVIDIA_VISIBLE_DEVICES=0,1
+      - NVIDIA_VISIBLE_DEVICES=0,1
+    volumes:
+      - /llm:/llm
+      - /Data:/Data
+      - /llm/.cache/huggingface:/root/.cache/huggingface
+    ports:
+      - "40001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0,1']
+              capabilities: [gpu]
+    runtime: nvidia
+    ipc: host
+#  image:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.vllm.phpMistral
+#    image: vllm-php-mistral:v0.7.3
+#    command: |
+#      --model microsoft/Phi-3.5-vision-instruct
+#      --max_num_batched_tokens 8192
+#      --served-model-name microsoft/Phi-3.5-vision-instruct
+#      --max-model-len 8192
+#      --trust-remote-code
+#      --api-key token-abc123
+#      --pipeline-parallel-size=1
+#      --limit-mm-per-prompt "image=5"
+#    environment:
+#      - HUGGING_FACE_HUB_TOKEN=hf_***
+#      - MODEL
+#      - SERVED_MODEL_NAME
+#      - MAX_MODEL_LEN
+#      - VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+#      - VLLM_AUDIO_FETCH_TIMEOUT=120
+#      #- NVIDIA_VISIBLE_DEVICES=0,1
+#      - NVIDIA_VISIBLE_DEVICES=0,1
+#    volumes:
+#      - /llm:/llm
+#      - /Data:/Data
+#      - /llm/.cache/huggingface:/root/.cache/huggingface
+#    ports:
+#      - "40001:8000"
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              device_ids: ['0,1']
+#              capabilities: [gpu]
+#    runtime: nvidia
+#    ipc: host
+#
+#

@@ -7,6 +7,8 @@ use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('HUGGINGFACE_TOKEN'); // "hf_**********"
+$apiKey = getenv('HUGGINGFACE_TGI_URL'); // https://api-inference.huggingface.co
+
 $client = new MistralClient(apiKey: (string) $apiKey, url:  'https://api-inference.huggingface.co');
 $client->setGuidedJsonEncodeType(type:MistralClient::GUIDED_JSON_TYPE_HUGGINGFACE);
 

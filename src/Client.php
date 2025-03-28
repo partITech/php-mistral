@@ -30,7 +30,7 @@ class Client extends Psr17Factory implements ClientInterface
     const int RESPONSE_FORMAT_JSON = 0;
 
     protected const string END_OF_STREAM = "[DONE]";
-    const string ENDPOINT = 'https://api.mistral.ai';
+    protected const string ENDPOINT = '';
 
     protected string $chatCompletionEndpoint = 'v1/chat/completions';
     protected string $completionEndpoint = 'v1/completions';
@@ -51,13 +51,19 @@ class Client extends Psr17Factory implements ClientInterface
     public const string FILE_PURPOSE_OCR='ocr';
 
     protected ?string $chunkPrefixKey = 'data: ';
-    protected string $apiKey;
+    protected ?string $apiKey=null;
     protected string $url;
     public const string ENCODING_FORMAT_FLOAT='float';
     public const string ENCODING_FORMAT_BASE64='base64';
     protected bool $messageMultiModalUrlTypeArray=false;
 
-    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float $timeout = null)
+    protected ?string $provider=null;
+    protected ?string $urlModel=null;
+    protected array $additionalHeaders = [];
+    protected array $params = [];
+
+
+    public function __construct(?string $apiKey=null, string $url = self::ENDPOINT, int|float $timeout = null)
     {
         parent::__construct();
         $this->client = Psr18ClientDiscovery::find();
@@ -101,10 +107,25 @@ class Client extends Psr17Factory implements ClientInterface
         bool   $stream = false
     ): array|ResponseInterface
     {
+        $uri = $this->url;
+        if(!is_null($this->provider)){
+            $uri .= '/' . $this->provider;
+        }
+        if(!is_null($this->urlModel)){
+            $uri .= '/models/' . $this->urlModel;
+        }
 
-        $uri = $this->url . '/' . ltrim($path, '/');
+        $uri .= '/' . ltrim($path, '/');
 
-        $request = $this->request->createRequest($method, $uri)->withHeader('Authorization', 'Bearer ' . $this->apiKey);
+        $request = $this->request->createRequest($method, $uri);
+
+        if(!is_null($this->apiKey)){
+            $request = $request->withHeader('Authorization', 'Bearer ' . $this->apiKey);
+        }
+
+        foreach($this->additionalHeaders as $header => $headerValue){
+            $request = $request->withHeader($header, $headerValue);
+        }
 
         if (isset($parameters['query']) && $method=='GET') {
             $uri = $request->getUri()->withQuery(http_build_query($parameters['query']));
@@ -113,11 +134,19 @@ class Client extends Psr17Factory implements ClientInterface
         }
 
         // File multipart building if ressource is in the parameter's list.
-        if(is_array($parameters) && $this->isMultipart($parameters)){
+        if(is_array($parameters) && $this->isMultipart($parameters)) {
             $multipartStream = $this->getMultipartStream($parameters);
             $request = $request->withBody($this->streamFactory->createStream($multipartStream->build()));
             $request = $request->withHeader('Content-Type', 'multipart/form-data; boundary=' . $multipartStream->getBoundary());
-        }else if(count($parameters)>1){
+
+        }else if(is_array($parameters) && isset($parameters['data-binary'])){
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $parameters['data-binary']);
+            finfo_close($finfo);
+            $request = $request->withBody($this->streamFactory->createStreamFromFile($parameters['data-binary']))
+                ->withHeader('Content-Type', 'application/octet-stream')
+                ->withHeader('Content-Type', $mimeType);
+        }else if(count($parameters)>=1){
             if($stream){
                 $parameters['stream'] = true;
             }
@@ -318,7 +347,6 @@ class Client extends Psr17Factory implements ClientInterface
         return $this->url;
     }
 
-    protected array $params = [];
 
     private function checkType(array $definition, string $param, $val ): int|bool|float|string|array
     {
@@ -335,7 +363,7 @@ class Client extends Psr17Factory implements ClientInterface
             return false;
         }
 
-        $type = $definition[$param];
+        $type = $definition[$param]??null;
 
         if(is_string($type) && gettype($val) == 'array' && is_array($val) ){
             return $val;
@@ -420,4 +448,23 @@ class Client extends Psr17Factory implements ClientInterface
         }
     }
 
+    public function sendBinaryRequest(string $path, string $model = '', bool $decode=false):mixed
+    {
+        if (!file_exists($path)) {
+            throw new MistralClientException(message: "File not found: " . $path, code:404);
+        }
+
+        try{
+            return $this->request('POST', $model, [
+                    'data-binary' => $path,
+                ],
+                stream: !$decode
+            );
+
+        }catch (Throwable $e){
+            new MistralClientException(message: $e->getMessage(), code: 500);
+        }
+
+        return false;
+    }
 }

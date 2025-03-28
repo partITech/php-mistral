@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Client;
 use Partitech\PhpMistral\Messages;
