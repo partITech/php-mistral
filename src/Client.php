@@ -168,7 +168,7 @@ class Client extends Psr17Factory implements ClientInterface
         return $stream ? $response : json_decode($response->getBody()->getContents(), true);
     }
 
-    private function getMultipartStream(array $parameters): MultipartStreamBuilder
+    public function getMultipartStream(array $parameters): MultipartStreamBuilder
     {
         $multipartStream = new MultipartStreamBuilder($this->streamFactory);
         foreach($parameters as $name => $parameter){
@@ -230,7 +230,7 @@ class Client extends Psr17Factory implements ClientInterface
 
         $discussion = $messages->format();
         if(is_array($discussion) && count($discussion) > 0){
-            $return[$this->promptKeyword] = $messages->format();
+            $return[$this->promptKeyword] = $discussion;
         }
 
         if(is_array($messages->getDocumentMessage())){
@@ -253,7 +253,7 @@ class Client extends Psr17Factory implements ClientInterface
         }
     }
 
-    private function handleResponseFormat(array &$return, array $params): void
+    protected function handleResponseFormat(array &$return, array $params): void
     {
         if (isset($params['response_format'])) {
             if ($params['response_format'] === self::RESPONSE_FORMAT_JSON) {

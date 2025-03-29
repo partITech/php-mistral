@@ -200,9 +200,33 @@ class Response
         return $this;
     }
 
+//    public function addMessage(Message $message): self
+//    {
+//        $this->choices->append($message);
+//
+//        return $this;
+//    }
+
     public function addMessage(Message $message): self
     {
-        $this->choices->append($message);
+        // if empty, automatically add
+        if ($this->choices->count() === 0) {
+            $this->choices->append($message);
+            return $this;
+        }
+
+        $arrayCopy = $this->choices->getArrayCopy();
+        $lastKey = array_key_last($arrayCopy);
+        /** @var Message $lastChoice */
+        $lastChoice = $arrayCopy[$lastKey];
+
+        if ($lastChoice->getRole() === $message->getRole()) {
+            // Replace the last message
+            $this->choices[$lastKey] = $message;
+        } else {
+            // Add new message if roles are different
+            $this->choices->append($message);
+        }
 
         return $this;
     }
