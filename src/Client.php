@@ -111,6 +111,7 @@ class Client extends Psr17Factory implements ClientInterface
         if(!is_null($this->provider)){
             $uri .= '/' . $this->provider;
         }
+
         if(!is_null($this->urlModel)){
             $uri .= '/models/' . $this->urlModel;
         }
@@ -191,10 +192,19 @@ class Client extends Psr17Factory implements ClientInterface
 
     protected function makeChatCompletionRequest(array $definition, ?Messages $messages=null, array $params=[], bool $stream = false): array
     {
-        $return = [
-            'stream' => $stream,
-            'model' => $params['model']
-        ];
+        $return = [];
+        $return['stream'] = $stream??false;
+        if(isset($params['model'])){
+            $return['model'] = $params['model'];
+        }
+        if(isset($params['agent_id'])){
+            $return['agent_id'] = $params['agent_id'];
+        }
+
+//        $return = [
+//            'stream' => $stream,
+//            'model' => $params['model']
+//        ];
 
         foreach($params as $key => $val){
             if(($verifiedParam = $this->checkType($definition, $key, $val)) !== false){

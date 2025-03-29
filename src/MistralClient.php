@@ -376,6 +376,28 @@ class MistralClient extends Client
         }
     }
 
+    /**
+     * @throws MistralClientException
+     * @throws DateMalformedStringException
+     */
+    public function agent(Messages $messages, string $agent, array $params = [], bool $stream=false): Response|Generator
+    {
+        $params['agent_id'] = $agent;
+        $request = $this->makeChatCompletionRequest(
+            definition: $this->chatParametersDefinition,
+            messages: $messages,
+            params: $params
+        );
+
+        $result = $this->request('POST', '/v1/agents/completions', $request, $stream);
+
+        if($stream){
+            return $this->getStream(stream: $result);
+        }else{
+            return Response::createFromArray($result);
+        }
+    }
+
 
     /**
      * @throws MistralClientException

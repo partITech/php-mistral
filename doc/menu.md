@@ -5,7 +5,8 @@
 
 ## La Plateforme
 - [Chat no streaming](LaPlateforme/chat_no_streaming.md)
-- [Chat with streaming](LaPlateforme/chat_streaming.md)
+- [Chat with streaming](LaPlateforme/agents.md)
+- [Agent](LaPlateforme/chat_streaming.md)
 - [Socket timeout](LaPlateforme/socket_timeout.md)
 - [Embeddings](LaPlateforme/embeddings.md)
 - [Fill in the middle](LaPlateforme/fill_in_the_middle.md)
