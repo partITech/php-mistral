@@ -6,7 +6,8 @@
 ### Current Status
 ✅ The platform is operational.  
 ✅ VLLM is fully implemented.  
-🚧 Hugging Face integration is currently in development.
+✅ Huggingface inference, text-embeddings-inference and text-generation-inference are fully implemented.  
+🚧 ollama is currently in development.
 
 ### Next Steps
 🔜 **Upcoming integrations:**
