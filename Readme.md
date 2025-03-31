@@ -11,7 +11,6 @@
 
 ### Next Steps
 🔜 **Upcoming integrations:**
-- ollama
 - llama.cpp
 - Grok
 - Anthropic  
