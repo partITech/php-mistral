@@ -9,7 +9,7 @@ class LamaCppClient extends MistralClient
         parent::__construct($apiKey, $url);
     }
 
-    public function embeddings(array $datas): array
+    public function embeddings(array $datas, string $model = 'embedding'): array
     {
         $embeddings = [
             'data'=> []

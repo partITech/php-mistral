@@ -61,7 +61,13 @@ class Message
      */
     public function updateContent(string $content): void
     {
-        $this->content .= $content;
+        if(is_string($this->content) || is_null($this->content)) {
+            $this->content .= $content;
+        }
+
+        if(is_array($this->content)) {
+            $this->content[] = $content;
+        }
     }
 
 

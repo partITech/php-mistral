@@ -1,0 +1,61 @@
+services:
+  embeddings:
+    image: ghcr.io/huggingface/text-embeddings-inference:cuda-latest
+    command: --model-id Alibaba-NLP/gte-large-en-v1.5 --api-key testKey
+    env_file:
+      - .env
+    volumes:
+      - .cache/huggingface:/data
+    ports:
+      - "8080:80"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+  rerank:
+    image: ghcr.io/huggingface/text-embeddings-inference:cuda-latest
+    command: --model-id BAAI/bge-reranker-base --api-key testKey
+    env_file:
+      - .env
+    volumes:
+      - .cache/huggingface:/data
+    ports:
+      - "8081:80"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+  sentiment-analysis:
+    image: ghcr.io/huggingface/text-embeddings-inference:cuda-latest
+    command: --model-id SamLowe/roberta-base-go_emotions --api-key testKey
+    env_file:
+      - .env
+    volumes:
+      - .cache/huggingface:/data
+    ports:
+      - "8082:80"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+  splade-pooling:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
+    command: --model-id naver/efficient-splade-VI-BT-large-query --api-key testKey  --pooling splade
+    env_file:
+      - .env
+    volumes:
+      - .cache/huggingface:/data
+    ports:
+      - "8083:80"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]

@@ -2,11 +2,10 @@
 
 namespace Partitech\PhpMistral;
 
-
-
 use DateMalformedStringException;
 use DateTime;
 use DateTimeInterface;
+use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -27,6 +26,7 @@ class File
      */
     public static function fromResponse(array $response): self
     {
+
         $file = new self();
         $file->setId(Uuid::fromString($response['id']));
         $file->setObject($response['object']);
@@ -90,6 +90,9 @@ class File
      */
     public function setBytes(int $bytes): File
     {
+        if($bytes < 0) {
+            throw new InvalidArgumentException('Bytes must be a positive integer');
+        }
         $this->bytes = $bytes;
         return $this;
     }
@@ -180,6 +183,10 @@ class File
      */
     public function setNumLines(?int $numLines): File
     {
+        if($numLines < 0) {
+            throw new InvalidArgumentException('NumLines must be a positive integer');
+        }
+
         $this->numLines = $numLines;
         return $this;
     }

@@ -1,6 +1,7 @@
 <?php
-
 namespace Partitech\PhpMistral;
+
+ini_set('default_socket_timeout', '-1');
 
 use DateMalformedStringException;
 use Generator;

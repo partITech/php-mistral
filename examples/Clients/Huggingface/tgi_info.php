@@ -3,19 +3,17 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
+use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\TgiClient;
-use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
 $tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
-// Not working on Huffingface inference
-//$client = new TgiClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
-// works with tgi
+
 $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {
     $info = $client->info();
     print_r($info);
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (MistralClientException $e) {
     echo $e->getMessage();
 }
 

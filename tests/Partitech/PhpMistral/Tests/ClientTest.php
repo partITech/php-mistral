@@ -562,4 +562,43 @@ class ClientTest extends TestCase
         $this->assertEquals('def ', $secondResult->getChunk());
 
     }
+
+    public function testAdditionalHeadersAreApplied()
+    {
+        $clientReflection = new \ReflectionClass(Client::class);
+        $property = $clientReflection->getProperty('additionalHeaders');
+        $property->setAccessible(true);
+        $property->setValue($this->client, ['X-Custom-Header' => 'Value']);
+
+        $mockRequest = $this->createMock(RequestInterface::class);
+        $mockResponse = $this->createMock(ResponseInterface::class);
+        $mockBody = $this->createMock(StreamInterface::class);
+
+        $mockRequest->method('withHeader')
+            ->willReturnCallback(function ($header, $value) use ($mockRequest) {
+                // Optionnel : log les appels pour vérif
+                // echo "Header: $header = $value\n";
+                return $mockRequest;
+            });
+        $mockRequest->expects($this->exactly(2))
+            ->method('withHeader')
+            ->withConsecutive(
+                ['Authorization', 'Bearer test-api-key'],
+                ['X-Custom-Header', 'Value']
+            )
+            ->willReturn($mockRequest);
+        $this->mockHttpClient->method('sendRequest')->willReturn($mockResponse);
+        $mockResponse->method('getStatusCode')->willReturn(200);
+        $mockResponse->method('getBody')->willReturn($mockBody);
+        $mockBody->method('getContents')->willReturn('{}');
+
+        $this->mockRequestFactory->method('createRequest')->willReturn($mockRequest);
+
+        $reflection = new \ReflectionClass(Client::class);
+        $method = $reflection->getMethod('request');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->client, 'GET', 'endpoint');
+        $this->assertEquals([], $result);
+    }
 }

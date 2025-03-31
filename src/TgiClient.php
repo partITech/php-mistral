@@ -7,7 +7,6 @@ use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
 
 
 ini_set('default_socket_timeout', '-1');
@@ -17,8 +16,7 @@ ini_set('default_socket_timeout', '-1');
 
 class TgiClient extends Client
 {
-    protected const string ENDPOINT = 'https://router.huggingface.co';
-//    protected const string ENDPOINT = 'https://api-inference.huggingface.co';
+    protected const string ENDPOINT = 'http://localhost:8080';
 
     protected array $chatParametersDefinition = [
         'frequency_penalty'              => ['double', [-2.0, 2.0]],
@@ -51,30 +49,11 @@ class TgiClient extends Client
         'typical_p'                    => ['double', [0.0, 1.0]],
         'watermark'                     => 'boolean',
 
-        // CompletionRequest uniquement
+        // CompletionRequest
         'prompt'                        => 'array',
         'suffix'                        => 'string',
     ];
 
-
-    public function __construct(
-        ?string $apiKey=null,
-        string $url = self::ENDPOINT,
-        ?string $provider=null,
-        int|float $timeout = null,
-        bool $useCache = false,
-        bool $waitForModel = false,
-    )
-    {
-        if($useCache){
-            $this->additionalHeaders['x-use-cache'] = 'true';
-        }
-        if($waitForModel){
-            $this->additionalHeaders['x-wait-for-model'] = 'true';
-        }
-        $this->provider = $provider;
-        parent::__construct($apiKey, $url, $timeout);
-    }
 
     protected function handleGuidedJson(array &$return, mixed $json, Messages $messages): void
     {
@@ -134,7 +113,6 @@ class TgiClient extends Client
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
      */
     public function chatTokenize(Messages $messages, array $params = []): array
@@ -213,26 +191,6 @@ class TgiClient extends Client
         return $result['text'] ?? false;
     }
 
-    /**
-     * @throws MistralClientException
-     */
-    public function postInputs(
-        string|array $inputs,
-        string $model = '',
-        ?string $pipeline=null,
-        array $params=[],
-        bool $stream = false
-    ): array|ResponseInterface
-    {
-
-        $params['inputs'] = $inputs;
-        $path=null;
-        if(!is_null($pipeline)){
-            $path = 'pipeline/' . $pipeline . '/';
-        }
-
-        return $this->request('POST', $path . $model, $params, $stream);
-    }
 
     /**
      * @throws MistralClientException
@@ -247,6 +205,5 @@ class TgiClient extends Client
 
         return parent::sendBinaryRequest($path, $model, $decode);
     }
-
 
 }
