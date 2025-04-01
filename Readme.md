@@ -96,7 +96,7 @@ $params = [
         'safe_prompt' => false,
         'random_seed' => null
 ];
-foreach ($client->chatStream($messages, $params)) as $chunk) {
+foreach ($client->chatStream($messages, $params) as $chunk) {
     echo $chunk->getChunk();
 }
 ```
