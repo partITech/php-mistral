@@ -1,6 +1,6 @@
 <?php
 
-namespace Partitech\PhpMistral\Tests;
+namespace Partitech\PhpMistral\Tools;
 
 class Tool
 {

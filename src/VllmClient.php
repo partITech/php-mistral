@@ -104,9 +104,9 @@ class VllmClient extends Client
     /**
      * @throws MistralClientException
      */
-    public function embeddings(array $datas, string $model = 'mistral-embed'): array
+    public function embeddings(array $input, string $model = 'mistral-embed'): array
     {
-        $request = ['model' => $model, 'input' => $datas,];
+        $request = ['model' => $model, 'input' => $input,];
         return $this->request('POST', 'v1/embeddings', $request);
     }
 

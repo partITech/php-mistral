@@ -60,6 +60,7 @@ class Response
      */
     public static function updateFromArray(self $response, array $data): self
     {
+
         if (isset($data['id'])) {
             $response->setId($data['id']);
         }
@@ -87,6 +88,7 @@ class Response
         $message = $response->getChoices()->count() > 0 ? $response->getChoices()[$response->getChoices()->count() - 1] : new Message();
 
         // Ollama response
+
         if (isset($data['message'])) {
             $message->setRole('assistant');
             if (isset($data['stream']) && $data['stream'] === true) {
@@ -96,7 +98,15 @@ class Response
                 $message->setContent($data['message']['content']);
             }
             $response->addMessage($message);
+            return $response;
         }
+        if(isset($data['status'])) {
+            $message->updateContent($data['status']);
+            $message->setChunk($data['status']);
+            $response->addMessage($message);
+            return $response;
+        }
+
 
 
         // Llama.cpp responses

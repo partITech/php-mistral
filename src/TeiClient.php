@@ -1,9 +1,7 @@
 <?php
 namespace Partitech\PhpMistral;
 
-
 // https://github.com/huggingface/text-embeddings-inference
-
 
 class TeiClient extends Client
 {

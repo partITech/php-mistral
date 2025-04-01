@@ -15,6 +15,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 use Throwable;
 
 class Client extends Psr17Factory implements ClientInterface
@@ -106,7 +107,7 @@ class Client extends Psr17Factory implements ClientInterface
         string $path,
         array  $parameters = [],
         bool   $stream = false
-    ): array|ResponseInterface
+    ): array|ResponseInterface|string
     {
         $uri = $this->url;
         if(!is_null($this->provider)){
@@ -166,7 +167,20 @@ class Client extends Psr17Factory implements ClientInterface
             throw new MistralClientException($response->getBody()->getContents(), $statusCode);
         }
 
-        return $stream ? $response : json_decode($response->getBody()->getContents(), true);
+        if($stream === true){
+            return $response;
+        }
+
+        // Non - stream response handling.
+        // if is valid json response, return as array.
+        $contents = $response->getBody()->getContents();
+
+        if(json_validate($contents)){
+            return json_decode($contents, true);
+        }
+
+        // else return body contents as string.
+        return $contents;
     }
 
     public function getMultipartStream(array $parameters): MultipartStreamBuilder
@@ -293,7 +307,7 @@ class Client extends Psr17Factory implements ClientInterface
                 continue;
             }
 
-            if(!is_null($this->chunkPrefixKey)){
+            if(!is_null($this->chunkPrefixKey) && !json_validate($chunk)){
                 if(!str_contains($chunk, $this->chunkPrefixKey)){
                     continue;
                 }
@@ -369,8 +383,9 @@ class Client extends Psr17Factory implements ClientInterface
                 'stream',
                 'messages',
                 'response_format',
-                'prediction']
-        ) ){
+                'prediction'
+            ])
+        ){
             return false;
         }
 

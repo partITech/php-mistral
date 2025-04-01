@@ -169,29 +169,38 @@ class Message
     {
         if(!is_array($this->content)){
             $this->content = [];
+            return $this;
         }
+        $this->content[] = $this->getContentByType($type, $content, $urlAsArray);
+        return $this;
+    }
+
+
+    public function getContentByType(string $type, string $content, bool $urlAsArray=false):?array
+    {
+        $msgContent = [];
         if($type === self::MESSAGE_TYPE_TEXT){
-            $this->content[] = [
+            $msgContent = [
                 'type' => 'text',
                 'text' => $content
             ];
         }else if($type === self::MESSAGE_TYPE_IMAGE_URL){
-            $this->content[] = [
+            $msgContent = [
                 'type' => 'image_url',
                 'image_url' => ['url'=> $content ]
             ];
         }else if($type === self::MESSAGE_TYPE_VIDEO_URL){
-            $this->content[] = [
+            $msgContent = [
                 'type' => 'video_url',
                 'video_url' => ['url'=> $content ]
             ];
         }else if($type === self::MESSAGE_TYPE_AUDIO_URL){
-            $this->content[] = [
+            $msgContent = [
                 'type' => 'audio_url',
                 'audio_url' => ['url'=> $content ]
             ];
         }else if($type === self::MESSAGE_TYPE_DOCUMENT_URL){
-            $this->content[] = [
+            $msgContent = [
                 'type' => 'document_url',
                 'document_url' => $content
             ];
@@ -208,13 +217,13 @@ class Message
             }
 
             $base64Data = base64_encode(file_get_contents($content));
-            $this->content[] = [
+            $msgContent = [
                 'type' => $fileType['api_key'],
                 $fileType['api_key'] => ['url' => "data:{$fileType['mime']};base64,{$base64Data}"]
             ];
         }
 
-        return $this;
+        return $msgContent;
     }
 
 

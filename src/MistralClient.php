@@ -50,8 +50,6 @@ class MistralClient extends Client
 
     protected function handleGuidedJson(array &$return, mixed $json, Messages $messages): void
     {
-//        $guidedJson = $json instanceof ObjectSchema ? $json->jsonSerialize() : $json;
-
         if($json instanceof ObjectSchema){
             $return['response_format'] = [
                 'type' => 'json_schema',
@@ -63,102 +61,6 @@ class MistralClient extends Client
             ];
         }
         $return['temperature'] = 0;
-//        $test = json_decode(json_encode($json->jsonSerialize()));
-        // Json needs to be valid, if not it will be ignored.
-//        if(!json_validate(json_encode($guidedJson))){
-//            return;
-//        }
-
-
-
-
-//        unset($guidedJson['examples']);
-//        $schema = ;
-//        $jsonSchema = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-//        $return['response_format'] = [
-//            'type' => 'json_schema',
-//            'json_schema' => [
-//                "schema" => [
-//                    'title' => 'Simple list',
-//                    'type' => 'object',
-//                    "additionalProperties" => false,
-//                    'properties' => [
-//                        'datas' => [
-//                            'type' => 'array',
-//                            'title' => 'ingredients',
-//                            'items' => [
-//                                'type' => 'string',
-//
-//                            ]
-//                        ]
-//                    ],
-//
-//                ],
-//                'name' => 'myname',
-//                'strict' => true
-//            ]
-//        ];
-//        $return['response_format'] = [
-//            'type' => 'json_schema',
-//            'json_schema' => [
-//                'schema'=> [
-//                    'properties' => [
-//                        'name' => [
-//                            "title" =>  "Name",
-//                            "type" => "string"
-//                        ],
-//                        'authors' => [
-//                            "items"=>[
-//                                "type"=> "string",
-//                                "description" => '1',
-//                                "examples"=> [ "john doe", "joannes does"]
-//                            ],
-//                            "title" =>  "Authors",
-//                            "type"=> "array"
-//                        ]
-//
-//                    ],
-//                    "required" => ["name","authors"],
-//                    "title"=> "Book",
-//                    "type"=>"object",
-//                    "additionalProperties"=> false
-//                ],
-//                'name' => 'book',
-//                'strict' => true,
-//            ]
-//        ];
-
-        // When JSON type temperature should be at the minimum to avoid wrong formated json.
-
-
-
-//        switch ($this->guidedJsonEncodeType) {
-//            case self::GUIDED_JSON_TYPE_JSON_ENCODE:
-//                $return[$this->guidedJsonKeyword] = json_encode($guidedJson);
-//                break;
-//
-//            case self::GUIDED_JSON_TYPE_ARRAY:
-//                $return[$this->guidedJsonKeyword] = $guidedJson;
-//                break;
-//
-//            case self::GUIDED_JSON_TYPE_HUGGINGFACE:
-//                $return['response_format'] = ['type' => 'json', 'value' => $guidedJson];
-//                break;
-//
-//            case self::GUIDED_JSON_TYPE_MISTRAL:
-//                if (isset($params['response_format']) && in_array($params['response_format'], [self::RESPONSE_FORMAT_JSON])) {
-//                    $return['response_format'] = ['type' => $params['response_format']];
-//                }
-//                $jsonExample = json_encode($guidedJson);
-//                $messages->prependLastMessage("
-//Return your answer in JSON format.
-//Additionally, here is a JSON Schema example to follow:
-//<json_schema>{$jsonExample}</json_schema>
-//            ");
-//                break;
-//        }
-//
-//        $return['temperature'] = 0;
     }
 
     public function listModels(): array

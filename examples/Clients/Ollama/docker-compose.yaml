@@ -1,0 +1,18 @@
+services:
+  ollama:
+    image: ollama/ollama:0.6.3
+    volumes:
+      - .cache/huggingface:/data
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    runtime: nvidia
+    ipc: host
+volumes:
+  ollama_data:
