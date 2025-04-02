@@ -1,0 +1,88 @@
+services:
+  #  llamacpp-chat:
+  #    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+  #    ports:
+  #      - 40001:8080
+  #    volumes:
+  #      - .cache:/models
+  #    environment:
+  #      LLAMA_ARG_MODEL: /models/mistral-small-3.1-24b-instruct-2503-q8_0.gguf
+  #      LLAMA_ARG_CTX_SIZE: 4096
+  #      LLAMA_ARG_N_PARALLEL: 2
+  #      LLAMA_ARG_ENDPOINT_METRICS: 1
+  #      LLAMA_ARG_PORT: 8080
+  #      NVIDIA_VISIBLE_DEVICES: 0,1
+  #      LLAMA_ARG_N_GPU_LAYERS: 1000
+  #      LLAMA_LOG_VERBOSITY: 1
+  #    deploy:
+  #      resources:
+  #        reservations:
+  #          devices:
+  #            - driver: nvidia
+  #              device_ids: ['0', '1']
+  #              capabilities: [gpu]
+  #    runtime: nvidia
+  #    ipc: host
+  #    extra_hosts:
+  #      - "host.docker.internal:host-gateway"
+#  llamacpp-completion:
+#    image: ghcr.io/ggml-org/llama.cpp:server
+#    ports:
+#      - 8080:8080
+#    volumes:
+#      - ./models:/models
+#    environment:
+#      LLAMA_ARG_MODEL: /models/llama-3.2-3b-instruct-q8_0.gguf
+#      LLAMA_ARG_CTX_SIZE: 4096
+#      LLAMA_ARG_N_PARALLEL: 2
+#      LLAMA_ARG_ENDPOINT_METRICS: 1
+#      LLAMA_ARG_PORT: 8080
+#  llamacpp-embedding:
+#    image: ghcr.io/ggml-org/llama.cpp:server
+#    ports:
+#      - 8080:8080
+#    volumes:
+#      - ./models:/models
+#    environment:
+#      LLAMA_ARG_MODEL: /models/snowflake-arctic-embed-s-q8_0.gguf
+#      LLAMA_ARG_CTX_SIZE: 4096
+#      LLAMA_ARG_N_PARALLEL: 2
+#      LLAMA_ARG_ENDPOINT_METRICS: 1
+#      LLAMA_ARG_PORT: 8080
+#  llamacpp-rerank:
+#    image: ghcr.io/ggml-org/llama.cpp:server
+#    ports:
+#      - 8080:8080
+#    volumes:
+#      - ./models:/models
+#    environment:
+#      LLAMA_ARG_MODEL: /models/bge-reranker-v2-m3-Q8_0.gguf
+#      LLAMA_ARG_RERANKING: 1
+  llamacpp-fim:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    ports:
+      - 40001:8080
+    volumes:
+      - .cache:/models
+    environment:
+      # alternatively, you can use "LLAMA_ARG_MODEL_URL" to download the model
+      LLAMA_ARG_MODEL: /models/all-hands_openhands-lm-32b-v0.1-Q5_K_S.gguf
+      LLAMA_ARG_CTX_SIZE: 4096
+      LLAMA_ARG_N_PARALLEL: 2
+      LLAMA_ARG_ENDPOINT_METRICS: 1
+      LLAMA_ARG_PORT: 8080
+      NVIDIA_VISIBLE_DEVICES: 0,1
+      LLAMA_ARG_N_GPU_LAYERS: 1000
+      LLAMA_LOG_VERBOSITY: 1
+      LLAMA_LOG_COLORS: 1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0', '1']
+              capabilities: [gpu]
+    runtime: nvidia
+    ipc: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

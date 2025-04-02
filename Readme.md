@@ -7,14 +7,12 @@
 ✅ The platform is operational.  
 ✅ VLLM is fully implemented.  
 ✅ Huggingface inference, text-embeddings-inference and text-generation-inference are fully implemented.  
-🚧 ollama is currently in development.
+✅ ollama is fully implemented.  
+✅ llama.cpp is fully implemented.  
+🚧 Anthropic is currently in development.
 
-### Next Steps
 🔜 **Upcoming integrations:**
-- llama.cpp
 - Grok
-- Anthropic  
-
 
 ### Try it out!
 You can start testing the implementation now.  
