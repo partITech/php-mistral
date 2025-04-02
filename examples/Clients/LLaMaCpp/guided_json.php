@@ -1,30 +1,24 @@
 <?php
+require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once './../SimpleListSchema.php';
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-require_once './SimpleListSchema.php';
-
-use Partitech\PhpMistral\MistralClient;
+use Partitech\PhpMistral\LlamaCppClient;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Messages;
 
-$url = "http://localhost:60003";
+$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
 
-$client = new MistralClient(apiKey: '', url: $url);
-$client->setGuidedJsonKeyword('format');
-$client->setChatCompletionEndPoint('api/chat');
-$client->setGuidedJsonEncodeType(MistralClient::GUIDED_JSON_TYPE_ARRAY);
-$client->setChunkPrefixKey(null);
+$client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
 $messages = new Messages();
 $messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? Answer in JSON.');
 
 $params = [
-    'model' => 'mistral',
     'temperature' => 0.7,
     'top_p' => 1,
     'max_tokens' => null,
-    'safe_prompt' => false,
-    'random_seed' => null,
+    'seed' => null,
     'guided_json' => new SimpleListSchema()
 ];
 
@@ -42,16 +36,17 @@ print_r(json_decode($chatResponse->getMessage()));
 print_r($chatResponse->getGuidedMessage());
 
 /*
-stdClass Object
+ * stdClass Object
 (
     [datas] => Array
         (
-            [0] => Mayonnaise
-            [1] => Mustard (Dijon mustard)
+            [0] => Egg yolks
+            [1] => Oil
             [2] => White wine vinegar
             [3] => Salt
-            [4] => Water
-            [5] => Egg yolks
+            [4] => Mustard (Dijon mustard)
+            [5] => Water
         )
+
 )
-*/
+ */

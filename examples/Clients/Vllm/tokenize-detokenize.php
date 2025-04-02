@@ -58,20 +58,3 @@ try {
 }
 
 echo $result->getPrompt() . PHP_EOL;
-
-
-
-
-//curl -X POST http://llm.bourdin.name:40001/tokenize \
-//-H "Content-Type: application/json" \
-//-d '{
-//"model": "Ministral-8B-Instruct-2410",
-//"prompt": "Votre texte à tokenizer ici."
-//}'
-//
-//curl -X POST http://llm.bourdin.name:40001/detokenize \
-//-H "Content-Type: application/json" \
-//-d '{
-//"model": "Ministral-8B-Instruct-2410",
-//"tokens": [1,1086,49220,40790,1755,128405,22986,1046]
-//}'

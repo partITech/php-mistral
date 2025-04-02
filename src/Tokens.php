@@ -9,11 +9,9 @@ use ArrayObject;
 class Tokens implements IteratorAggregate
 {
     private ArrayObject $tokens;
-    private ?string $prompt;
-    private string $model;
-
-
-    private int $maxModelLength;
+    private ?string $prompt=null;
+    private string $model='';
+    private ?int $maxModelLength=null;
 
     public function __construct()
     {
@@ -63,10 +61,10 @@ class Tokens implements IteratorAggregate
     }
 
     /**
-     * @param string $prompt
+     * @param string|null $prompt
      * @return Tokens
      */
-    public function setPrompt(string $prompt): Tokens
+    public function setPrompt(?string $prompt): Tokens
     {
         $this->prompt = $prompt;
         return $this;
@@ -91,18 +89,18 @@ class Tokens implements IteratorAggregate
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getMaxModelLength(): int
+    public function getMaxModelLength(): ?int
     {
         return $this->maxModelLength;
     }
 
     /**
-     * @param int $maxModelLength
+     * @param int|null $maxModelLength
      * @return Tokens
      */
-    public function setMaxModelLength(int $maxModelLength): Tokens
+    public function setMaxModelLength(?int $maxModelLength): Tokens
     {
         $this->maxModelLength = $maxModelLength;
         return $this;

@@ -15,7 +15,6 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 use Throwable;
 
 class Client extends Psr17Factory implements ClientInterface
@@ -65,7 +64,7 @@ class Client extends Psr17Factory implements ClientInterface
     protected array $params = [];
 
 
-    public function __construct(?string $apiKey=null, string $url = self::ENDPOINT, int|float $timeout = null)
+    public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
     {
         parent::__construct();
         $this->client = Psr18ClientDiscovery::find();
