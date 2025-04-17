@@ -55,7 +55,7 @@ class MistralClient
     private HttpClientInterface $httpClient;
     private null|int|float $timeout = null; // null = default_socket_timeout
 
-    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float $timeout = null)
+    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float|null $timeout = null)
     {
         $this->setTimeout($timeout);
         $this->httpClient = new RetryableHttpClient(
