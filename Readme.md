@@ -4,7 +4,7 @@
 > It is still under development.
 
 ### Current Status
-✅ The platform is operational.  
+✅ La platforme (mistral) is operational.  
 ✅ VLLM is fully implemented.  
 ✅ Huggingface inference, text-embeddings-inference and text-generation-inference are fully implemented.  
 ✅ ollama is fully implemented.  
@@ -13,7 +13,7 @@
 ✅ Grok is fully implemented.  
 🚧 documentation is currently in development.
 
-🔜 **Upcoming integrations:**
+🔜 **Upcoming :**
 - Unit tests
 - Functional tests
 - Gemini (for now no needs, no request. This integration is delayed)
