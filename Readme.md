@@ -9,10 +9,14 @@
 ✅ Huggingface inference, text-embeddings-inference and text-generation-inference are fully implemented.  
 ✅ ollama is fully implemented.  
 ✅ llama.cpp is fully implemented.  
-🚧 Anthropic is currently in development.
+✅ Anthropic is fully implemented.  
+✅ Grok is fully implemented.  
+🚧 documentation is currently in development.
 
 🔜 **Upcoming integrations:**
-- Grok
+- Unit tests
+- Functional tests
+- Gemini (for now no needs, no request. This integration is delayed)
 
 ### Try it out!
 You can start testing the implementation now.  
