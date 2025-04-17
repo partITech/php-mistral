@@ -14,6 +14,7 @@
         "test": "phpunit"
     },
     "require": {
+        "php": ">=8.3",
         "symfony/http-client": "^6.4 || ^7.0",
         "knplabs/php-json-schema": "^0.1.0"
     }
