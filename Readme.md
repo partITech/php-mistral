@@ -18,6 +18,7 @@
 - Functional tests
 - Gemini (for now no needs, no request. This integration is delayed)
 
+
 ### Try it out!
 You can start testing the implementation now.  
 📖 Documentation is available here: [Project Documentation](https://github.com/partITech/php-mistral/blob/psr18/doc/menu.md)  
