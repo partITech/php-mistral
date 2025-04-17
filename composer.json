@@ -19,6 +19,7 @@
         "test": "phpunit"
     },
     "require": {
+        "php": ">=8.3",
         "ext-fileinfo": "*",
         "ext-http": "*",
         "symfony/mime": "^7.2",

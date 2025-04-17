@@ -17,7 +17,7 @@ class HuggingFaceClient extends TgiClient
         ?string $apiKey=null,
         string $url = self::ENDPOINT,
         ?string $provider=null,
-        int|float $timeout = null,
+        int|float|null $timeout = null,
         bool $useCache = false,
         bool $waitForModel = false,
     )

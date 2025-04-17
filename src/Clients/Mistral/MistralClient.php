@@ -21,7 +21,7 @@ ini_set('default_socket_timeout', '-1');
 class MistralClient extends Client
 {
     protected const string ENDPOINT = 'https://api.mistral.ai';
-    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float $timeout = null)
+    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float|null $timeout = null)
     {
         parent::__construct($apiKey, $url, $timeout);
     }
