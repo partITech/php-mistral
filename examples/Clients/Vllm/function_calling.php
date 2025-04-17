@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Vllm\VllmClient;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
-use Partitech\PhpMistral\VllmClient;
 
 $temperature = 0.3;
 

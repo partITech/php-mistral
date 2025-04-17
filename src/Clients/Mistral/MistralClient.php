@@ -1,10 +1,16 @@
 <?php
 
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\Mistral;
 
 use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\File;
+use Partitech\PhpMistral\Files;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
 use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\UuidInterface;
 use Throwable;

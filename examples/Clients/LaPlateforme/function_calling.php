@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClient;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;

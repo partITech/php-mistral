@@ -13,8 +13,14 @@ class Message
     public const string MESSAGE_TYPE_AUDIO_URL = 'audio_url';
     public const string MESSAGE_TYPE_BASE64 = 'base64_image';
     public const string MESSAGE_TYPE_DOCUMENT_URL = 'document_url';
+    public const string MESSAGE_TYPE_DOCUMENT_BASE64 = 'document_base64'; // only used by anthropic for pdf documents
     private bool $urlAsArray=false;
-
+    public const string TYPE_ANTHROPIC = 'Anthropic';
+    public const string TYPE_XAI = 'XAi';
+    public const string TYPE_TGI = 'TGI';
+    public const string TYPE_OLLAMA = 'OLLAMA';
+    public const string TYPE_LLAMACPP = 'LLAMACPP';
+    public const string TYPE_VLLM = 'VLLM';
 
     private ?string $role     = null;
     private null|string|array $content  = null;
@@ -22,6 +28,12 @@ class Message
     private ?array $toolCalls = null;
     private ?string $toolCallId = null;
     private ?string $name = null;
+    private string $type;
+
+    public function __construct(string $type='openai')
+    {
+        $this->type=$type;
+    }
 
     /**
      * @return ?string
@@ -34,9 +46,11 @@ class Message
     /**
      * @param string $role
      */
-    public function setRole(string $role): void
+    public function setRole(string $role): self
     {
         $this->role = $role;
+
+        return $this;
     }
 
     /**
@@ -50,33 +64,37 @@ class Message
     /**
      * @param string|array|null $content
      */
-    public function setContent(null|string|array $content): void
+    public function setContent(null|string|array $content): self
     {
         $this->content = $content;
+        return $this;
     }
 
 
     /**
      * @param string $content
      */
-    public function updateContent(string $content): void
+    public function updateContent(array|string $content, bool $asArray=false): self
     {
+        if(is_array($this->content) || $asArray) {
+            $this->content[] = $content;
+        }
         if(is_string($this->content) || is_null($this->content)) {
             $this->content .= $content;
         }
 
-        if(is_array($this->content)) {
-            $this->content[] = $content;
-        }
+        return $this;
     }
 
 
     /**
      * @param string $chunk
      */
-    public function setChunk(string $chunk): void
+    public function setChunk(string $chunk): self
     {
         $this->chunk = $chunk;
+
+        return $this;
     }
 
     /**
@@ -126,7 +144,7 @@ class Message
      * @param array|null $toolCalls
      * @return Message
      */
-    public function setToolCalls(?array $toolCalls): Message
+    public function setToolCalls(?array $toolCalls): self
     {
         if(null === $toolCalls){
             return $this;
@@ -140,10 +158,21 @@ class Message
         }
 
         $this->toolCalls = $toolCalls;
+
         return $this;
     }
 
-    public function setName(?string $name): Message
+    public function setToolCall(?array $toolCall): self
+    {
+        if(null === $toolCall){
+            return $this;
+        }
+
+        $this->toolCalls[] = $toolCall;
+        return $this;
+    }
+
+    public function setName(?string $name): self
     {
         $this->name = $name;
         return $this;
@@ -154,7 +183,7 @@ class Message
         return $this->name;
     }
 
-    public function setToolCallId(?string $toolCallId): Message
+    public function setToolCallId(?string $toolCallId): self
     {
         $this->toolCallId = $toolCallId;
         return $this;
@@ -165,18 +194,19 @@ class Message
         return $this->toolCallId;
     }
 
-    public function addContent(string $type, string $content, bool $urlAsArray=false): Message
+    public function addContent(string $type, string $content, bool $urlAsArray=false, string $detail='low'): self
     {
         if(!is_array($this->content)){
             $this->content = [];
-            return $this;
+//            $this->content[] = $content;
+//            return $this;
         }
-        $this->content[] = $this->getContentByType($type, $content, $urlAsArray);
+        $this->content[] = $this->getContentByType($type, $content, $urlAsArray, $detail);
         return $this;
     }
 
 
-    public function getContentByType(string $type, string $content, bool $urlAsArray=false):?array
+    public function getContentByType(string $type, string $content, bool $urlAsArray=false, string $detail='low'):?array
     {
         $msgContent = [];
         if($type === self::MESSAGE_TYPE_TEXT){
@@ -185,10 +215,29 @@ class Message
                 'text' => $content
             ];
         }else if($type === self::MESSAGE_TYPE_IMAGE_URL){
-            $msgContent = [
-                'type' => 'image_url',
-                'image_url' => ['url'=> $content ]
-            ];
+            if($this->type === self::TYPE_ANTHROPIC){
+                $msgContent = [
+                    'type' => 'image',
+                    'source' => [
+                        'type' => 'url',
+                        'url'=> $content
+                    ]
+                ];
+            }elseif($type===self::TYPE_XAI){
+                $msgContent = [
+                    'type' => 'image_url',
+                    'image_url' => [
+                        'detail' => $detail,
+                        'url'=> $content
+                    ]
+                ];
+
+            }else{
+                $msgContent = [
+                    'type' => 'image_url',
+                    'image_url' => ['url'=> $content ]
+                ];
+            }
         }else if($type === self::MESSAGE_TYPE_VIDEO_URL){
             $msgContent = [
                 'type' => 'video_url',
@@ -200,10 +249,44 @@ class Message
                 'audio_url' => ['url'=> $content ]
             ];
         }else if($type === self::MESSAGE_TYPE_DOCUMENT_URL){
-            $msgContent = [
-                'type' => 'document_url',
-                'document_url' => $content
-            ];
+            if($this->type === self::TYPE_ANTHROPIC){
+                $msgContent = [
+                    'type' => 'document',
+                    'source' => [
+                        'type' => 'url',
+                        'url' => $content
+                    ]
+                ];
+            }else{
+                $msgContent = [
+                    'type' => 'document_url',
+                    'document_url' => $content
+                ];
+            }
+
+        }else if($type === self::MESSAGE_TYPE_DOCUMENT_BASE64){
+            // Get the base64 image content.
+            if (!file_exists($content) || !is_readable($content)) {
+                throw new InvalidArgumentException("Le fichier spécifié est introuvable ou illisible : {$content}");
+            }
+
+            $fileType = $this->getFileTypeInfo($content);
+
+            if (isset($fileType['error'])) {
+                throw new InvalidArgumentException($fileType['error']);
+            }
+
+            $base64Data = base64_encode(file_get_contents($content));
+            if($this->type === self::TYPE_ANTHROPIC) {
+                $msgContent = [
+                    'type' => 'document',
+                    'source' => [
+                        'type' => 'base64',
+                        'media_type' => $fileType['mime'],
+                        'data' => $base64Data
+                    ]
+                ];
+            }
         }else if($type === self::MESSAGE_TYPE_BASE64){
             // Get the base64 image content.
             if (!file_exists($content) || !is_readable($content)) {
@@ -217,10 +300,30 @@ class Message
             }
 
             $base64Data = base64_encode(file_get_contents($content));
-            $msgContent = [
-                'type' => $fileType['api_key'],
-                $fileType['api_key'] => ['url' => "data:{$fileType['mime']};base64,{$base64Data}"]
-            ];
+            if($this->type === self::TYPE_ANTHROPIC){
+                $msgContent = [
+                    'type' => 'image',
+                    'source' => [
+                        'type' => 'base64',
+                        'media_type' => $fileType['mime'],
+                        'data' => $base64Data
+                    ]
+                ];
+            }else if($this->type === self::TYPE_XAI){
+                $msgContent = [
+                    'type' => 'image_url',
+                    'image_url' => [
+                        'url' => "data:{$fileType['mime']};base64,{$base64Data}",
+                        'detail' => $detail
+                    ]
+                ];
+            }else{
+                $msgContent = [
+                    'type' => $fileType['api_key'],
+                    $fileType['api_key'] => ['url' => "data:{$fileType['mime']};base64,{$base64Data}"]
+                ];
+            }
+
         }
 
         return $msgContent;

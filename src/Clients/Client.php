@@ -1,5 +1,5 @@
 <?php
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients;
 
 ini_set('default_socket_timeout', '-1');
 
@@ -10,11 +10,14 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Message\MultipartStream\MultipartStreamBuilder;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Throwable;
 
 class Client extends Psr17Factory implements ClientInterface
@@ -26,6 +29,7 @@ class Client extends Psr17Factory implements ClientInterface
     const string DEFAULT_FIM_MODEL = 'codestral-2405';
     const string TOOL_CHOICE_ANY = 'any';
     const string TOOL_CHOICE_AUTO = 'auto';
+    const string TOOL_CHOICE_TOOL = 'tool';
     const string TOOL_CHOICE_NONE = 'none';
 
     const int RESPONSE_FORMAT_JSON = 0;
@@ -74,6 +78,11 @@ class Client extends Psr17Factory implements ClientInterface
         $this->url = $url;
     }
 
+    public function newMessage():Message
+    {
+        return new Message();
+    }
+
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         return $this->client->sendRequest($request);
@@ -105,10 +114,10 @@ class Client extends Psr17Factory implements ClientInterface
         string $method,
         string $path,
         array  $parameters = [],
-        bool   $stream = false
+        ?bool   $stream = false
     ): array|ResponseInterface|string
     {
-        $uri = $this->url;
+        $uri = rtrim($this->url, '/');
         if(!is_null($this->provider)){
             $uri .= '/' . $this->provider;
         }
@@ -256,7 +265,7 @@ class Client extends Psr17Factory implements ClientInterface
         return $return;
     }
 
-    private function handleTools(array &$return, array $params): void
+    protected function handleTools(array &$return, array $params): void
     {
         if (isset($params['tools'])) {
             if (is_string($params['tools'])) {

@@ -1,12 +1,17 @@
 <?php
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\Tgi;
 
 
 use ArrayObject;
 use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
-use Psr\Http\Message\ResponseInterface;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Tokens;
 
 
 ini_set('default_socket_timeout', '-1');
@@ -17,6 +22,11 @@ ini_set('default_socket_timeout', '-1');
 class TgiClient extends Client
 {
     protected const string ENDPOINT = 'http://localhost:8080';
+
+    public function newMessage():Message
+    {
+        return new Message(type: Message::TYPE_TGI);
+    }
 
     protected array $chatParametersDefinition = [
         'frequency_penalty'              => ['double', [-2.0, 2.0]],
@@ -67,6 +77,10 @@ class TgiClient extends Client
         $return['temperature'] = 0;
     }
 
+    /**
+     * @throws DateMalformedStringException
+     * @throws MistralClientException
+     */
     public function generate(string $prompt, array $params = [], bool $stream=false): Response|Generator
     {
         $request = $this->makeChatCompletionRequest(
@@ -87,7 +101,7 @@ class TgiClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return Response::createFromArray($result);
+            return TgiResponse::createFromArray($result);
         }
     }
 
@@ -108,7 +122,7 @@ class TgiClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return Response::createFromArray($result);
+            return TgiResponse::createFromArray($result);
         }
     }
 

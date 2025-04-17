@@ -30,8 +30,7 @@ composer require partitech/php-mistral
 Here's how to quickly get started with a simple chat completion:
 
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\Messages;
 
 $client = new MistralClient('YOUR_PRIVATE_MISTRAL_KEY');
 

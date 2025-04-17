@@ -1,7 +1,7 @@
 <?php
 
+use Partitech\PhpMistral\Clients\Tei\TeiClient;
 use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\TeiClient;
 
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 

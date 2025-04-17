@@ -1,13 +1,17 @@
 <?php
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\Ollama;
 
 use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
 
 class OllamaClient extends Client
 {
-
     protected array $chatParametersDefinition = [
         'frequency_penalty'          => 'double',
         'presence_penalty'           => 'double',
@@ -27,8 +31,10 @@ class OllamaClient extends Client
         parent::__construct(url: $url);
     }
 
-
-
+    public function newMessage():Message
+    {
+        return new Message(type: Message::TYPE_OLLAMA);
+    }
 
     /**
      * @throws MistralClientException
@@ -79,8 +85,6 @@ class OllamaClient extends Client
     {
         return $this->request('GET', '/api/tags');
     }
-
-
 
     /**
      * @throws MistralClientException
@@ -137,7 +141,7 @@ class OllamaClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return Response::createFromArray($result);
+            return OllamaResponse::createFromArray($result);
         }
     }
 

@@ -1,4 +1,5 @@
 services:
+  ## start container and pull mistral : ollama pull mistral
   ollama:
     image: ollama/ollama:0.6.3
     volumes:

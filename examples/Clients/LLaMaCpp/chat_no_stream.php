@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
-use Partitech\PhpMistral\LlamaCppClient;
+use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
 use Partitech\PhpMistral\Messages;
 
 //docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/llama-3.2-3b-instruct-q8_0.gguf -c 512 --host 0.0.0.0 --port 8080 --metrics

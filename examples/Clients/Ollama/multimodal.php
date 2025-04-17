@@ -1,10 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\OllamaClient;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
 
 $ollamaUrl = getenv('OLLAMA_URL');   // "self hosted Ollama"
 $client = new OllamaClient(url: $ollamaUrl);

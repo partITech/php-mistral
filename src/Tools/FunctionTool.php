@@ -36,4 +36,29 @@ class FunctionTool
             'description' => $parameter->getDescription()
         ];
     }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
 }

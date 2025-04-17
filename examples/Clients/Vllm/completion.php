@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
-use Partitech\PhpMistral\VllmClient;
+
+use Partitech\PhpMistral\Clients\Vllm\VllmClient;
 use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('VLLM_API_KEY');   // "personal_token"

@@ -12,9 +12,9 @@ Client::FILE_PURPOSE_BATCH
 Client::FILE_PURPOSE_OCR
 ```
 #### Usage
+
 ```php
-use Partitech\PhpMistral\Client;
-use Partitech\PhpMistral\MistralClient;
+use Partitech\PhpMistral\Clients\Client;use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 
 $client = new MistralClient($apiKey);
 // from https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf

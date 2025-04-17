@@ -20,7 +20,7 @@ class Parameter
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getType(): ?string
     {
@@ -38,7 +38,7 @@ class Parameter
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName(): ?string
     {
@@ -56,7 +56,7 @@ class Parameter
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription(): ?string
     {

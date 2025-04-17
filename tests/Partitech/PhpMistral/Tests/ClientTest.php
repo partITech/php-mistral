@@ -3,10 +3,10 @@
 namespace Partitech\PhpMistral\Tests;
 
 
-use Partitech\PhpMistral\Client;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;

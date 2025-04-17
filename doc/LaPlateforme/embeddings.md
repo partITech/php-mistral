@@ -11,8 +11,7 @@ Send an array of sentences to the Embedding model.
 
 ```php
 
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\MistralClientException;
 
 $client = new MistralClient($apiKey);
 

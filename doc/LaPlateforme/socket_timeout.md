@@ -69,10 +69,9 @@ Install client
 composer require php-http/curl-client php-http/message nyholm/psr7
 ```
 And use this client
+
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\Messages;
-use Http\Client\Curl\Client;
+use Http\Client\Curl\Client;use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\Messages;
 
 // export MISTRAL_API_KEY=
 $apiKey = getenv('MISTRAL_API_KEY');

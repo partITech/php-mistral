@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\LlamaCppClient;
+use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
 use Partitech\PhpMistral\MistralClientException;
 
 $llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"

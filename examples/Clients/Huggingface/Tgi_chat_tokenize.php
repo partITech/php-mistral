@@ -3,12 +3,11 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
-use Partitech\PhpMistral\HuggingFaceClient;
+use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\TgiClient;
 
 $tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
-
+$apiKey='';
 
 $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 
@@ -20,17 +19,17 @@ $params = [
     'guided_json' => new SimpleListSchema()
 ];
 
-//try {
-//    $chatResponse = $client->chatTokenize(
-//        $messages,
-//        $params
-//    );
-//} catch (\Throwable $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
-//
-//print_r($chatResponse);
+try {
+    $chatResponse = $client->chatTokenize(
+        $messages,
+        $params
+    );
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+print_r($chatResponse);
 /*
  *
  *

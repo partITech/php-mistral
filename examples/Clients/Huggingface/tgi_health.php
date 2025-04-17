@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
-use Partitech\PhpMistral\TgiClient;
+use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
 $tgiUrl = getenv('TGI_URL');   // "self hosted tgi"

@@ -1,10 +1,7 @@
 ## Response object
 
-
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\Messages;
-use \Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\Messages;
 
 
 $client = new MistralClient($apiKey);

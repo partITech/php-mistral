@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\MistralClient;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\MistralClientException;
 
 // export MISTRAL_API_KEY=your_api_key

@@ -91,18 +91,31 @@ class Messages
         ];
     }
 
-    public function addToolMessage(string $name, array $content, string $toolCallId): self
+    public function addToolMessage(string $name, string|array $content, string $toolCallId, ?string $clientType=null): self
     {
-        $message = new Message();
-        $message->setRole(self::ROLE_TOOL);
-        $message->setContent($content);
-        $message->setName($name);
-        $message->setToolCallId($toolCallId);
-        $this->addMessage($message);
+        if($clientType===Message::TYPE_ANTHROPIC){
+            $message = new Message();
+            $message->setRole(self::ROLE_USER);
+            $message->setContent([[
+                'type' => 'tool_result',
+                'tool_use_id' => $toolCallId,
+                'content' => (is_array($content)) ? reset($content) : $content
+            ]]);
+            $this->addMessage($message);
+
+        }else{
+            $message = new Message();
+            $message->setRole(self::ROLE_TOOL);
+            $message->setContent($content);
+            $message->setName($name);
+            $message->setToolCallId($toolCallId);
+            $this->addMessage($message);
+        }
+
         return $this;
     }
 
-    public function addAssistantMessage(null|string $content, null|array $toolCalls = null): self
+    public function addAssistantMessage(null|string|array $content, null|array $toolCalls = null): self
     {
         $message = new Message();
         $message->setRole(self::ROLE_ASSISTANT);

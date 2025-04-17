@@ -7,9 +7,7 @@
 With the **max_tokens** set to null, the result is stopped when the model have finished his response.
 
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\Messages;
 
 
 $client = new MistralClient($apiKey);

@@ -2,8 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
-use Partitech\PhpMistral\OllamaClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\Messages;
 
 
@@ -28,7 +27,7 @@ try {
         $messages,
         $params
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

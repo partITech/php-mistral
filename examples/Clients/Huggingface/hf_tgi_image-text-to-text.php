@@ -2,16 +2,18 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
+use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\HuggingFaceClient;
 use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
 $tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
 
-$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
+//$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
+$client = new TgiClient(url: $tgiUrl);
 
-$message = new Message();
+$message = $client->newMessage();
 $message->setRole('user');
 $message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'Describe this image in detail please.');
 $message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://s3.amazonaws.com/cms.ipressroom.com/338/files/201808/5b894ee1a138352221103195_A680%7Ejogging-edit/A680%7Ejogging-edit_hero.jpg');

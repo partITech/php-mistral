@@ -24,10 +24,7 @@ To enable Guided JSON, simply pass a valid JSON schema in the inference request 
 Example usage:
 
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\JsonSchema\JsonSchema;
-use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);

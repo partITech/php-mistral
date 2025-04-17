@@ -2,9 +2,8 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\LlamaCppClient;
+use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
 use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\MistralClient;
 
 $llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
 $llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"

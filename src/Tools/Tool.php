@@ -15,4 +15,14 @@ class Tool
         $this->type = $type;
         $this->function = $function;
     }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getFunction(): FunctionTool
+    {
+        return $this->function;
+    }
 }

@@ -1,11 +1,13 @@
 <?php
 
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients;
 
 use ArrayObject;
 use DateMalformedStringException;
 use DateTime;
 use DateTimeZone;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\MistralClientException;
 use Throwable;
 
 class Response
@@ -14,6 +16,7 @@ class Response
     private string $object='chat.completion';
     private int $created;
     private string $model;
+    private string $fingerPrint;
     private ArrayObject $choices;
     private ?array $pages;
 
@@ -30,9 +33,9 @@ class Response
      */
     public static function createFromArray(array $data): self
     {
-        $response = new self();
+        $response = new static();
         try{
-            $self = self::updateFromArray($response, $data);
+            $self = static::updateFromArray($response, $data);
         }catch(Throwable $e){
             throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
         }
@@ -58,9 +61,8 @@ class Response
     /**
      * @throws DateMalformedStringException
      */
-    public static function updateFromArray(self $response, array $data): self
+    public static function updateFromArray(self $response, array $data): Response
     {
-
         if (isset($data['id'])) {
             $response->setId($data['id']);
         }
@@ -84,42 +86,20 @@ class Response
             $response->setModel($data['model']);
         }
 
+        // chat response
+        if (isset($data['usage'])) {
+            $response->setUsage($data['usage']);
+        }
+
+        // ocr response
+        if (isset($data['usage_info'])) {
+            $response->setUsage($data['usage_info']);
+        }
+        if (isset($data['pages'])) {
+            $response->setPages($data['pages']);
+        }
 
         $message = $response->getChoices()->count() > 0 ? $response->getChoices()[$response->getChoices()->count() - 1] : new Message();
-
-        // Ollama response
-
-        if (isset($data['message'])) {
-            $message->setRole('assistant');
-            if (isset($data['stream']) && $data['stream'] === true) {
-                $message->updateContent($data['message']['content']);
-                $message->setChunk($data['message']['content']);
-            } else {
-                $message->setContent($data['message']['content']);
-            }
-            $response->addMessage($message);
-            return $response;
-        }
-        if(isset($data['status'])) {
-            $message->updateContent($data['status']);
-            $message->setChunk($data['status']);
-            $response->addMessage($message);
-            return $response;
-        }
-
-
-
-        // Llama.cpp responses
-        if (isset($data['content']) ) {
-            $message->setRole('assistant');
-            if (isset($data['stream']) && $data['stream'] === true) {
-                $message->updateContent($data['content']);
-                $message->setChunk($data['content']);
-            } else {
-                $message->setContent($data['content']);
-            }
-            $response->addMessage($message);
-        }
 
         // Mistral platform response
         if (isset($data['choices'])) {
@@ -157,43 +137,7 @@ class Response
                     $response->addMessage($message);
                 }
             }
-        }
-
-        // TGI generate
-        if(isset($data[0]['generated_text'])) {
-            $message->updateContent($data[0]['generated_text']);
-            $message->setChunk($data[0]['generated_text']);
-            if ($response->getChoices()->count() === 0) {
-                $response->addMessage($message);
-            }
-        }
-        if(isset($data['generated_text'])) {
-            $message->updateContent($data['generated_text']);
-            $message->setChunk($data['generated_text']);
-            if ($response->getChoices()->count() === 0) {
-                $response->addMessage($message);
-            }
-        }
-        if(isset($data['token']) && is_array($data['token']) && isset($data['token']['text'])) {
-            $message->updateContent($data['token']['text']);
-            $message->setChunk($data['token']['text']);
-            if ($response->getChoices()->count() === 0) {
-                $response->addMessage($message);
-            }
-        }
-
-
-        // chat response
-        if (isset($data['usage'])) {
-            $response->setUsage($data['usage']);
-        }
-
-        // ocr response
-        if (isset($data['usage_info'])) {
-            $response->setUsage($data['usage_info']);
-        }
-        if (isset($data['pages'])) {
-            $response->setPages($data['pages']);
+            return $response;
         }
 
         return $response;
@@ -209,13 +153,6 @@ class Response
         $this->choices = $choices;
         return $this;
     }
-
-//    public function addMessage(Message $message): self
-//    {
-//        $this->choices->append($message);
-//
-//        return $this;
-//    }
 
     public function addMessage(Message $message): self
     {
@@ -316,6 +253,14 @@ class Response
 
     public function getGuidedMessage(?bool $associative = null): null|object|array
     {
+        if(is_array($this->getMessage()) && array_is_list($this->getMessage())){
+            foreach($this->getMessage() as $messagePart){
+                if(isset($messagePart['type']) && $messagePart['type'] ==='tool_use' && isset($messagePart['input']) && is_array($messagePart['input'])){
+                    return $messagePart['input'];
+                }
+            }
+        }
+
         if (is_string($this->getMessage()) && json_validate($this->getMessage())) {
             return json_decode($this->getMessage(), $associative);
         }
@@ -323,7 +268,7 @@ class Response
         return null;
     }
 
-    public function getMessage(): ?string
+    public function getMessage(): null|array|string
     {
         return $this->choices->count() === 0 ? null : $this->getLastMessage()->getContent();
     }
@@ -347,6 +292,24 @@ class Response
     public function getPages(): ?array
     {
         return $this->pages;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFingerPrint(): string
+    {
+        return $this->fingerPrint;
+    }
+
+    /**
+     * @param string $fingerPrint
+     * @return Response
+     */
+    public function setFingerPrint(string $fingerPrint): Response
+    {
+        $this->fingerPrint = $fingerPrint;
+        return $this;
     }
 
 }

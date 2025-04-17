@@ -11,9 +11,7 @@ To sen a simple chat query you only have few lines to use.
 With the **max_tokens** set to 250, the result is automatically stopped at the 250 token.
 
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\Messages;
 
 $client = new MistralClient($apiKey);
 

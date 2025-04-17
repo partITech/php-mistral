@@ -2,8 +2,9 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
-use Partitech\PhpMistral\OllamaClient;
+use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\Messages;
+
 $ollamaUrl = getenv('OLLAMA_URL');   // "self hosted Ollama"
 
 $client = new OllamaClient(url: $ollamaUrl);

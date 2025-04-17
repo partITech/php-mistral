@@ -2,9 +2,9 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
-use Partitech\PhpMistral\HuggingFaceClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
 $tgiUrl = getenv('TGI_URL');   // "self hosted tgi"

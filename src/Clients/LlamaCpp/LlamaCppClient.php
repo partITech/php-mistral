@@ -1,11 +1,17 @@
 <?php
 //https://github.com/ggml-org/llama.cpp/tree/master/examples/server#get-props-get-server-global-properties
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\LlamaCpp;
 
 use ArrayObject;
 use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Tokens;
 
 class LlamaCppClient extends Client
 {
@@ -63,6 +69,11 @@ class LlamaCppClient extends Client
         parent::__construct($apiKey, $url);
     }
 
+    public function newMessage():Message
+    {
+        return new Message(type: Message::TYPE_LLAMACPP);
+    }
+
     /**
      * @throws MistralClientException
      */
@@ -91,7 +102,7 @@ class LlamaCppClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return Response::createFromArray($result);
+            return LlamaCppResponse::createFromArray($result);
         }
     }
 
@@ -188,7 +199,7 @@ class LlamaCppClient extends Client
         if($stream){
             return $this->getStream(stream: $result);
         }else{
-            return Response::createFromArray($result);
+            return LlamaCppResponse::createFromArray($result);
         }
     }
 
@@ -222,7 +233,6 @@ class LlamaCppClient extends Client
      */
     public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator
     {
-
         $request = $this->makeChatCompletionRequest(
             definition: $this->chatParametersDefinition,
             messages: $messages,
@@ -234,7 +244,7 @@ class LlamaCppClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return Response::createFromArray($result);
+            return LlamaCppResponse::createFromArray($result);
         }
     }
 

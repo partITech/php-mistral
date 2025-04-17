@@ -1,11 +1,17 @@
 <?php
 
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\Vllm;
 
 use ArrayObject;
 use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Tokens;
 use Throwable;
 
 ini_set('default_socket_timeout', '-1');
@@ -44,6 +50,11 @@ class VllmClient extends Client
         'extra_args'                 => 'array',
     ];
 
+
+    public function newMessage():Message
+    {
+        return new Message(type: Message::TYPE_VLLM);
+    }
 
     /**
      * @throws DateMalformedStringException

@@ -25,8 +25,7 @@ Now you can use the `Messages` object in your `MistralClient::chat()` method.
 
 ```php
 
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;use Partitech\PhpMistral\MistralClientException;
 
 $client = new MistralClient($apiKey);
 

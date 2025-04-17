@@ -1,7 +1,11 @@
 <?php
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\Tei;
 
 // https://github.com/huggingface/text-embeddings-inference
+
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\MistralClientException;
 
 class TeiClient extends Client
 {

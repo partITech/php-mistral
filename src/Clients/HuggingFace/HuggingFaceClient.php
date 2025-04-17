@@ -1,16 +1,10 @@
 <?php
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Clients\HuggingFace;
 
-
-use ArrayObject;
-use DateMalformedStringException;
-use Generator;
-use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Clients\Tgi\TgiClient;
+use Partitech\PhpMistral\MistralClientException;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
 
-
-ini_set('default_socket_timeout', '-1');
 // https://huggingface.co/docs/api-inference/parameters
 // https://github.com/huggingface/text-generation-inference
 // swagger : https://huggingface.github.io/text-generation-inference/
@@ -83,5 +77,4 @@ class HuggingFaceClient extends TgiClient
 
         return parent::sendBinaryRequest($path, $model, $decode);
     }
-
 }
