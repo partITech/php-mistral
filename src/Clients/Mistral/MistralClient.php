@@ -21,9 +21,9 @@ ini_set('default_socket_timeout', '-1');
 class MistralClient extends Client
 {
     protected const string ENDPOINT = 'https://api.mistral.ai';
-    public function __construct(string $apiKey, string $url = self::ENDPOINT, int|float|null $timeout = null)
+    public function __construct(string $apiKey, string $url = self::ENDPOINT)
     {
-        parent::__construct($apiKey, $url, $timeout);
+        parent::__construct($apiKey, $url);
     }
 
     protected array $chatParametersDefinition = [
@@ -326,4 +326,49 @@ class MistralClient extends Client
         $request = ['model' => $model, 'input' => $datas,];
         return $this->request('POST', 'v1/embeddings', $request);
     }
+
+    /**
+     * @throws MistralClientException
+     */
+    public function moderation(string $model, string|array $input, bool $filter = true): array
+    {
+        if(is_string($input)){
+            $input=[$input];
+        }
+        $result = $this->request('POST', 'v1/moderations', ['model' => $model, 'input' => $input]);
+
+        if($filter === false){
+            return $result;
+        }
+
+        $moderationResult = [];
+        foreach($result['results'] as $inputResult){
+            // only get key categories of moderated items
+            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));
+        }
+
+        return $moderationResult;
+    }
+
+
+    /**
+     * @throws MistralClientException
+     */
+    public function chatModeration(string $model, Messages $messages, bool $filter = true): array
+    {
+        $result = $this->request('POST', 'v1/chat/moderations', ['model' => $model, 'input' => $messages->format()]);
+
+        if($filter === false){
+            return $result;
+        }
+
+        $moderationResult = [];
+        foreach($result['results'] as $inputResult){
+            // only get key categories of moderated items
+            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));
+        }
+
+        return $moderationResult;
+    }
+
 }
