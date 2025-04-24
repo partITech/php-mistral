@@ -77,4 +77,14 @@ class HuggingFaceClient extends TgiClient
 
         return parent::sendBinaryRequest($path, $model, $decode);
     }
+
+    /**
+     * @throws MistralClientException
+     */
+    public function listDatasetFiles(string $dataset, string $revision = 'main'): array
+    {
+        $path = "/api/datasets/{$dataset}/revision/{$revision}";
+        $response = $this->request('GET', $path);
+        return $response['siblings'] ?? [];
+    }
 }

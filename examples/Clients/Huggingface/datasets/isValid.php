@@ -1,0 +1,28 @@
+<?php
+require_once __DIR__ . '/../../../../vendor/autoload.php';
+
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
+use Partitech\PhpMistral\MistralClientException;
+
+$apiKey = getenv('HF_TOKEN');
+
+$client = new HuggingFaceDatasetClient (apiKey: (string) $apiKey);
+
+
+try {
+    $isValid = $client->isValid('google/civil_comments');
+} catch (MistralClientException $e) {
+    print_r($e);
+}
+
+print_r($isValid);
+
+//Array
+//(
+//    [preview] => 1
+//    [viewer] => 1
+//    [search] => 1
+//    [filter] => 1
+//    [statistics] => 1
+//)

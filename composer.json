@@ -30,7 +30,9 @@
         "php-http/discovery": "^1.20",
         "psr/http-client": "^1.0",
         "nyholm/psr7": "^1.8",
-        "php-http/multipart-stream-builder": "^1.4"
+        "php-http/multipart-stream-builder": "^1.4",
+        "ext-zip": "*",
+        "czproject/git-php": "^4.4"
     },
     "config": {
         "allow-plugins": {
