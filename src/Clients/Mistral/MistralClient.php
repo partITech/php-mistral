@@ -371,4 +371,25 @@ class MistralClient extends Client
         return $moderationResult;
     }
 
+
+    public function classifications(string $model, string|array $input, bool $filter = true): array
+    {
+        if(is_string($input)){
+            $input=[$input];
+        }
+        $result = $this->request('POST', 'v1/classifications', ['model' => $model, 'input' => $input]);
+
+        if($filter === false){
+            return $result;
+        }
+
+        $moderationResult = [];
+        foreach($result['results'] as $inputResult){
+            // only get key categories of moderated items
+            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));
+        }
+
+        return $moderationResult;
+    }
+
 }

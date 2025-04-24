@@ -114,7 +114,7 @@ class Client extends Psr17Factory implements ClientInterface
         string $method,
         string $path,
         array  $parameters = [],
-        ?bool   $stream = false
+        ?bool  $stream = false
     ): array|ResponseInterface|string
     {
         $uri = rtrim($this->url, '/');
