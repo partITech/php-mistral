@@ -10,15 +10,15 @@ $client = new MistralClient($apiKey);
 
 // Get the full response from la plateforme for your input message for moderation.
 // No moderation is needed for this message.
-//try {
-//    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a very nice person', filter:false);
-//} catch (\Throwable $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
-//
-//
-//print_r($result);
+try {
+    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a very nice person', filter:false);
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+print_r($result);
 
 /*
  Array
@@ -72,15 +72,15 @@ $client = new MistralClient($apiKey);
 
 
 // Get the full response from la plateforme for your input message for moderation
-//try {
-//    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a disgusting person', filter: false);
-//} catch (\Throwable $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
-//
-//
-//print_r($result);
+try {
+    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a disgusting person', filter: false);
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+print_r($result);
 
 /*
  Array
@@ -134,26 +134,26 @@ $client = new MistralClient($apiKey);
 
 
 
-//try {
-//    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a disgusting person', filter: true);
-//} catch (\Throwable $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
-//
-//
-//print_r($result);
-//
-//
-//try {
-//    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a nice person', filter: true);
-//} catch (\Throwable $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
-//
-//
-//print_r($result);
+try {
+    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a disgusting person', filter: true);
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+print_r($result);
+
+
+try {
+    $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a nice person', filter: true);
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+print_r($result);
 
 
 
