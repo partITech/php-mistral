@@ -6,16 +6,16 @@
 
 ### ✅ Integration Overview
 
-| Backend                  | Status       | Notes                                                                 |
-|--------------------------|--------------|-----------------------------------------------------------------------|
-| **Mistral**              | ✅ Complete | Core inference integration operational                               |
-| **VLLM**                 | ✅ Complete | Fully functional, supports parallelized generation                   |
-| **Hugging Face**         | ✅ Complete | Includes: `inference`, `text-embeddings-inference`, `text-generation-inference` |
-| **Ollama**               | ✅ Complete | Local backend support (macOS/Linux-native)                           |
-| **llama.cpp**            | ✅ Complete | C++ bindings via HTTP, ready to use                                  |
-| **Anthropic**            | ✅ Complete | Claude-compatible client working as expected                         |
-| **Grok**                 | ✅ Complete | Early-stage API support included                                     |
-| **Gemini**               | ⏸ Deferred | Low demand – integration postponed for now
+| Backend                  | Status       | Notes                                                                                                    |
+|--------------------------|--------------|----------------------------------------------------------------------------------------------------------|
+| **Mistral**              | ✅ Complete | Allmost complete. last step, fine tuning on the way                                                      |
+| **VLLM**                 | ✅ Complete | Fully functional                                                                                         |
+| **Hugging Face**         | ✅ Complete | Includes: `inference`, `text-embeddings-inference`, `text-generation-inference`, `Datasets manipulation` |
+| **Ollama**               | ✅ Complete | Fully functional                                                            |
+| **llama.cpp**            | ✅ Complete | Fully functional                                                                    |
+| **Anthropic**            | ✅ Complete | Fully functional                                                         |
+| **Grok**                 | ✅ Complete | Fully functional                                                                       |
+| **Gemini**               | ⏸ Deferred | Low demand – integration postponed for now                                                               
 
 ---
 
