@@ -8,7 +8,6 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
-use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tokens;
@@ -21,12 +20,8 @@ ini_set('default_socket_timeout', '-1');
 
 class TgiClient extends Client
 {
+    protected string $clientType = Client::TYPE_TGI;
     protected const string ENDPOINT = 'http://localhost:8080';
-
-    public function newMessage():Message
-    {
-        return new Message(type: Message::TYPE_TGI);
-    }
 
     protected array $chatParametersDefinition = [
         'frequency_penalty'              => ['double', [-2.0, 2.0]],
@@ -178,8 +173,7 @@ class TgiClient extends Client
      */
     public function models(): array
     {
-        $result = $this->request('GET', '/v1/models', stream: false);
-        return $result;
+        return $this->request('GET', '/v1/models', stream: false);
     }
 
 

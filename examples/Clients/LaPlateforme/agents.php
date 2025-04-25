@@ -19,8 +19,7 @@ $apiKey  = getenv('MISTRAL_API_KEY');
 $agentId = getenv('MISTRAL_AGENT_ID');
 
 $client = new MistralClient($apiKey);
-$messages = new Messages();
-$messages->addUserMessage('Write a poem about Paris');
+$messages= $client->getMessages()->addUserMessage('Write a poem about Paris');
 try {
     $result = $client->agent(
         messages: $messages,
@@ -28,6 +27,7 @@ try {
         params: [],
         stream: false
     );
+    print_r($result->getMessage());
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
@@ -58,8 +58,8 @@ Notre ville lumière, pour l'éternité.
  echo PHP_EOL . "*****************" . PHP_EOL;
 
 $client = new MistralClient($apiKey);
-$messages = new Messages();
-$messages->addUserMessage('Write a poem about Paris');
+$messages= $client->getMessages()->addUserMessage('Write a poem about Paris');
+
 try {
     foreach ($client->agent(messages: $messages, agent: $agentId, params: [], stream: true) as $chunk) {
         echo $chunk->getChunk();

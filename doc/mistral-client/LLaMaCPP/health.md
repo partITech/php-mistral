@@ -1,0 +1,26 @@
+## Health
+
+
+### Code
+```php
+use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
+use Partitech\PhpMistral\MistralClientException;
+
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
+
+$client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
+try {
+       // returns Bool.
+    $info = $client->health();
+    print_r($info);
+} catch (MistralClientException $e) {
+    echo $e->getMessage();
+}
+```
+
+### Result
+
+```text
+1
+```

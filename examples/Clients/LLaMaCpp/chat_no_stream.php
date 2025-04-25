@@ -1,42 +1,34 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\Messages;
 
 //docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/llama-3.2-3b-instruct-q8_0.gguf -c 512 --host 0.0.0.0 --port 8080 --metrics
 
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
-
-
-$messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
-
-$params = [
-    'temperature' => 0.7,
-    'top_p' => 1,
-    'max_tokens' => null,
-    'seed' => null,
-];
+$messages = $client->getMessages()->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
 
 try {
     $chatResponse = $client->chat(
         $messages,
-        $params
+        [
+            'temperature' => 0.7,
+            'top_p' => 1,
+            'max_tokens' => null,
+            'seed' => null,
+        ]
     );
+    print_r($chatResponse->getMessage());
 } catch (Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($chatResponse->getMessage());
-
 /*
- * A great question about a classic condiment!
+A great question about a classic condiment!
 
 Dijon mayonnaise, also known as Dijon dressing or Dijon sauce, is a type of mayonnaise that originated from the Dijon region in France. The ingredients that make up traditional Dijon mayonnaise are:
 

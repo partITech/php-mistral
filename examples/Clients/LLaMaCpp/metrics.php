@@ -2,22 +2,20 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\MistralClientException;
 
 // docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/llama-3.2-3b-instruct-q8_0.gguf -c 512 --host 0.0.0.0 --port 8080 --metrics
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
 try {
-    $response = $client->props();
-} catch (MistralClientException $e) {
+    $response = $client->metrics();
+    print_r($response);
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
-
-print_r($response);
 
 
 //Array

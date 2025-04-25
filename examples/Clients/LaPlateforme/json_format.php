@@ -2,15 +2,14 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
-use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 
-// export MISTRAL_API_KEY=your_api_key
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
 
-$messages = new Messages();
-$messages->addUserMessage('What is the best French cheese? Return the product and produce location in JSON format');
+$messages = $client
+    ->getMessages()
+    ->addUserMessage('What is the best French cheese? Return the product and produce location in JSON format');
 
 $params = [
     'model' => 'mistral-large-latest',

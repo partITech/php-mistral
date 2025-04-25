@@ -3,37 +3,46 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 
 // export MISTRAL_API_KEY=your_api_key
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
 
-$message = new Message();
+$message = $client->newMessage();
 $message->setRole('user');
-$message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'Describe this image in detail please.');
-$message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://s3.amazonaws.com/cms.ipressroom.com/338/files/201808/5b894ee1a138352221103195_A680%7Ejogging-edit/A680%7Ejogging-edit_hero.jpg');
-$message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'and theses two images as well. Answer in French.');
-$message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://www.wolframcloud.com/obj/resourcesystem/images/a0e/a0ee3983-46c6-4c92-b85d-059044639928/6af8cfb971db031b.png');
-$message->addContent(type: Message::MESSAGE_TYPE_BASE64, content: realpath('./medias/pixtral_image_example_charts.jpeg'));
-$messages = new Messages();
-$messages->addMessage($message);
+$message->addContent(
+    type: Message::MESSAGE_TYPE_TEXT,
+    content: 'Describe this image in detail please.'
+);
+$message->addContent(
+    type: Message::MESSAGE_TYPE_IMAGE_URL,
+    content: 'https://s3.amazonaws.com/cms.ipressroom.com/338/files/201808/5b894ee1a138352221103195_A680%7Ejogging-edit/A680%7Ejogging-edit_hero.jpg'
+);
+$message->addContent(
+    type: Message::MESSAGE_TYPE_TEXT,
+    content: 'and theses two images as well. Answer in French.'
+);
+$message->addContent(
+    type: Message::MESSAGE_TYPE_IMAGE_URL,
+    content: 'https://www.wolframcloud.com/obj/resourcesystem/images/a0e/a0ee3983-46c6-4c92-b85d-059044639928/6af8cfb971db031b.png'
+);
+$message->addContent(
+    type: Message::MESSAGE_TYPE_BASE64,
+    content: realpath('./../../medias/pixtral_image_example_charts.jpeg')
+);
+$messages = $client
+    ->getMessages()
+    ->addMessage($message);
 
 try {
-    $result = $client->chat(
-        $messages,
-        [
-            'model' => 'pixtral-12b-2409',
-            'max_tokens' => 1024,
-        ]
-    );
-} catch (MistralClientException $e) {
+    $result = $client->chat($messages, ['model' => 'pixtral-12b-2409', 'max_tokens' => 1024,]);
+    print($result->getMessage());
+} catch (Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print($result->getMessage());
+
 /*
 ### Description des Images
 

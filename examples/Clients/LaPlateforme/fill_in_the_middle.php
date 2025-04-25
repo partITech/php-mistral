@@ -37,9 +37,11 @@ try {
 print_r($result->getMessage());
 
 /**
- * function datePlusNdays(\DateTime $date, $n) {
+ * function datePlusNDays(\DateTime $date, int $n) {
  * $datePlusNdays = clone $date;
- * $datePlusNdays->add(new \DateInterval('P'.abs($n).'D'));
+ * $datePlusNdays->modify("+$n days");
+ * return $datePlusNdays;
+ * }
  */
 
 ###############################################

@@ -17,13 +17,14 @@ use Psr\Http\Message\ResponseInterface;
 
 class XAiClient extends Client
 {
+    protected string $clientType = Client::TYPE_XAI;
 
     protected const string ENDPOINT = 'https://api.x.ai/';
 
     protected array $chatParametersDefinition = [
         'temperature'           => ['double', [0, 1]],
         'max_tokens'            => 'integer',
-        'reasoning_effort'      => 'string', // low  medium high
+        'reasoning_effort'      => 'string', // low medium high
         'seed'                  => 'integer',
         'n'                     => 'integer',
         'max_completion_tokens' => 'integer',
@@ -37,11 +38,6 @@ class XAiClient extends Client
     public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
     {
         parent::__construct(apiKey: $apiKey, url: $url);
-    }
-
-    public function newMessage():Message
-    {
-        return new Message(type: Message::TYPE_XAI);
     }
 
     protected function handleGuidedJson(array &$return, mixed $json, Messages $messages): void
@@ -115,7 +111,9 @@ class XAiClient extends Client
     }
 
 
-
+    /**
+     * @throws MistralClientException
+     */
     public function listLanguageModels(): array
     {
         return $this->request('GET', 'v1/language-models');
@@ -129,6 +127,9 @@ class XAiClient extends Client
         return $this->request('GET', 'v1/language-models/' . $id);
     }
 
+    /**
+     * @throws MistralClientException
+     */
     public function listImageGenerationModels(): array
     {
         return $this->request('GET', 'v1/image-generation-models');
@@ -159,5 +160,4 @@ class XAiClient extends Client
         $tokens->setModel($model);
         return $tokens;
     }
-
 }

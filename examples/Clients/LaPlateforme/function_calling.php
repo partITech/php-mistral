@@ -12,7 +12,6 @@ use Partitech\PhpMistral\Tools\Tool;
 $model = 'ministral-8b-latest';
 $temperature = 0.3;
 
-// export MISTRAL_API_KEY=
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient(apiKey: $apiKey);
 
@@ -89,7 +88,7 @@ $namesToFunctions = [
     "retrievePaymentDate" => $retrievePaymentDate(...)
 ];
 
-// Create the tools definition
+// Create the tool definition
 $transactionIdParam = new Parameter(
     type: Parameter::STRING_TYPE,
     name: 'transactionId',
@@ -162,8 +161,8 @@ $tools = [
 //    }
 //]
 
-$messages = new Messages();
-$messages->addUserMessage(content: "What's the status of my transaction?");
+$messages = $client->getMessages()
+    ->addUserMessage(content: "What's the status of my transaction?");
 
 try {
     $chatResponse = $client->chat(
@@ -175,7 +174,7 @@ try {
             'tool_choice' => Client::TOOL_CHOICE_AUTO
         ]
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
@@ -267,7 +266,7 @@ try {
             'tool_choice' => Client::TOOL_CHOICE_AUTO
         ]
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

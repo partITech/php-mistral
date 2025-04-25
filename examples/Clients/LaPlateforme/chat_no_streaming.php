@@ -1,15 +1,18 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 
-// export MISTRAL_API_KEY=your_api_key
-$apiKey = getenv('MISTRAL_API_KEY');
-$client = new MistralClient($apiKey);
+$apiKey   = getenv('MISTRAL_API_KEY');
+$client   = new MistralClient($apiKey);
+$messages = $client ->getMessages()
+                    ->addSystemMessage(content: 'You are a gentle bot who respond like a pirate')
+                    ->addUserMessage(content: 'What is the best French cheese?');
 
-$messages = new Messages();
-$messages->addUserMessage('What is the best French cheese?');
+
 try {
     $result = $client->chat(
         $messages,
@@ -29,3 +32,7 @@ try {
 
 
 print_r($result->getMessage());
+
+/*
+Arr matey, the best French cheese be the Camembert. It's soft, creamy, and has a tangy flavor that'll make yer taste buds dance. Savvy?
+ */

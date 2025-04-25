@@ -3,6 +3,7 @@
 namespace Partitech\PhpMistral;
 
 use http\Exception\InvalidArgumentException;
+use Partitech\PhpMistral\Clients\Client;
 
 class Message
 {
@@ -15,12 +16,7 @@ class Message
     public const string MESSAGE_TYPE_DOCUMENT_URL = 'document_url';
     public const string MESSAGE_TYPE_DOCUMENT_BASE64 = 'document_base64'; // only used by anthropic for pdf documents
     private bool $urlAsArray=false;
-    public const string TYPE_ANTHROPIC = 'Anthropic';
-    public const string TYPE_XAI = 'XAi';
-    public const string TYPE_TGI = 'TGI';
-    public const string TYPE_OLLAMA = 'OLLAMA';
-    public const string TYPE_LLAMACPP = 'LLAMACPP';
-    public const string TYPE_VLLM = 'VLLM';
+
 
     private ?string $role     = null;
     private null|string|array $content  = null;
@@ -30,9 +26,9 @@ class Message
     private ?string $name = null;
     private string $type;
 
-    public function __construct(string $type='openai')
+    public function __construct(string $type = Client::TYPE_OPENAI)
     {
-        $this->type=$type;
+        $this->type = $type;
     }
 
     /**
@@ -215,7 +211,7 @@ class Message
                 'text' => $content
             ];
         }else if($type === self::MESSAGE_TYPE_IMAGE_URL){
-            if($this->type === self::TYPE_ANTHROPIC){
+            if($this->type === Client::TYPE_ANTHROPIC){
                 $msgContent = [
                     'type' => 'image',
                     'source' => [
@@ -223,7 +219,7 @@ class Message
                         'url'=> $content
                     ]
                 ];
-            }elseif($type===self::TYPE_XAI){
+            }elseif($type === Client::TYPE_XAI){
                 $msgContent = [
                     'type' => 'image_url',
                     'image_url' => [
@@ -249,7 +245,7 @@ class Message
                 'audio_url' => ['url'=> $content ]
             ];
         }else if($type === self::MESSAGE_TYPE_DOCUMENT_URL){
-            if($this->type === self::TYPE_ANTHROPIC){
+            if($this->type === Client::TYPE_ANTHROPIC){
                 $msgContent = [
                     'type' => 'document',
                     'source' => [
@@ -277,7 +273,7 @@ class Message
             }
 
             $base64Data = base64_encode(file_get_contents($content));
-            if($this->type === self::TYPE_ANTHROPIC) {
+            if($this->type === Client::TYPE_ANTHROPIC) {
                 $msgContent = [
                     'type' => 'document',
                     'source' => [
@@ -300,7 +296,7 @@ class Message
             }
 
             $base64Data = base64_encode(file_get_contents($content));
-            if($this->type === self::TYPE_ANTHROPIC){
+            if($this->type === Client::TYPE_ANTHROPIC){
                 $msgContent = [
                     'type' => 'image',
                     'source' => [
@@ -309,7 +305,7 @@ class Message
                         'data' => $base64Data
                     ]
                 ];
-            }else if($this->type === self::TYPE_XAI){
+            }else if($this->type === Client::TYPE_XAI){
                 $msgContent = [
                     'type' => 'image_url',
                     'image_url' => [

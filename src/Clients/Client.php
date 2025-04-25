@@ -62,11 +62,26 @@ class Client extends Psr17Factory implements ClientInterface
     public const string ENCODING_FORMAT_BASE64='base64';
     protected bool $messageMultiModalUrlTypeArray=false;
 
+
+    public const string TYPE_ANTHROPIC = 'Anthropic';
+    public const string TYPE_XAI = 'XAi';
+    public const string TYPE_OPENAI = 'OpenAI';
+    public const string TYPE_TGI = 'TGI';
+    public const string TYPE_TEI = 'TEI';
+    public const string TYPE_OLLAMA = 'OLLAMA';
+    public const string TYPE_LLAMACPP = 'LLAMACPP';
+    public const string TYPE_VLLM = 'VLLM';
+    public const string TYPE_MISTRAL = 'Mistral';
+    public const string TYPE_HUGGINGFACE = 'HuggingFace';
+
+
+
     protected ?string $provider=null;
     protected ?string $urlModel=null;
     protected array $additionalHeaders = [];
     protected array $params = [];
-
+    protected string $clientType = self::TYPE_OPENAI;
+    protected Messages $messages;
 
     public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
     {
@@ -76,11 +91,7 @@ class Client extends Psr17Factory implements ClientInterface
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
         $this->apiKey = $apiKey;
         $this->url = $url;
-    }
-
-    public function newMessage():Message
-    {
-        return new Message();
+        $this->messages = $this->newMessages();
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface
@@ -500,5 +511,20 @@ class Client extends Psr17Factory implements ClientInterface
         }
 
         return false;
+    }
+
+    public function getMessages():Messages
+    {
+        return $this->messages;
+    }
+
+    public function newMessage():Message
+    {
+        return new Message(type: $this->clientType);
+    }
+
+    public function newMessages():Messages
+    {
+        return new Messages(type: $this->clientType);
     }
 }

@@ -15,28 +15,39 @@ $client = new AnthropicClient(apiKey: (string)$apiKey);
 // So we can use function calling process, and we have changed a bit the guided_json utility as for the others client to replicate the same as vllm
 // in order to smoothly switch between clients.
 
-$messages = new Messages();
-$messages->addUserMessage("I'm a HUGE hater of pickles.  I actually despise pickles.  They are garbage.");
-
-$params = ['model' => 'claude-3-7-sonnet-20250219', 'temperature' => 0.2, 'max_tokens' => 512, 'guided_json' => new SentimentScoresFunctionSchema()];
+$messages = $client
+    ->getMessages()
+    ->addUserMessage("I'm a HUGE hater of pickles.  I actually despise pickles.  They are garbage.");
 
 try {
-    $chatResponse = $client->chat($messages, $params);
+    $chatResponse = $client->chat(
+        $messages,
+        [
+            'model' => 'claude-3-7-sonnet-20250219',
+            'temperature' => 0.2,
+            'max_tokens' => 512,
+            'guided_json' => new SentimentScoresFunctionSchema()
+        ]
+    );
+
+    $guidedMessage = $chatResponse->getGuidedMessage();
+    print_r($guidedMessage);
+
+    $toolCallResponse = $chatResponse->getToolCalls();
+
+    print_r($toolCallResponse[0]['function']['arguments']);
 } catch (Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
-$guidedMessage = $chatResponse->getGuidedMessage();
-print_r($guidedMessage);
 
-$toolCallResponse = $chatResponse->getToolCalls();
 
-print_r($toolCallResponse[0]['function']['arguments']);
-
-//Array
-//(
-//    [positive_score] => 0.01
-//    [negative_score] => 0.92
-//    [neutral_score] => 0.07
-//)
+/*
+Array
+(
+    [positive_score] => 0.01
+    [negative_score] => 0.92
+    [neutral_score] => 0.07
+)
+ */
 

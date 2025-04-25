@@ -10,80 +10,133 @@ $apiKey = getenv('ANTHROPIC_API_KEY');
 $client = new AnthropicClient(apiKey: (string)$apiKey);
 $file = $client->downloadToTmp('https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf');
 
-$message = $client->newMessage()->setRole('user')->addContent(type: Message::MESSAGE_TYPE_TEXT, content: 'What are the key findings in this document?')->addContent(type: Message::MESSAGE_TYPE_DOCUMENT_BASE64, content: realpath($file));
+$message = $client
+    ->newMessage()
+    ->setRole('user')
+    ->addContent(type: Message::MESSAGE_TYPE_TEXT, content: 'What are the key findings in this document?')
+    ->addContent(type: Message::MESSAGE_TYPE_DOCUMENT_BASE64, content: realpath($file));
 $messages = new Messages();
 $messages->addMessage($message);
 
 try {
-    $result = $client->chat($messages, ['model' => 'claude-3-5-haiku-20241022', 'max_tokens' => 1024,]);
+    $result = $client->chat(
+        $messages,
+        [
+            'model' => 'claude-3-5-haiku-20241022',
+            'max_tokens' => 1024
+        ]
+    );
+    print($result->getMessage());
 } catch (Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
+/*
+ Based on the document, here are the key findings for the Claude 3.5 Sonnet and Claude 3.5 Haiku models:
 
-print($result->getMessage());
+1. New Capabilities:
+- Claude 3.5 Sonnet introduces a new computer use capability, allowing it to:
+  - Interpret screenshots
+  - Generate GUI computer commands
+  - Navigate websites and web applications
+  - Interact with user interfaces
+  - Complete multi-step processes
+
+2. Performance Improvements:
+- Achieved state-of-the-art results in several domains:
+  - SWE-bench Verified: 49.0% pass rate (highest to date)
+  - TAU-bench: 69.2% success in retail customer service, 46.0% in airline domain
+  - Agentic coding tasks: 78% problem-solving success
+  - Vision capabilities: Top performance in mathematical reasoning, chart interpretation, and document analysis
+
+3. Human Feedback Evaluations:
+- Outperformed previous models in:
+  - Document analysis (61% win rate)
+  - Visual understanding (57% win rate)
+  - Creative writing (58% win rate)
+  - Coding (52% win rate)
+  - Following precise instructions (51% win rate)
+
+4. Safety Considerations:
+- Underwent extensive safety evaluations
+- Classified under AI Safety Level (ASL)-2
+- Improved harm reduction compared to previous models
+- No identified catastrophic risks
+
+5. Knowledge Cutoff:
+- Claude 3.5 Sonnet: April 2024
+- Claude 3.5 Haiku: July 2024
+
+The models demonstrate significant advances in reasoning, coding, visual processing, and task completion capabilities.
+ */
 
 echo PHP_EOL . "____________________________________________________________" . PHP_EOL;
+$client = new AnthropicClient(apiKey: (string)$apiKey);
 
-$message = new Message(type: Message::TYPE_ANTHROPIC);
-$message->setRole('user');
-$message->addContent(type: Message::MESSAGE_TYPE_TEXT, content: 'What are the key findings in this document?');
-$message->addContent(type: Message::MESSAGE_TYPE_DOCUMENT_URL, content: 'https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf');
-$messages = new Messages();
-$messages->addMessage($message);
+$message = $client
+    ->newMessage()
+    ->setRole('user')
+    ->addContent(type: Message::MESSAGE_TYPE_TEXT, content: 'What are the key findings in this document?')
+    ->addContent(type: Message::MESSAGE_TYPE_DOCUMENT_URL, content: 'https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf');
+$messages = $client->getMessages()->addMessage($message);
 
 try {
-    $result = $client->chat($messages, ['model' => 'claude-3-5-haiku-20241022', 'max_tokens' => 1024,]);
+    $result = $client->chat(
+        $messages,
+        [
+            'model' => 'claude-3-5-haiku-20241022',
+            'max_tokens' => 1024
+        ]
+    );
+    print($result->getMessage());
 } catch (Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print($result->getMessage());
 
-/**
- * # Summary of Claude 3.5 Haiku and Upgraded Claude 3.5 Sonnet
- *
- * This model card addendum describes two new models from Anthropic: an upgraded version of Claude 3.5 Sonnet and the new Claude 3.5 Haiku. Here are the key points:
- *
- * ## Key Capabilities and Improvements
- *
- * ### Upgraded Claude 3.5 Sonnet:
- * - Introduces computer use capability: can interpret GUI screenshots and generate appropriate tool calls
- * - Can navigate websites, interact with interfaces, and complete multi-step processes
- * - Sets new state-of-the-art standards in agentic coding (SWE-bench), task completion (TAU-bench), and computer use (OSWorld)
- * - Achieves 14.9% success rate on OSWorld tasks (22% with increased interaction steps)
- * - Knowledge cutoff: April 2024
- *
- * ### Claude 3.5 Haiku:
- * - Smaller model that performs comparably to the original Claude 3.5 Sonnet in many areas
- * - Strong at reasoning and instruction following
- * - Will initially launch as a text-only model
- * - Knowledge cutoff: July 2024
- *
- * ## Performance Highlights
- *
- * ### Tool Use & Agentic Tasks:
- * - Upgraded Sonnet: 49.0% on SWE-bench Verified (vs. 33.4% for original)
- * - Haiku: 40.6% on SWE-bench Verified (better than original Sonnet)
- * - On TAU-bench, Upgraded Sonnet achieves 69.2% for retail and 46.0% for airline domains
- *
- * ### Reasoning & Coding:
- * - Both models show improvements in mathematical reasoning, coding, and general problem-solving
- * - Upgraded Sonnet achieves 78.3% on MATH problems and 93.7% on HumanEval
- * - Haiku achieves 69.2% on MATH and 88.1% on HumanEval
- *
- * ### Vision Capabilities (Upgraded Sonnet):
- * - State-of-the-art performance on multimodal evaluations
- * - 70.7% on MathVista, 95.3% on AI2D, 90.8% on ChartQA
- *
- * ## Safety Evaluations
- *
- * - Both models underwent extensive safety evaluations for biological, cybersecurity, and autonomous behavior risks
- * - Testing included multimodal red-team exercises and specific evaluations for computer use
- * - Pre-deployment testing conducted with US AI Safety Institute and UK AI Safety Institute
- * - Trust & Safety evaluations across 14 policy areas in 6 languages
- * - Enhanced ability to recognize and resist prompt injection attempts
- *
- * The document highlights that while the computer use capability represents a significant advancement, it's still in early development stages and safety remains a priority.
+
+/*
+Based on my analysis of the document, here are the key findings:
+
+1. Model Capabilities:
+- Upgraded Claude 3.5 Sonnet introduces a new computer use capability, allowing it to:
+  - Interpret screenshots
+  - Navigate websites and web applications
+  - Interact with user interfaces
+  - Perform multi-step complex tasks
+
+2. Performance Improvements:
+- Achieved state-of-the-art results in several benchmarks:
+  - SWE-bench Verified: 49.0% pass rate (compared to previous 33.4%)
+  - TAU-bench: 69.2% success in retail customer service cases
+  - OSWorld: 22% success rate in computer use tasks (up from 14.9%)
+
+3. Vision and Reasoning Capabilities:
+- Improved performance in visual processing:
+  - MathVista: 70.7% accuracy
+  - AI2D (science diagrams): 95.3% accuracy
+  - ChartQA: 90.8% accuracy
+  - DocVQA: 94.2% accuracy
+
+4. Human Feedback Evaluations:
+- Outperformed previous models in areas like:
+  - Document analysis (61% win rate)
+  - Visual understanding (57% win rate)
+  - Creative writing (58% win rate)
+  - Coding (52% win rate)
+
+5. Safety Considerations:
+- Underwent extensive safety evaluations
+- Classified under AI Safety Level (ASL)-2
+- Improvements in prompt injection resistance
+- No identified catastrophic risk potential
+
+6. Claude 3.5 Haiku:
+- Performs comparably to original Claude 3.5 Sonnet in many tasks
+- Demonstrates improvements over previous Haiku model
+
+7. Knowledge Cutoff:
+- Claude 3.5 Sonnet: April 2024
+- Claude 3.5 Haiku: July 2024
  */

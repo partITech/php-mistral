@@ -7,8 +7,7 @@ use Partitech\PhpMistral\Messages;
 // export MISTRAL_API_KEY=your_api_key
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
-$messages = new Messages();
-$messages->addUserMessage('What is the best French cheese?');
+$messages = $client->getMessages()->addUserMessage('What is the best French cheese?');
 
 try {
     $result = $client->chatModeration(model: 'mistral-moderation-latest', messages: $messages, filter: false);
@@ -19,10 +18,7 @@ try {
 
 print_r($result);
 
-
-
-$messages = new Messages();
-$messages->addUserMessage('You are a disgusting person');
+$messages = $client->getMessages()->addUserMessage('You are a disgusting person');
 try {
     $result = $client->chatModeration(model: 'mistral-moderation-latest', messages: $messages, filter: true);
 } catch (\Throwable $e) {

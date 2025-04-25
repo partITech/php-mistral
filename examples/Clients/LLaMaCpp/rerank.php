@@ -2,10 +2,9 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\MistralClientException;
 
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
@@ -48,13 +47,14 @@ try {
     $rerank = $client->rerank(
         query: "What are the health benefits of yoga?",
         documents: $documents,
-        top: 3);
-} catch (MistralClientException $e) {
+        top: 3
+    );
+    print_r($rerank);
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($rerank);
 /*
 Array
 (

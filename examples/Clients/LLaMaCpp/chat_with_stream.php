@@ -1,19 +1,16 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
 
-$messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
+$messages = $client->getMessages()->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
 
 $params = [
     'temperature' => 0.7,

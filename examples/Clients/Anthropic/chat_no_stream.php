@@ -8,16 +8,15 @@ use Partitech\PhpMistral\Messages;
 $apiKey = getenv('ANTHROPIC_API_KEY');
 $client = new AnthropicClient(apiKey: (string)$apiKey);
 
-$messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
+$messages = $client->getMessages()->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
 
 $params = ['model' => 'claude-3-7-sonnet-20250219', 'temperature' => 0.7, 'max_tokens' => 1024];
 
 try {
     $chatResponse = $client->chat($messages, $params);
+    print_r($chatResponse->getMessage());
 } catch (Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($chatResponse->getMessage());

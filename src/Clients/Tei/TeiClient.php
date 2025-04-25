@@ -9,6 +9,7 @@ use Partitech\PhpMistral\MistralClientException;
 
 class TeiClient extends Client
 {
+    protected string $clientType = Client::TYPE_TEI;
     protected const string ENDPOINT = 'http://localhost:8080';
 
     public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)

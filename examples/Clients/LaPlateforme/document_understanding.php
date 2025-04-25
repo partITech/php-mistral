@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
@@ -9,13 +10,12 @@ use Partitech\PhpMistral\Messages;
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
 
-$message = new Message();
+$message = $client->newMessage();
 $message->setRole('user');
 $message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'Resume this document.');
 $message->addContent(type: Message::MESSAGE_TYPE_DOCUMENT_URL,    content: 'https://arxiv.org/pdf/1805.04770');
 
-$messages = new Messages();
-$messages->addMessage($message);
+$messages = $client->getMessages()->addMessage($message);
 
 try {
     $result = $client->chat(
@@ -27,12 +27,15 @@ try {
             'document_page_limit'   => 64
         ]
     );
+
+    print($result->getMessage());
+
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print($result->getMessage());
+
 /*
 ### Resume of the Document
 

@@ -9,6 +9,7 @@ use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\File;
 use Partitech\PhpMistral\Files;
+use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 use Psr\Http\Message\ResponseInterface;
@@ -20,26 +21,23 @@ ini_set('default_socket_timeout', '-1');
 
 class MistralClient extends Client
 {
-    protected const string ENDPOINT = 'https://api.mistral.ai';
-    public function __construct(string $apiKey, string $url = self::ENDPOINT)
-    {
-        parent::__construct($apiKey, $url);
-    }
+    protected string $clientType = self::TYPE_MISTRAL;
 
+    protected const string ENDPOINT = 'https://api.mistral.ai';
     protected array $chatParametersDefinition = [
-        'temperature'        => ['numeric', [0, 0.7]],
-        'top_p'              => ['numeric', [0, 1]], // Default: 1
-        'max_tokens'         => 'integer',
-        'stop'               => 'string',
-        'random_seed'        => ['numeric', [0, PHP_INT_MAX]],
-        'presence_penalty'   => ['numeric', [-2, 2]],  // Default: 0
-        'frequency_penalty'  => ['numeric', [-2, 2]], // Default: 0
-        'n'                  => 'integer',
-        'safe_prompt'        => 'boolean',
-        'include_image_base64' => 'boolean',
-        'document_image_limit' => 'integer',
-        'document_page_limit' => 'integer',
-    ];
+    'temperature'        => ['numeric', [0, 0.7]],
+    'top_p'              => ['numeric', [0, 1]], // Default: 1
+    'max_tokens'         => 'integer',
+    'stop'               => 'string',
+    'random_seed'        => ['numeric', [0, PHP_INT_MAX]],
+    'presence_penalty'   => ['numeric', [-2, 2]],  // Default: 0
+    'frequency_penalty'  => ['numeric', [-2, 2]], // Default: 0
+    'n'                  => 'integer',
+    'safe_prompt'        => 'boolean',
+    'include_image_base64' => 'boolean',
+    'document_image_limit' => 'integer',
+    'document_page_limit' => 'integer',
+];
 
     protected array $fimParametersDefinition = [
         'temperature'        => ['numeric', [0, 0.7]],
@@ -51,7 +49,10 @@ class MistralClient extends Client
         'random_seed'        => ['numeric', [0, PHP_INT_MAX]],
         'min_tokens'         => ['numeric', [0, PHP_INT_MAX]],
     ];
-
+    public function __construct(string $apiKey, string $url = self::ENDPOINT)
+    {
+        parent::__construct($apiKey, $url);
+    }
 
 
     protected function handleGuidedJson(array &$return, mixed $json, Messages $messages): void
@@ -344,7 +345,7 @@ class MistralClient extends Client
         $moderationResult = [];
         foreach($result['results'] as $inputResult){
             // only get key categories of moderated items
-            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));
+            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));;
         }
 
         return $moderationResult;
@@ -391,5 +392,4 @@ class MistralClient extends Client
 
         return $moderationResult;
     }
-
 }

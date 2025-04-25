@@ -12,8 +12,8 @@ use Partitech\PhpMistral\Tools\Tool;
 $temperature = 0.3;
 //docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/Mistral-Nemo-Instruct-2407.Q4_K_S.gguf -c 10000 --host 0.0.0.0 --port 8080 --jinja
 
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
@@ -69,7 +69,6 @@ $retrievePaymentStatus = function ($values) use ($data): array|string {
     $key = array_search($transactionId, $data['transactionId']);
     return ['status' => $data['paymentStatus'][$key]];
 };
-
 
 /**
  * This function retrieves the payment date of a transaction id.

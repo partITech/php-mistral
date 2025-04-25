@@ -8,7 +8,6 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
-use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tokens;
@@ -19,6 +18,7 @@ ini_set('default_socket_timeout', '-1');
 
 class VllmClient extends Client
 {
+    protected string $clientType = Client::TYPE_VLLM;
     protected array $chatParametersDefinition = [
         'n'                          => 'integer',
         'best_of'                    => 'integer',
@@ -49,12 +49,6 @@ class VllmClient extends Client
         'allowed_token_ids'          => 'array',
         'extra_args'                 => 'array',
     ];
-
-
-    public function newMessage():Message
-    {
-        return new Message(type: Message::TYPE_VLLM);
-    }
 
     /**
      * @throws DateMalformedStringException
@@ -230,6 +224,4 @@ class VllmClient extends Client
         $request = ['model' => $model, 'query' => $query, 'documents' => $documents, 'top_n' => $top];
         return $this->request('POST', 'v1/rerank', $request);
     }
-
-
 }

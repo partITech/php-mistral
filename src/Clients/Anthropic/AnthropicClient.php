@@ -18,6 +18,7 @@ ini_set('default_socket_timeout', '-1');
 
 class AnthropicClient extends Client
 {
+    protected string $clientType = self::TYPE_ANTHROPIC;
     protected array $chatParametersDefinition = [
         'max_tokens'            => 'integer',
         'max_completion_tokens' => 'integer',
@@ -30,11 +31,6 @@ class AnthropicClient extends Client
 
     ];
     protected const string ENDPOINT = 'https://api.anthropic.com/';
-
-    public function newMessage():Message
-    {
-        return new Message(type: Message::TYPE_ANTHROPIC);
-    }
 
     public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
     {

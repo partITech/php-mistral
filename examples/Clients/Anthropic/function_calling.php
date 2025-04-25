@@ -7,7 +7,6 @@ use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
-use Partitech\PhpMistral\Message;
 
 $apiKey = getenv('ANTHROPIC_API_KEY');
 $temperature = 0.7;
@@ -16,7 +15,13 @@ $model = 'claude-3-5-haiku-20241022';
 $client = new AnthropicClient(apiKey: (string)$apiKey);
 
 // Assuming we have the following data
-$data = ["transactionId" => ['T1001', 'T1002', 'T1003', 'T1004', 'T1005'], "customerId" => ['C001', 'C002', 'C003', 'C002', 'C001'], "paymentAmount" => [125.50, 89.99, 120.00, 54.30, 210.20], "paymentDate" => ['2021-10-05', '2021-10-06', '2021-10-07', '2021-10-05', '2021-10-08'], "paymentStatus" => ['Paid', 'Unpaid', 'Paid', 'Paid', 'Pending']];
+$data = [
+    "transactionId" => ['T1001', 'T1002', 'T1003', 'T1004', 'T1005'],
+    "customerId" => ['C001', 'C002', 'C003', 'C002', 'C001'],
+    "paymentAmount" => [125.50, 89.99, 120.00, 54.30, 210.20],
+    "paymentDate" => ['2021-10-05', '2021-10-06', '2021-10-07', '2021-10-05', '2021-10-08'],
+    "paymentStatus" => ['Paid', 'Unpaid', 'Paid', 'Paid', 'Pending']
+];
 
 /**
  * This function retrieves the payment status of a transaction id.
@@ -176,7 +181,7 @@ $messages->addAssistantMessage(content: $chatResponse->getMessage(),
 
 // Add the tool message to query anthropic for a message
 // For anthropic you will need to add specific clientType as the tools response is not in a mistral nor vllm way
-$messages->addToolMessage(name: $toolCall['function']['name'], content: $namesToFunctions[$functionName]($functionParams), toolCallId: $toolCall['id'], clientType: Message::TYPE_ANTHROPIC);
+$messages->addToolMessage(name: $toolCall['function']['name'], content: $namesToFunctions[$functionName]($functionParams), toolCallId: $toolCall['id']);
 
 try {
     $chatResponse = $client->chat(messages: $messages, params: ['model' => $model, 'tools' => $tools, 'max_tokens' => 512, 'tool_choice' => Client::TOOL_CHOICE_AUTO]);

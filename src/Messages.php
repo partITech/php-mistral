@@ -3,6 +3,7 @@
 namespace Partitech\PhpMistral;
 
 use ArrayObject;
+use Partitech\PhpMistral\Clients\Client;
 
 class Messages
 {
@@ -14,11 +15,13 @@ class Messages
     private ArrayObject $messages;
     private ?array $document=null;
 
-    public function __construct()
+    private string $type;
+
+    public function __construct(string $type = Client::TYPE_OPENAI)
     {
+        $this->type = $type;
         $this->messages = new ArrayObject();
     }
-
 
     /**
      * @return ArrayObject
@@ -58,7 +61,7 @@ class Messages
 
     public function addSystemMessage(string $content): self
     {
-        $message = new Message();
+        $message = new Message(type: $this->type);
         $message->setRole(self::ROLE_SYSTEM);
         $message->setContent($content);
         $this->addMessage($message);
@@ -67,7 +70,7 @@ class Messages
 
     public function addUserMessage(string $content): self
     {
-        $message = new Message();
+        $message = new Message(type: $this->type);
         $message->setRole(self::ROLE_USER);
         $message->setContent($content);
         $this->addMessage($message);
@@ -91,33 +94,32 @@ class Messages
         ];
     }
 
-    public function addToolMessage(string $name, string|array $content, string $toolCallId, ?string $clientType=null): self
+    public function addToolMessage(string $name, string|array $content, string $toolCallId): self
     {
-        if($clientType===Message::TYPE_ANTHROPIC){
-            $message = new Message();
+        $message = new Message($this->type);
+        if($this->type===CLIENT::TYPE_ANTHROPIC){
             $message->setRole(self::ROLE_USER);
             $message->setContent([[
                 'type' => 'tool_result',
                 'tool_use_id' => $toolCallId,
                 'content' => (is_array($content)) ? reset($content) : $content
             ]]);
-            $this->addMessage($message);
 
         }else{
-            $message = new Message();
             $message->setRole(self::ROLE_TOOL);
             $message->setContent($content);
             $message->setName($name);
             $message->setToolCallId($toolCallId);
-            $this->addMessage($message);
         }
+
+        $this->addMessage($message);
 
         return $this;
     }
 
     public function addAssistantMessage(null|string|array $content, null|array $toolCalls = null): self
     {
-        $message = new Message();
+        $message = new Message($this->type);
         $message->setRole(self::ROLE_ASSISTANT);
         $message->setContent($content);
         $message->setToolCalls($toolCalls);

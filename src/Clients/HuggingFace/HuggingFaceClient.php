@@ -1,6 +1,7 @@
 <?php
 namespace Partitech\PhpMistral\Clients\HuggingFace;
 
+use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 use Partitech\PhpMistral\MistralClientException;
 use Psr\Http\Message\ResponseInterface;
@@ -11,6 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class HuggingFaceClient extends TgiClient
 {
+    protected string $clientType = Client::TYPE_HUGGINGFACE;
     protected const string ENDPOINT = 'https://router.huggingface.co';
 
     public function __construct(

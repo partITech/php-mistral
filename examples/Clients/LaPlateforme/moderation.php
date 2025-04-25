@@ -12,13 +12,11 @@ $client = new MistralClient($apiKey);
 // No moderation is needed for this message.
 try {
     $result = $client->moderation(model: 'mistral-moderation-latest' , input: 'you are a very nice person', filter:false);
+    print_r($result);
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
-
-
-print_r($result);
 
 /*
  Array

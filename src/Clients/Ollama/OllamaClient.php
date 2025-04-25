@@ -6,12 +6,12 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
-use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
 
 class OllamaClient extends Client
 {
+    protected string $clientType = Client::TYPE_OLLAMA;
     protected array $chatParametersDefinition = [
         'frequency_penalty'          => 'double',
         'presence_penalty'           => 'double',
@@ -29,11 +29,6 @@ class OllamaClient extends Client
     public function __construct(string $url = self::ENDPOINT)
     {
         parent::__construct(url: $url);
-    }
-
-    public function newMessage():Message
-    {
-        return new Message(type: Message::TYPE_OLLAMA);
     }
 
     /**
@@ -87,7 +82,7 @@ class OllamaClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|DateMalformedStringException
      */
     public function pull(string $model, bool $insecure = false, bool $stream = false): array|Generator
     {
