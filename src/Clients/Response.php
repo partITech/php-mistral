@@ -49,7 +49,7 @@ class Response
             $datas = json_decode($json, true);
             $datas['stream'] = $stream;
             try{
-                return self::createFromArray($datas);
+                return static::createFromArray($datas);
             }catch(Throwable $e){
                 new MistralClientException($e->getMessage(), $e->getCode(), $e);
             }

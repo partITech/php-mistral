@@ -18,6 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 class XAiClient extends Client
 {
     protected string $clientType = Client::TYPE_XAI;
+    protected string $responseClass = XAIResponse::class;
 
     protected const string ENDPOINT = 'https://api.x.ai/';
 

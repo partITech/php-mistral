@@ -5,9 +5,14 @@ require_once './../SimpleListSchema.php';
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
+$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 
-$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
+$client = new HuggingFaceClient(
+    apiKey: (string) $apiKey,
+    provider: 'hf-inference',
+    useCache: true,
+    waitForModel: true
+);
 
 $inputs = [
     'question' => 'what is my name ?',

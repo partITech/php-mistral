@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -11,12 +10,16 @@ $client = new HuggingFaceDatasetClient (apiKey: (string) $apiKey);
 
 
 try {
-    $searchResult = $client->search(dataset: 'cornell-movie-review-data/rotten_tomatoes', split: 'train', config: 'default', query: 'love');
+    $searchResult = $client->search(
+        dataset: 'cornell-movie-review-data/rotten_tomatoes',
+        split: 'train',
+        config: 'default',
+        query: 'love'
+    );
+    print_r($searchResult);
 } catch (MistralClientException $e) {
     print_r($e);
 }
-
-print_r($searchResult);
 
 /*
 Array

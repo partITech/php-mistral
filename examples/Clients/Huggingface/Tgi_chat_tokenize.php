@@ -1,22 +1,18 @@
 <?php
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
-use Partitech\PhpMistral\Messages;
 
 $tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
 $apiKey='';
 
 $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 
-$messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise?');
+$messages = $client->getMessages()->addUserMessage('What are the ingredients that make up dijon mayonnaise?');
 
 $params = [
-    'model' => 'mistralai/Mistral-Nemo-Instruct-2407', // from https://huggingface.co/models?inference=warm&sort=trending&search=mistral
-    'guided_json' => new SimpleListSchema()
+    'model' => 'mistralai/Mistral-Nemo-Instruct-2407'
 ];
 
 try {
@@ -24,12 +20,13 @@ try {
         $messages,
         $params
     );
+    print_r($chatResponse);
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($chatResponse);
+
 /*
  *
  *

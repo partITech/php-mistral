@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -9,14 +8,17 @@ $apiKey = getenv('HF_TOKEN');
 
 $client = new HuggingFaceDatasetClient (apiKey: (string) $apiKey);
 
-
 try {
-    $firstRows = $client->firstRows(dataset: 'ibm-research/duorc', split: 'train', config: 'SelfRC');
+    $firstRows = $client->firstRows(
+        dataset: 'ibm-research/duorc',
+        split: 'train',
+        config: 'SelfRC'
+    );
+    print_r($firstRows);
 } catch (MistralClientException $e) {
-    print_r($e);
+    print_r($e->getMessage());
 }
 
-print_r($firstRows);
 
 /*
 Array

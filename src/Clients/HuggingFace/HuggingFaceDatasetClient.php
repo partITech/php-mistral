@@ -43,7 +43,7 @@ class HuggingFaceDatasetClient extends Client
             $destination = sys_get_temp_dir() . '/' . uniqid("hf_{$datasetFileName}_");
         }
 
-        if (!is_dir($destination) && !mkdir($destination) && !is_dir($destination)) {
+        if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
             throw new RuntimeException("Failed to create temp directory: $destination");
         }
 
@@ -154,6 +154,9 @@ class HuggingFaceDatasetClient extends Client
     }
 
 
+    /**
+     * @throws MistralClientException
+     */
     public function statistics(string $dataset, string $split, string $config): array
     {
         $this->url = self::ENDPOINT_DATASET_SERVER;
@@ -267,33 +270,6 @@ class HuggingFaceDatasetClient extends Client
         ];
     }
 
-
-
-
-//    /**
-//     * @throws MistralClientException
-//     */
-//    public function commit(string $repository, string $dir, array $files, string $branch = 'main', string $summary,  string $commitMessage = 'Ajout de fichiers'): array
-//    {
-//        $this->url = self::ENDPOINT_HUGGINGFACE;
-//        $return = [];
-//        foreach ($files as $file) {
-//            $contents = file_get_contents($dir. DIRECTORY_SEPARATOR .  $file);
-//            $parameters = [
-//                'commit_message' => $commitMessage,
-//                'summary' => $summary,
-//                'operations' => [
-//                    "operation" => "add",
-//                    'path' => $file,
-//                    'content' => base64_encode($contents),
-//                ]
-//            ];
-//            $return[] = $this->request('POST', "/api/datasets/{$repository}/commit/{$branch}", $parameters);
-//        }
-//        return $return;
-//    }
-
-
     /**
      * @throws MistralClientException
      */
@@ -338,5 +314,4 @@ class HuggingFaceDatasetClient extends Client
 
         return $files;
     }
-
 }

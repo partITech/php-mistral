@@ -1,17 +1,27 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
+$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 
-$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
+$client = new HuggingFaceClient(
+    apiKey: (string) $apiKey,
+    provider: 'hf-inference',
+    useCache: true,
+    waitForModel: true
+);
 
 $path = $filePath = realpath("./../../medias/cat_scooter_sherlock.png");
+
 try {
-    $response = $client->sendBinaryRequest(path: $path, model: 'facebook/detr-resnet-50', decode: true, pipeline: 'object-detection');
+    $response = $client->sendBinaryRequest(
+        path: $path,
+        model: 'facebook/detr-resnet-50',
+        decode: true,
+        pipeline: 'object-detection'
+    );
     print_r($response) ;
 } catch (MistralClientException $e) {
     echo $e->getMessage();
@@ -33,7 +43,6 @@ Array
                     [xmax] => 851
                     [ymax] => 979
                 )
-
         )
 
     [1] => Array
@@ -47,16 +56,18 @@ Array
                     [xmax] => 929
                     [ymax] => 871
                 )
-
         )
-
 )
  *
  */
 
 $path = $filePath = realpath("./../../medias/lake_bird.png");
 try {
-    $response = $client->sendBinaryRequest(path: $path, model: 'facebook/detr-resnet-101', decode: true);
+    $response = $client->sendBinaryRequest(
+        path: $path,
+        model: 'facebook/detr-resnet-101',
+        decode: true
+    );
     print_r($response) ;
 } catch (MistralClientException $e) {
     echo $e->getMessage();
@@ -78,8 +89,6 @@ Array
                     [xmax] => 968
                     [ymax] => 954
                 )
-
         )
-
 )
  */

@@ -12,6 +12,7 @@ use Partitech\PhpMistral\MistralClientException;
 class OllamaClient extends Client
 {
     protected string $clientType = Client::TYPE_OLLAMA;
+    protected string $responseClass = OllamaResponse::class;
     protected array $chatParametersDefinition = [
         'frequency_penalty'          => 'double',
         'presence_penalty'           => 'double',

@@ -1,17 +1,8 @@
-<?php
-require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
+## Multimodal
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
-use Partitech\PhpMistral\Clients\Tgi\TgiClient;
-use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\Messages;
-
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
-$tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
-
-//$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
-$client = new TgiClient(url: $tgiUrl);
+### Code
+```php
+$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
 
 $message = $client->newMessage();
 $message->setRole('user');
@@ -32,14 +23,16 @@ try {
         $messages,
         $params
     );
+    print_r($chatResponse->getMessage());
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
+```
 
-print_r($chatResponse->getMessage());
+### Result
 
-/*
+```text
 The image depicts three people running outdoors in a natural setting, surrounded by lush greenery. The background appears to be a serene, green forest or park, indicating a healthy and active environment. The participants are in motion, suggesting they are engaged in a fitness activity.
 
 - The individual on the left is a man wearing a gray, long-sleeved, dotted athletic top and black athletic shorts. He has short hair and is smiling as he runs, showing an active and pleasant demeanor.
@@ -47,4 +40,5 @@ The image depicts three people running outdoors in a natural setting, surrounded
 - The individual on the right is a woman wearing a pink, long-sleeved, ribbed athletic top and black athletic leggings. She has curly hair that flows naturally with her movement and is also smiling, contributing to the overall positive and dynamic scene.
 
 The lighting in the image is bright, suggesting it was taken during the day, possibly in the morning or late afternoon when the sun is softer. The overall atmosphere of the image is one of enthusiasm and camaraderie, emphasizing the joy derived from outdoor physical activities.
-*/
+
+```

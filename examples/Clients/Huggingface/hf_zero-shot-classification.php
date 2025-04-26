@@ -1,12 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
-
+$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 $client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
 
 $inputs = 'Hi, I recently bought a device from your company but it is not working as advertised and I would like to get reimbursed!';

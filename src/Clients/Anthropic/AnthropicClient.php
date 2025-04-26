@@ -19,6 +19,7 @@ ini_set('default_socket_timeout', '-1');
 class AnthropicClient extends Client
 {
     protected string $clientType = self::TYPE_ANTHROPIC;
+    protected string $responseClass = AnthropicResponse::class;
     protected array $chatParametersDefinition = [
         'max_tokens'            => 'integer',
         'max_completion_tokens' => 'integer',

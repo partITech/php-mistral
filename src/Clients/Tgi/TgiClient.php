@@ -21,6 +21,7 @@ ini_set('default_socket_timeout', '-1');
 class TgiClient extends Client
 {
     protected string $clientType = Client::TYPE_TGI;
+    protected string $responseClass = TgiResponse::class;
     protected const string ENDPOINT = 'http://localhost:8080';
 
     protected array $chatParametersDefinition = [

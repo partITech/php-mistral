@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
 use Partitech\PhpMistral\MistralClientException;
 

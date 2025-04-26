@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -12,11 +11,10 @@ $client = new HuggingFaceDatasetClient (apiKey: (string) $apiKey);
 
 try {
     $repository = $client->create(name: 'rotten_tomatoes2', type: HuggingFaceDatasetClient::REPOSITORY_TYPE_DATASET, private: false);
+    print_r($repository);
 } catch (MistralClientException $e) {
     print_r($e);
 }
-
-print_r($repository);
 
 /*
 Array

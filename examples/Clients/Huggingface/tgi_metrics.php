@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 

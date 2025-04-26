@@ -69,7 +69,7 @@ class HuggingFaceClient extends TgiClient
     /**
      * @throws MistralClientException
      */
-    public function sendBinaryRequest(string $path, string $model = '', bool $decode=false, ?string $pipeline=null):mixed
+    public function sendBinaryRequest(string $path, string $model = '', bool $decode=false, ?string $pipeline=null): mixed
     {
         if(!is_null($pipeline)){
             $model = 'pipeline/' . $pipeline . '/' . $model;

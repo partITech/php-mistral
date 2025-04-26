@@ -47,3 +47,54 @@
 - [Rerank](LLaMaCPP/rerank.md)
 - [Slots](LLaMaCPP/slots.md)
 - [Tokenize|Detokenize](LLaMaCPP/tokenize-detokenize.md)
+
+## Hugging Face datasets
+- [Create](HuggingFaceDataset/create.md)
+- [Commit](HuggingFaceDataset/commit.md)
+- [Delete](HuggingFaceDataset/delete.md)
+- [Download](HuggingFaceDataset/download.md)
+- [First row](HuggingFaceDataset/firstRow.md)
+- [Is valid](HuggingFaceDataset/isValid.md)
+- [List by author](HuggingFaceDataset/listByAuthor.md)
+- [Rename](HuggingFaceDataset/rename.md)
+- [Rows](HuggingFaceDataset/rows.md)
+- [Search](HuggingFaceDataset/search.md)
+- [Splits](HuggingFaceDataset/splits.md)
+- [Statistics](HuggingFaceDataset/statistics.md)
+
+## Hugging Face TEI
+- [Embed](TextEmbeddingInference/embed.md)
+- [Embed sparse](TextEmbeddingInference/embed_sparse.md)
+- [Predict](TextEmbeddingInference/predict.md)
+- [Rerank](TextEmbeddingInference/rerank.md)
+
+## Hungging Face TGI
+- [Chat no stream](HuggingFaceTGI/tchat_no_stream.md)
+- [Chat with stream](HuggingFaceTGI/tchat_with_stream.md)
+- [Generate](HuggingFaceTGI/generate.md)
+- [Multimodal](HuggingFaceTGI/multimodal.md)
+- [Chat tokenize](HuggingFaceTGI/chat_tokenize.md)
+- [Health](HuggingFaceTGI/health.md)
+- [Info](HuggingFaceTGI/info.md)
+- [Metrics](HuggingFaceTGI/metrics.md)
+- [Models](HuggingFaceTGI/models.md)
+- [Tokenize](HuggingFaceTGI/tokenize.md)
+
+
+
+## Hugging Face Inference
+- [Chat no stream](HuggingFaceInference/tchat_no_stream.md)
+- [Chat with stream](HuggingFaceInference/tchat_with_stream.md)
+- [Generate](HuggingFaceInference/generate.md)
+- [Audio classification](HuggingFaceInference/audio_classification.md)
+- [Feature extraction](HuggingFaceInference/feature_extraction.md)
+- [Fill mask](HuggingFaceInference/Fill_mask.md)
+- [Object detection](HuggingFaceInference/object_detection.md)
+- [Speech recognition](HuggingFaceInference/speech_recognition.md)
+- [Summarization](HuggingFaceInference/summarization.md)
+- [Table question answering](HuggingFaceInference/table_question_answering.md)
+- [Text classification](HuggingFaceInference/text_classification.md)
+- [Text to image](HuggingFaceInference/text_to_image.md)
+- [Multimodal](HuggingFaceInference/multimodal.md)
+- [Translation](HuggingFaceInference/translation.md)
+- [Zero shot classification](HuggingFaceInference/zero_shot_classification.md)

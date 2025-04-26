@@ -82,7 +82,7 @@ class Client extends Psr17Factory implements ClientInterface
     protected array $params = [];
     protected string $clientType = self::TYPE_OPENAI;
     protected Messages $messages;
-
+    protected string $responseClass = Response::class;
     public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
     {
         parent::__construct();
@@ -312,7 +312,7 @@ class Client extends Psr17Factory implements ClientInterface
     {
         $response = null;
         $body = $stream->getBody();
-
+        $responseClass = $this->responseClass;
         while(!$body->eof()){
             $chunk = $body->read(8192);
 
@@ -338,7 +338,7 @@ class Client extends Psr17Factory implements ClientInterface
 
             if(is_string($datas)){
                 if(json_validate($datas)){
-                    yield $response = Response::createFromJson($datas, true);
+                    yield $response = $responseClass::createFromJson($datas, true);
                 }
                 continue;
             }
@@ -350,9 +350,9 @@ class Client extends Psr17Factory implements ClientInterface
                 $data = json_decode($data, true);
                 $data['stream'] = true;
                 if ($response === null) {
-                    $response = Response::createFromArray($data);
+                    $response = $responseClass::createFromArray($data);
                 } else {
-                    $response = Response::updateFromArray($response, $data);
+                    $response = $responseClass::updateFromArray($response, $data);
                 }
 
                 yield $response;

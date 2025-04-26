@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
-use Partitech\PhpMistral\MistralClientException;
 
 /*
 commit uses git lfs
@@ -14,7 +12,6 @@ https://git-lfs.com/
 $apiKey = getenv('HF_TOKEN');
 $hfUser = getenv('HF_USER');
 $client = new HuggingFaceDatasetClient (apiKey: (string) $apiKey);
-
 
 $files = $client->listFiles('mon_dataset');
 

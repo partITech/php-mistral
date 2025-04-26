@@ -1,23 +1,21 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
+$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 
 $client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
 
-$path = $filePath = realpath("./../../medias/mit.wav");
+$path = realpath("./../../medias/mit.wav");
 try {
-    $response = $client->sendBinaryRequest(path: $path, model: 'speechbrain/google_speech_command_xvector', decode: true);
+    $response = $client->sendBinaryRequest(path: $path, model: 'speechbrain/google_speech_command_xvector', pipeline:'audio-classification', decode: true);
     print_r($response) ;
 } catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
 }
-
 
 /*
 Array
