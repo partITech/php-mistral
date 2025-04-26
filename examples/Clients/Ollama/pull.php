@@ -1,25 +1,24 @@
 <?php
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$ollamaUrl = getenv('OLLAMA_URL');   // "self hosted Ollama"
+$ollamaUrl = getenv('OLLAMA_URL');
 
 $client = new OllamaClient(url: $ollamaUrl);
 
 // List Running Models
-//try {
-//    $info = $client->pull(
-//        model : 'llama3.2:1b',
-//        insecure : true
-//    );
-//    print_r($info);
-//} catch (MistralClientException $e) {
-//    echo $e->getMessage();
-//}
+try {
+    $info = $client->pull(
+        model : 'llama3.2:1b',
+        insecure : true
+    );
+    print_r($info);
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+}
 
 /*
  Array
@@ -92,7 +91,7 @@ try {
     foreach ($client->pull(model: 'mistral', insecure: true, stream: true) as $chunk) {
         echo $chunk->getChunk() . PHP_EOL;
     }
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
 }
 

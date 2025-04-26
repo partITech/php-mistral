@@ -1,7 +1,7 @@
-<?php
+## Copy
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
+### Code
+```php
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -15,4 +15,10 @@ try {
 } catch (MistralClientException $e) {
     echo $e->getMessage();
 }
+```
 
+### Result
+
+```text
+successfully copied to mistral_copy
+```

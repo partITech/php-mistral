@@ -1,6 +1,9 @@
-<?php
-require_once __DIR__ . '/../../../vendor/autoload.php';
+## Function calling
+> [!NOTE]
+> For a deeper understanding of the **function calling** concept, please refer to the [Function Calling](/mistral-client?file=Basics/function_calling.md) page, which provides more detailed explanations and examples.
 
+
+```php
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\Tools\FunctionTool;
@@ -13,7 +16,10 @@ $model = 'llama3.2:3b';
 
 $client = new OllamaClient(url: $ollamaUrl);
 
-// Assuming we have the following data
+```
+### Initial datas
+Assuming we have the following data
+```php
 $data = [
     "transactionId" => [
         'T1001',
@@ -51,7 +57,10 @@ $data = [
         'Pending'
     ]
 ];
+```
 
+### Callable functions
+```php
 /**
  * This function retrieves the payment status of a transaction id.
  */
@@ -85,8 +94,11 @@ $namesToFunctions = [
     "retrievePaymentStatus" => $retrievePaymentStatus(...),
     "retrievePaymentDate" => $retrievePaymentDate(...)
 ];
+```
 
-// Create the tools definition
+### Create the tool definition
+
+```php
 $transactionIdParam = new Parameter(
     type: Parameter::STRING_TYPE,
     name: 'transactionId',
@@ -102,7 +114,6 @@ $retrievePaymentStatusFunction = new FunctionTool(
     ]
 );
 
-
 $retrievePaymentDateFunction = new FunctionTool(
     name: 'retrievePaymentDate',
     description: 'Get payment date of a transaction id',
@@ -115,50 +126,57 @@ $tools = [
     new Tool('function', $retrievePaymentStatusFunction),
     new Tool('function', $retrievePaymentDateFunction),
 ];
+```
+$tools should be encoded as json by HttpClient.
 
-// $tools should be encoded as json by HttpClient.
-// $jsonTools = json_encode($tools, JSON_PRETTY_PRINT);
-//[
-//    {
-//        "type": "function",
-//        "function": {
-//        "name": "retrievePaymentStatus",
-//            "description": "Get payment status of a transaction id",
-//            "parameters": {
-//            "type": "object",
-//                "required": [
-//                "transactionId"
-//            ],
-//                "properties": {
-//                "transactionId": {
-//                    "type": "string",
-//                        "description": "The transaction id."
-//                    }
-//                }
-//            }
-//        }
-//    },
-//    {
-//        "type": "function",
-//        "function": {
-//        "name": "retrievePaymentDate",
-//            "description": "Get payment date of a transaction id",
-//            "parameters": {
-//            "type": "object",
-//                "required": [
-//                "transactionId"
-//            ],
-//                "properties": {
-//                "transactionId": {
-//                    "type": "string",
-//                        "description": "The transaction id."
-//                    }
-//                }
-//            }
-//        }
-//    }
-//]
+```php
+$jsonTools = json_encode($tools, JSON_PRETTY_PRINT);
+```
+```json
+[
+    {
+        "type": "function",
+        "function": {
+        "name": "retrievePaymentStatus",
+            "description": "Get payment status of a transaction id",
+            "parameters": {
+            "type": "object",
+                "required": [
+                "transactionId"
+            ],
+                "properties": {
+                "transactionId": {
+                    "type": "string",
+                        "description": "The transaction id."
+                    }
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+        "name": "retrievePaymentDate",
+            "description": "Get payment date of a transaction id",
+            "parameters": {
+            "type": "object",
+                "required": [
+                "transactionId"
+            ],
+                "properties": {
+                "transactionId": {
+                    "type": "string",
+                        "description": "The transaction id."
+                    }
+                }
+            }
+        }
+    }
+]
+```
+### Message query
 
+```php
 $messages = $client->getMessages()
     ->addUserMessage(content: "What's the status of my transaction?");
 
@@ -176,23 +194,33 @@ try {
     echo $e->getMessage();
     exit(1);
 }
+```
 
-// print_r($chatResponse->getMessage());
-// will output :
-// I'd be happy to help you with that!
-// However, I'll need a bit more information to provide a useful response.
-// Could you please tell me the type of transaction you're referring to? It could be a bank transaction,
-// a purchase from an online store, a cryptocurrency transfer, or something else.
-// Additionally, if you have any specific details like a transaction ID, that would be very helpful.
-// Please note that I can't access personal data or account details, but I can guide you on how to check the status.
+```php
+print_r($chatResponse->getMessage());
+```
+will output :
 
+```text
+ I'd be happy to help you with that!
+ However, I'll need a bit more information to provide a useful response.
+ Could you please tell me the type of transaction you're referring to? It could be a bank transaction,
+ a purchase from an online store, a cryptocurrency transfer, or something else.
+ Additionally, if you have any specific details like a transaction ID, that would be very helpful.
+ Please note that I can't access personal data or account details, but I can guide you on how to check the status.
+```
 
-
-// Push response to history
+#### Push response to history
+```php
 $messages->addAssistantMessage(content: $chatResponse->getMessage());
-// Add customer response
+```
+#### Add customer response
+```php
 $messages->addUserMessage(content: 'My transaction ID is T1001.');
+```
 
+#### Request the model with this new information
+```php
 try {
     $chatResponse = $client->chat(
         messages: $messages,
@@ -212,49 +240,69 @@ $toolCallResponse = $chatResponse->getToolCalls();
 $toolCall = $toolCallResponse[0];
 $functionName = $toolCall['function']['name'];
 $functionParams = $toolCall['function']['arguments'];
+print_r($toolCall);
+```
+```text
+Array
+(
+    [id] => 1b9Ds90lR
+    [function] => Array
+        (
+            [name] => retrievePaymentStatus
+            [arguments] => Array
+                (
+                    [transactionId] => T1001
+                )
+        )
+)
+```
 
-// Call the proper function
+#### Call the proper function
+```php
 $functionResult = $namesToFunctions[$functionName]($functionParams);
-
-//print_r($toolCall);
-//Array
-//(
-//    [id] => 1b9Ds90lR
-//    [function] => Array
-//        (
-//            [name] => retrievePaymentStatus
-//            [arguments] => Array
-//                (
-//                    [transactionId] => T1001
-//                )
-//        )
-//)
-
 print_r($functionResult);
-//Array
-//(
-//    [status] => Paid
-//)
+```
 
+```text
+Array
+(
+    [status] => Paid
+)
+
+```
+```php
 print_r($functionParams);
-//Array
-//(
-//    [transactionId] => T1001
-//)
+```
+```text
+Array
+(
+    [transactionId] => T1001
+)
+```
 
-// Add the last assistant message to messages history
+#### Add the last assistant message to messages history
+```php
 $messages->addAssistantMessage(
     content: $chatResponse->getMessage(),
     toolCalls: $chatResponse->getToolCalls()
 );
+```
 
-// Add the tool message to query mistral for a message
+
+#### Add the tool message to query mistral
+Finally add to message history the callable function's result
+
+```php
 $messages->addToolMessage(
     name: $toolCall['function']['name'],
     content: $namesToFunctions[$functionName]($functionParams),
     toolCallId: $toolCall['id']
 );
+```
 
+### Final query
+
+```php 
 try {
     $chatResponse = $client->chat(
         messages: $messages,
@@ -270,5 +318,8 @@ try {
 }
 
 print_r($chatResponse->getMessage());
+```
 
-//The current status of your transaction (T1001) is "Paid". If you need further details or have any other questions, feel free to ask!
+```text
+The current status of your transaction (T1001) is "Paid". If you need further details or have any other questions, feel free to ask!
+```

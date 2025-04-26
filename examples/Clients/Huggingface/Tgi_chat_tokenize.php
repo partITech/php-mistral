@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 
-$tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
+$tgiUrl = getenv('TGI_URL');
 $apiKey='';
 
 $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);

@@ -54,7 +54,7 @@
 - [Delete](HuggingFaceDataset/delete.md)
 - [Download](HuggingFaceDataset/download.md)
 - [First row](HuggingFaceDataset/firstRow.md)
-- [Is valid](HuggingFaceDataset/isValid.md)
+- [is Valid](HuggingFaceDataset/isValid.md)
 - [List by author](HuggingFaceDataset/listByAuthor.md)
 - [Rename](HuggingFaceDataset/rename.md)
 - [Rows](HuggingFaceDataset/rows.md)
@@ -68,7 +68,7 @@
 - [Predict](TextEmbeddingInference/predict.md)
 - [Rerank](TextEmbeddingInference/rerank.md)
 
-## Hugging Face TGI
+## Hungging Face TGI
 - [Chat no stream](HuggingFaceTGI/tchat_no_stream.md)
 - [Chat with stream](HuggingFaceTGI/tchat_with_stream.md)
 - [Generate](HuggingFaceTGI/generate.md)
@@ -98,3 +98,17 @@
 - [Multimodal](HuggingFaceInference/multimodal.md)
 - [Translation](HuggingFaceInference/translation.md)
 - [Zero shot classification](HuggingFaceInference/zero_shot_classification.md)
+
+## Ollama
+- [Chat no stream](Ollana/tchat_no_stream.md)
+- [Chat with stream](Ollana/tchat_with_stream.md)
+- [Copy](Ollama/copy.md)
+- [Delete](Ollama/delete.md)
+- [Embed](Ollama/embed.md)
+- [Function Calling](Ollama/function_calling.md)
+- [Guided JSON](Ollama/guided_json.md)
+- [List](Ollama/list.md)
+- [Multimodal](Ollama/multimodal.md)
+- [Pull](Ollama/pull.md)
+- [Show](Ollama/show.md)
+- [Version](Ollama/version.md)

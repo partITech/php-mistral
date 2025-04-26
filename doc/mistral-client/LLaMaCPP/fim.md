@@ -7,8 +7,8 @@
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
 use Partitech\PhpMistral\Message;
 
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
@@ -53,8 +53,8 @@ function getDatePlusNDays($date, $n) {\n    $datePlusNdays = new \DateTime($date
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
 use Partitech\PhpMistral\Message;
 
-$llamacppUrl = getenv('LLAMACPP_URL');   // "self hosted Ollama"
-$llamacppApiKey = getenv('LLAMACPP_API_KEY');   // "self hosted Ollama"
+$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 

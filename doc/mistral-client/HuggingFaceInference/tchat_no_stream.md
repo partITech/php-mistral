@@ -10,8 +10,8 @@ require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
-$tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
+$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
+$tgiUrl = getenv('TGI_URL');
 
 $client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
 

@@ -1,7 +1,7 @@
-<?php
+## Embed
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
+### Code
+```php
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -15,8 +15,11 @@ try {
 } catch (MistralClientException $e) {
     echo $e->getMessage();
 }
+```
 
-/*
+### Result
+
+```text
 Array
 (
     [model] => mistral
@@ -4128,4 +4131,4 @@ Array
     [load_duration] => 1685828
     [prompt_eval_count] => 6
 )
-*/
+```

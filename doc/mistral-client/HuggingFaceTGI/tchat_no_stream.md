@@ -10,7 +10,7 @@ require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 
-$tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
+$tgiUrl = getenv('TGI_URL');
 
 $client = new TgiClient(url: $tgiUrl);
 

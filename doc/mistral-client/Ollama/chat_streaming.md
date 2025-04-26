@@ -1,6 +1,6 @@
-<?php
-require_once __DIR__ . '/../../../vendor/autoload.php';
+## Simple chat with streaming
 
+```php
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -25,8 +25,10 @@ try {
     echo $e->getMessage();
     exit(1);
 }
+```
 
-/*
+See the result : 
+```php
  Dijon Mayonnaise is a type of mayonnaise that traditionally originates from the Dijon region in France. The basic ingredients for making Dijon mayonnaise include:
 
 1. Egg yolks - These provide the emulsion base for the mayonnaise.
@@ -40,4 +42,6 @@ try {
 5. Salt and pepper - To taste, these season the mayonnaise.
 
 6. Water (optional) - Adding a small amount of water can help thin out the mixture if it becomes too thick during preparation.
- */
+```
+
+

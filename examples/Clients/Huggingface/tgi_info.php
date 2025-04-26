@@ -5,8 +5,8 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');   // "personal_token"
-$tgiUrl = getenv('TGI_URL');   // "self hosted tgi"
+$apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
+$tgiUrl = getenv('TGI_URL');
 
 $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {

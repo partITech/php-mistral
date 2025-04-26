@@ -1,7 +1,7 @@
-<?php
+## Show
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
+### Code
+```php
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\MistralClientException;
 
@@ -14,10 +14,11 @@ try {
 } catch (MistralClientException $e) {
     echo $e->getMessage();
 }
+```
 
+### Result
 
-/*
-
+```text
 Array
 (
     [license] =>                                  Apache License
@@ -520,4 +521,5 @@ stop                           "[/INST]"
 
     [modified_at] => 2025-03-31T12:54:37.206776544Z
 )
-*/
+
+```

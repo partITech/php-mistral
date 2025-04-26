@@ -6,7 +6,7 @@ require_once './../SimpleListSchema.php';
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\MistralClientException;
 
-$ollamaUrl = getenv('OLLAMA_URL');   // "self hosted Ollama"
+$ollamaUrl = getenv('OLLAMA_URL');
 
 $client = new OllamaClient(url: $ollamaUrl);
 
@@ -28,7 +28,7 @@ try {
             echo $msg . PHP_EOL;
         }
     }
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
 }
 

@@ -1,6 +1,7 @@
-<?php
-require_once __DIR__ . '/../../../vendor/autoload.php';
+## Multimodal
 
+### Code
+```php
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
 use Partitech\PhpMistral\Message;
 
@@ -28,10 +29,11 @@ try {
     echo $e->getMessage();
     exit(1);
 }
+```
 
+### Result
 
-
-/*
+```text
 Okay, let's break down each media step-by-step.
 
 **Media 1: Three People Running in a Park**
@@ -74,4 +76,4 @@ Okay, let's break down each media step-by-step.
 
 
 If you would like, give me another media to describe!
- */
+```
