@@ -54,5 +54,5 @@ You're more than welcome to jump in 🙌
 
 ### 🚀 Get Started
 
-- 📖 [Read the early docs](https://github.com/partITech/php-mistral/blob/psr18/doc/menu.md)
+- 📖 [Read the early docs](https://github.com/partITech/php-mistral/blob/psr18/doc/mistral-client/menu.md)
 - 📂 [See real-world usage](https://github.com/partITech/php-mistral/tree/psr18/examples/Clients) – every backend is covered 🧰
