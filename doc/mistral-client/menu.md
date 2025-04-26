@@ -68,7 +68,7 @@
 - [Predict](TextEmbeddingInference/predict.md)
 - [Rerank](TextEmbeddingInference/rerank.md)
 
-## Hungging Face TGI
+## Hugging Face TGI
 - [Chat no stream](HuggingFaceTGI/tchat_no_stream.md)
 - [Chat with stream](HuggingFaceTGI/tchat_with_stream.md)
 - [Generate](HuggingFaceTGI/generate.md)
