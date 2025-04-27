@@ -2,19 +2,19 @@
 - [Quick start](Basics/quick_start.md)
 - [Response Object](Basics/response_object.md)
 - [Multiturn messages](Basics/multiturn_messages.md)
+- [Chat](Basics/chat.md)
 - [Function calling](Basics/function_calling.md)
+- [Socket timeout](Basics/socket_timeout.md)
+
 ---
 
 ## La Plateforme
-- [Chat no streaming](LaPlateforme/chat_no_streaming.md)
-- [Chat with streaming](LaPlateforme/chat_streaming.md)
-- [Socket timeout](LaPlateforme/socket_timeout.md)
+
 - [Embeddings](LaPlateforme/embeddings.md)
 - [Fill in the middle](LaPlateforme/fill_in_the_middle.md)
 - [Vision](LaPlateforme/pixtral.md)
 - [OCR](LaPlateforme/ocr.md)
 - [Document understanding](LaPlateforme/document_understanding.md)
-- [Function calling](LaPlateforme/function_calling.md)
 - [Structured JSON output](LaPlateforme/json_object.md)
 - [Guided JSON output](LaPlateforme/structured_json_output.md)
 - [Agent](LaPlateforme/agent.md)
@@ -23,10 +23,7 @@
 - [Moderation](LaPlateforme/moderation.md)
 
 ## Anthropic
-- [Chat no streaming](Anthropic/chat_no_streaming.md)
-- [Chat with streaming](Anthropic/chat_streaming.md)
 - [Count tokens](Anthropic/count_token.md)
-- [Function calling](Anthropic/function_calling.md)
 - [List models](Anthropic/list_models.md)
 - [Get model](Anthropic/get_model.md)
 - [Multimodal](Anthropic/multimodal.md)
@@ -34,12 +31,9 @@
 - [Sentiment analysis](Anthropic/sentiment_analysis.md)
 
 ## LLaMa.CPP
-- [Chat no streaming](LLaMaCPP/chat_no_streaming.md)
-- [Chat with streaming](LLaMaCPP/chat_streaming.md)
 - [Completion](LLaMaCPP/completion.md)
 - [Embeddings](LLaMaCPP/embeddings.md)
 - [FIM](LLaMaCPP/fim.md)
-- [Function calling](LLaMaCPP/function_calling.md)
 - [Guided JSON output](LLaMaCPP/structured_json_output.md)
 - [Health](LLaMaCPP/health.md)
 - [Metrics](LLaMaCPP/metrics.md)
@@ -69,8 +63,6 @@
 - [Rerank](TextEmbeddingInference/rerank.md)
 
 ## Hungging Face TGI
-- [Chat no stream](HuggingFaceTGI/tchat_no_stream.md)
-- [Chat with stream](HuggingFaceTGI/tchat_with_stream.md)
 - [Generate](HuggingFaceTGI/generate.md)
 - [Multimodal](HuggingFaceTGI/multimodal.md)
 - [Chat tokenize](HuggingFaceTGI/chat_tokenize.md)
@@ -83,8 +75,6 @@
 
 
 ## Hugging Face Inference
-- [Chat no stream](HuggingFaceInference/tchat_no_stream.md)
-- [Chat with stream](HuggingFaceInference/tchat_with_stream.md)
 - [Generate](HuggingFaceInference/generate.md)
 - [Audio classification](HuggingFaceInference/audio_classification.md)
 - [Feature extraction](HuggingFaceInference/feature_extraction.md)
@@ -100,15 +90,15 @@
 - [Zero shot classification](HuggingFaceInference/zero_shot_classification.md)
 
 ## Ollama
-- [Chat no stream](Ollana/tchat_no_stream.md)
-- [Chat with stream](Ollana/tchat_with_stream.md)
 - [Copy](Ollama/copy.md)
 - [Delete](Ollama/delete.md)
 - [Embed](Ollama/embed.md)
-- [Function Calling](Ollama/function_calling.md)
 - [Guided JSON](Ollama/guided_json.md)
 - [List](Ollama/list.md)
 - [Multimodal](Ollama/multimodal.md)
 - [Pull](Ollama/pull.md)
 - [Show](Ollama/show.md)
 - [Version](Ollama/version.md)
+
+
+

@@ -6,7 +6,12 @@ use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 
-$client = new HuggingFaceClient(apiKey: (string) $apiKey, provider: 'hf-inference', useCache: true, waitForModel: true);
+$client = new HuggingFaceClient(
+    apiKey: (string) $apiKey,
+    provider: 'hf-inference',
+    useCache: true,
+    waitForModel: true
+);
 
 $path = realpath("./../../medias/mit.wav");
 try {

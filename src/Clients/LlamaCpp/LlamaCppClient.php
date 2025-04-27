@@ -71,7 +71,7 @@ class LlamaCppClient extends Client
 
     public function newMessage():Message
     {
-        return new Message(type: Message::TYPE_LLAMACPP);
+        return new Message(type: Client::TYPE_LLAMACPP);
     }
 
     /**

@@ -29,7 +29,6 @@ class AnthropicClient extends Client
         'top_p'                 => ['double', [0, 1]],
         'stop'                  => 'string',
         'temperature'           => ['double', [0, 1]],
-
     ];
     protected const string ENDPOINT = 'https://api.anthropic.com/';
 
