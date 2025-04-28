@@ -95,11 +95,105 @@ This ensures **flexibility**, **interoperability**, and **future-proofing** of y
 composer require partitech/php-mistral
 ```
 
+
 ---
 
 ## Example Usages
 
-*(Examples unchanged)*
+### Chat Completion (Streaming)
+
+```php
+$client = new MistralClient($apiKey);
+$messages = $client->getMessages()->addUserMessage('What is the best French cheese?');
+
+$params = [
+    'model' => 'mistral-large-latest',
+        'temperature' => 0.7,
+        'top_p' => 1,
+        'max_tokens' => null,
+        'safe_prompt' => false,
+        'random_seed' => 0
+];
+
+try {
+    /** @var Message $chunk */
+    foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
+        echo $chunk->getChunk();
+    }
+} catch (MistralClientException|DateMalformedStringException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+```
+
+### Dense Embedding
+
+```php
+use Partitech\PhpMistral\Clients\Tei\TeiClient;
+
+$client = new TeiClient(apiKey: $apiKey, url: $embeddingUrl);
+$embedding = $client->embed(inputs: "My name is Olivier and I");
+```
+
+### Sparse Embedding (Splade Pooling)
+
+```php
+$client = new TeiClient(apiKey: (string) $apiKey, url: $teiUrl);
+$embedding = $client->embedSparse(inputs: 'What is Deep Learning?');
+var_dump($embedding);
+```
+
+### Rerank
+
+```php
+$client = new TeiClient(apiKey: $apiKey, url: $teiUrl);
+$results = $client->rerank(
+        query: 'What is the difference between Deep Learning and Machine Learning?',
+        texts: [
+            'Deep learning is...',
+            'cheese is made of',
+            'Deep Learning is not...'
+        ]
+
+    );
+```
+
+### Hugging Face Dataset Management
+
+```php
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
+
+$client = new HuggingFaceDatasetClient(apiKey: $apiKey);
+
+// Commit large dataset to huggingface repository
+$commit = $client->commit(
+    repository: $hfUser . '/test2',
+    dir: realpath('mon_dataset'),
+    files: $client->listFiles('./dir'),
+    summary: 'commit title',
+    commitMessage: 'commit message',
+    branch: 'main'
+);
+
+// get specific dataset page
+$paginatedRows = $client->rows(
+        dataset: 'nvidia/OpenCodeReasoning', 
+        split: 'split_0', 
+        config: 'split_0', 
+        offset: 3, 
+        length: 2 
+    );
+
+// Download Dataset locally
+$dest = $client->downloadDatasetFiles(
+    'google/civil_comments',
+    revision: 'main',
+    destination: '/tmp/downloaded_datasets/civil_comments'
+);
+```
+
+> [!TIP]
+> Combine **Hugging Face Datasets** with **Embeddings** and **Reranking** to build advanced search or finetuning pipelines directly in PHP.
 
 ---
 
