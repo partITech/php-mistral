@@ -1,236 +1,117 @@
-## Response object
+# Response Object
 
+The **Response** object in PhpMistral is a unified structure used to parse and access the results returned from different providers, such as Mistral Platform, OpenAI, Anthropic, TGI, Llama.cpp, Ollama, and xAI.
 
-```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\Messages;
-use \Partitech\PhpMistral\MistralClientException;
+It abstracts the underlying API responses, providing a consistent interface for developers, regardless of the model backend.
 
+> [!TIP]
+> Whether you're using Mistral Platform, OpenAI, TGI, or another backend, the `Response` object offers a standardized way to handle responses.
 
-$client = new MistralClient($apiKey);
+## Core Methods
 
-$messages = new Messages();
-$messages->addUserMessage('What is the best French cheese?');
-try {
-    $result = $client->chat(
-        $messages,
-        [
-            'model' => 'mistral-large-latest',
-            'temperature' => 0.7,
-            'top_p' => 1,
-            'max_tokens' => 250,
-            'safe_prompt' => false,
-            'random_seed' => null
-        ]
-    );
-```
+### `getMessage()`
 
----
-### `$result->getMessage()`
-
-Get the last message response from the server. In fact, it gets the last message from the Messages class, which is a list of messages.
-
-```text
-Choosing the "best" French cheese can be quite subjective, as it often depends on personal taste. France is renowned for its wide variety of cheeses, with estimates suggesting there are over 400 different types. Here are a few that are often highly regarded:
-
-1. **Brie de Meaux**: Often referred to as the "King of Cheeses," Brie de Meaux is a soft cheese with a rich, creamy interior and a bloomy rind.
-
-2. **Camembert de Normandie**: Another soft cheese, Camembert is known for its creamy texture and earthy flavor. It's often enjoyed at room temperature to fully appreciate its aroma and taste.
-
-3. **Roquefort**: This is a classic blue cheese made from sheep's milk. It has a strong, tangy flavor and is often enjoyed with sweet accompaniments like honey or fruit.
-
-4. **Comté**: A hard cheese made from unpasteurized cow's milk, Comté has a complex flavor profile that includes notes of fruit, nuts, and spices.
-
-5. **Reblochon**: A
-```
----
-### `$result->getChunk()`
-
-When using streamed response, it get the las chunk of the message yelded by the server.
-```text
-Det
-erm
-ining
- the
- "
-best
-"
- French
- cheese
- can
- be
- subject
-ive
-,
- as
- it
- often
- depends
- on
- personal
- taste
-.
-
-```
----
-### `$result->getId()`
-Get the id's response from the serer
+Returns the **last complete message** content (usually the assistant's reply). Depending on the context, it might return:
+- A **string**: For standard chat completions.
+- A **structured array/object**: When using **Guided JSON** outputs.
 
 ```php
-6f17daa1804340598531fcc9349138fd
+echo $response->getMessage();
 ```
----
-### `$result->getChoices()`
 
-Get array object with choices responses from the server
+> [!NOTE]
+> In **Guided JSON** mode, `getMessage()` may return a JSON string or array depending on the provider.
+
+---
+
+### `getChunk()`
+
+Used in **streaming mode** to retrieve the **latest chunk** of text yielded by the server.
 
 ```php
-ArrayObject Object
-(
-    [storage:ArrayObject:private] => Array
-        (
-            [0] => Partitech\PhpMistral\Message Object
-                (
-                    [role:Partitech\PhpMistral\Message:private] => assistant
-                    [content:Partitech\PhpMistral\Message:private] => Choosing the "best" French cheese can be quite subjective, as it often depends on personal taste. France is renowned for its wide variety of cheeses, with estimates suggesting there are over 400 different types. Here are a few that are often highly regarded:
-
-1. **Brie de Meaux**: Often referred to as the "King of Cheeses," Brie de Meaux is a soft cheese with a rich, creamy interior and a bloomy rind.
-
-2. **Camembert de Normandie**: Another soft cheese, Camembert is known for its creamy texture and earthy flavor. It's often enjoyed at room temperature to fully appreciate its aroma and taste.
-
-3. **Roquefort**: This is a classic blue cheese made from sheep's milk. It has a strong, tangy flavor and is often enjoyed with sweet accompaniments like honey or fruit.
-
-4. **Comté**: A hard cheese made from unpasteurized cow's milk, Comté has a complex flavor profile that includes notes of fruit, nuts, and spices.
-
-5. **Reblochon**: A
-                    [chunk:Partitech\PhpMistral\Message:private] => 
-                    [toolCalls:Partitech\PhpMistral\Message:private] => 
-                    [toolCallId:Partitech\PhpMistral\Message:private] => 
-                    [name:Partitech\PhpMistral\Message:private] => 
-                )
-
-        )
-
-)
-```
----
-### `$result->getCreated()`
-
-Get created the created response (integer timestamp)
-
-```text
-1741532545
-```
----
-### `$result->getGuidedMessage()`
-
-Get the guided message object. basically the same that the client provided to vllm.
-~~Only use with vllm server~~ At first it was a [VLLM](https://github.com/vllm-project/vllm) only option.
-In the first 2025 quarter, this is now available on La Plateforme, Ollaml and Llama.cpp too. 
-So now hen you use the guided_json option, you can now have the $result->getGuidedMessage() object.
-
-A classe used for the quided_json parameter :
-
-```php
-<?php
-
-use Partitech\PhpMistral\JsonSchema\JsonSchema;
-use KnpLabs\JsonSchema\ObjectSchema;
-
-class SimpleListSchema extends ObjectSchema
-{
-    public function __construct()
-    {
-        $items = JsonSchema::create(
-            title: 'List of items',
-            description: 'Base on uer query, create a list of items to answer.',
-            examples: [
-                "200g golden caster sugar",
-                "200g unsalted butter, softened plus extra for the tins",
-                "4 large eggs",
-                "200g self-raising flour",
-                "½ tsp vanilla extract",
-            ],
-            schema: JsonSchema::text()
-        );
-
-        $collection = JsonSchema::collection(jsonSchema: $items);
-        $this->addProperty(name: 'datas', schema: $collection, required: true);
-    }
-
-    public function getTitle(): string
-    {
-        return 'Simple list';
-    }
-
-    public function getDescription(): string
-    {
-        return 'Analysis of a query and create specific list of answers.';
-    }
+while ($chunk = $response->getChunk()) {
+    echo $chunk;
 }
 ```
-```php
-$client = new MistralClient($apiKey);
 
-$messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up roast beef');
+> [!TIP]
+> Combine `getChunk()` with streaming to progressively display results.
 
-
-$params = [
-    'model' => 'ministral-3b-latest',
-    'temperature' => 0.7,
-    'top_p' => 1,
-    'max_tokens' => null,
-    'safe_prompt' => false,
-    'random_seed' => null,
-    'presence_penalty' => 1,
-    'guided_json' => new SimpleListSchema()
-];
-
-try {
-    $chatResponse = $client->chat(
-        $messages,
-        $params
-    );
-```
-Will return the guided object result.
-
-```text
-stdClass Object
-(
-    [datas] => Array
-        (
-            [0] => 200g beef
-            [1] => 1 tbsp olive oil
-            [2] => 1 tsp salt
-            [3] => 1 tsp black pepper
-            [4] => 1 tsp dried rosemary
-            [5] => 1 tsp dried thyme
-        )
-
-)
-```
 ---
 
-### `$result->getModel()`
-Get the model used.
+### `getId()`
+
+Retrieves the unique **identifier** of the response.
 
 ```php
-mistral-large-latest
+echo $response->getId(); // Example: "6f17daa1804340598531fcc9349138fd"
 ```
 
 ---
-### `$result->getObject()`
 
-get the object index from the response
+### `getChoices()`
+
+Returns an **ArrayObject** of `Message` objects representing the choices from the server.
+
 ```php
-chat.completion
+foreach ($response->getChoices() as $message) {
+    echo $message->getContent();
+}
 ```
 
 ---
-### `$result->getToolCalls()`
 
-Get function response message from the server
+### `getCreated()`
+
+Returns the **timestamp** of when the response was created.
+
+```php
+echo $response->getCreated(); // Example: 1741532545
+```
+
+---
+
+### `getGuidedMessage(bool $associative = null)`
+
+When using **Guided JSON schema**, this method decodes the returned JSON structure into an object or associative array.
+
+```php
+$guidedData = $response->getGuidedMessage(true); 
+print_r($guidedData);
+```
+
+> [!IMPORTANT]
+> Initially specific to **vLLM**, this method is now compatible with **Mistral Platform**, and all chat clients from php-mistral.
+
+---
+
+### `getModel()`
+
+Returns the **model name** used in the request.
+
+```php
+echo $response->getModel(); // Example: "mistral-large-latest"
+```
+
+---
+
+### `getObject()`
+
+Returns the **object type** of the response (typically `chat.completion`).
+
+```php
+echo $response->getObject();
+```
+
+---
+
+### `getToolCalls()`
+
+If **function calling** (tool usage) was triggered, this method returns the related data.
+
+```php
+$toolCalls = $response->getToolCalls();
+```
 
 ```php
 Array
@@ -247,16 +128,80 @@ Array
 )
 ```
 
+> [!NOTE]
+> Only relevant when **tool calling** features are used (e.g., OpenAI, Mistral Platform).
 
 ---
-### `$result->getUsage()`
 
-Get the usage response from the server.
+### `getUsage()`
+
+Provides information about **token usage**:
+
 ```php
 Array
 (
     [prompt_tokens] => 10
-    [total_tokens] => 260
     [completion_tokens] => 250
+    [total_tokens] => 260
 )
 ```
+
+> [!TIP]
+> Useful for monitoring costs and token limits.
+
+---
+
+### `getPages()`
+
+If the provider supports **pagination** (e.g., document processing or OCR), this method returns the associated pages.
+
+---
+
+### `getFingerPrint()`
+
+Specific to some providers (e.g., **xAI**), returns a **system fingerprint**.
+
+```php
+echo $response->getFingerPrint();
+```
+
+---
+
+
+## Example: Guided JSON
+
+```php
+$guidedData = $response->getGuidedMessage(true);
+
+print_r($guidedData);
+```
+
+```php
+Array
+(
+    [datas] => Array
+        (
+            [0] => 200g beef
+            [1] => 1 tbsp olive oil
+            [2] => 1 tsp salt
+            [3] => 1 tsp black pepper
+            [4] => 1 tsp dried rosemary
+            [5] => 1 tsp dried thyme
+        )
+)
+```
+
+---
+
+## Example: Streaming with Chunks
+
+```php
+foreach ($client->chat($messages, $params, stream: true) as $response) {
+    echo $response->getChunk();
+}
+```
+
+---
+
+> [!TIP]
+> The **Response** object abstracts the complexity of different provider responses, offering a developer-friendly API.
