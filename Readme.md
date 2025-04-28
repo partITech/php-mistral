@@ -1,58 +1,196 @@
-> [!WARNING]  
-> ⚠️ This branch (`psr18`) introduces PSR-18 (HTTP Client) support.  
-> The implementation is stable, but still evolving. Expect refinements prior to release.
+**PhpMistral** is an **open-source** PHP client designed to interact with various LLM inference servers (like Mistral, Hugging Face TGI, vLLM, Ollama, llama.cpp, xAI, and more), embedding servers, and Hugging Face datasets.  
+It provides a unified interface for chat completions (streaming & non-streaming), embeddings (dense & sparse), reranking, guided JSON generation, document generation, and Hugging Face dataset management.
+
+> [!IMPORTANT]
+> 📖 **Official Documentation** is available here: [https://php-mistral.partitech.com/](https://php-mistral.partitech.com/)  
+> Make sure to visit for in-depth guides, examples, and advanced usage.
+
+
+
+> [!TIP]
+> Perfect for developers building AI-driven PHP applications: chatbots, document search, reranking, embeddings, or dataset management for finetuning.
 
 ---
 
-### ✅ Integration Overview
+## Key Features
 
-| Backend                  | Status       | Notes                                                                                                    |
-|--------------------------|--------------|----------------------------------------------------------------------------------------------------------|
-| **Mistral**              | ✅ Complete | Allmost complete. last step, fine tuning on the way                                                      |
-| **VLLM**                 | ✅ Complete | Fully functional                                                                                         |
-| **Hugging Face**         | ✅ Complete | Includes: `inference`, `text-embeddings-inference`, `text-generation-inference`, `Datasets manipulation` |
-| **Ollama**               | ✅ Complete | Fully functional                                                            |
-| **llama.cpp**            | ✅ Complete | Fully functional                                                                    |
-| **Anthropic**            | ✅ Complete | Fully functional                                                         |
-| **Grok**                 | ✅ Complete | Fully functional                                                                       |
-| **Gemini**               | ⏸ Deferred | Low demand – integration postponed for now                                                               
+- **Open-source**:
+    - Free to use, modify, and contribute to.
+- **Framework-agnostic**:
+    - Compatible with any PHP framework (Laravel, Symfony, Slim, custom apps, etc.).
+- **Multi-backend support**:
+    - OpenAI, Mistral Platform, Hugging Face TGI, vLLM, Ollama, llama.cpp, xAI, and more.
+- **Chat completions**:
+    - Streaming and non-streaming interactions.
+- **Embeddings**:
+    - Dense embeddings and sparse embeddings (Splade pooling).
+- **Reranking API**:
+    - Compare and rank multiple documents based on a query.
+- **Guided JSON generation**:
+    - Ensure structured outputs based on a schema.
+- **Document generation (Mistral)**:
+    - Generate structured documents directly from models.
+- **Pooling API (vLLM)**:
+    - Efficient load balancing across multiple vLLM servers.
+- **Hugging Face Dataset API**:
+    - Seamlessly interact with Hugging Face datasets, list files, download, manage, and search datasets directly from PHP.
+
+> [!IMPORTANT]
+> The Hugging Face Dataset API is a **must-have** for anyone working with finetuning or dataset manipulation. Easily list, fetch, and manage datasets from Hugging Face directly in your PHP applications.
+
+---
+## Supported Providers & Features
+
+### Core Features
+
+| Provider              | Chat (stream) | Chat (non-stream) | Embeddings | Sparse Embeddings |
+|-----------------------|---------------|-------------------|------------|-------------------|
+| Mistral Platform      | ✅             | ✅                 | ✅          |                   |
+| Hugging Face TGI      | ✅             | ✅                 | ✅          |                   |
+| vLLM                  | ✅             | ✅                 | ✅          |                   |
+| Ollama                | ✅             | ✅                 | ✅          |                   |
+| llama.cpp             | ✅             | ✅                 | ✅          |                   |
+| xAI                   | ✅             | ✅                 | ✅          |                   |
+| Text Embedding Inference |           |                   | ✅          | ✅                 |
+
+### Advanced Features
+
+| Provider              | Rerank | Guided JSON | Documents | Pooling | HF Datasets |
+|-----------------------|--------|-------------|-----------|---------|-------------|
+| Mistral Platform      | ✅      | ✅           | ✅         |         |             |
+| Hugging Face TGI      | ✅      | ✅           |           |         | ✅           |
+| vLLM                  | ✅      | ✅           |           | ✅       |             |
+| Ollama                | ✅      | ✅           |           |         |             |
+| llama.cpp             | ✅      | ✅           |           |         |             |
+| xAI                   | ✅      | ✅           |           |         |             |
+| Text Embedding Inference |    |             |           |         |             |
 
 ---
 
-### 📘 Documentation Status
+## Installation
 
-Full documentation is **currently in development**.
-
-In the meantime, all major use cases — including request building, client configuration, and response handling — are illustrated via real-world examples in:
-
-📁 [`examples/Clients`](https://github.com/partITech/php-mistral/tree/psr18/examples/Clients)
-
-> These are **canonical examples**, directly mapped to each backend’s official API behavior.  
-> You can rely on them today for actual integration and experimentation.
+```bash
+composer require partitech/php-mistral
+```
 
 ---
 
-### 🛠️ Roadmap & Next Steps
+## Example Usages
 
-- 🧪 PHPUnit-based unit testing
-- 📚 Finalize and publish documentation
-- 🧭 Gemini (optional, pending interest)
+### Chat Completion (Streaming)
+
+```php
+$client = new MistralClient($apiKey);
+$messages = $client->getMessages()->addUserMessage('What is the best French cheese?');
+
+$params = [
+    'model' => 'mistral-large-latest',
+        'temperature' => 0.7,
+        'top_p' => 1,
+        'max_tokens' => null,
+        'safe_prompt' => false,
+        'random_seed' => 0
+];
+
+try {
+    /** @var Message $chunk */
+    foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
+        echo $chunk->getChunk();
+    }
+} catch (MistralClientException|DateMalformedStringException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+```
+
+### Dense Embedding
+
+```php
+use Partitech\PhpMistral\Clients\Tei\TeiClient;
+
+$client = new TeiClient(apiKey: $apiKey, url: $embeddingUrl);
+$embedding = $client->embed(inputs: "My name is Olivier and I");
+```
+
+### Sparse Embedding (Splade Pooling)
+
+```php
+$client = new TeiClient(apiKey: (string) $apiKey, url: $teiUrl);
+$embedding = $client->embedSparse(inputs: 'What is Deep Learning?');
+var_dump($embedding);
+```
+
+### Rerank
+
+```php
+$client = new TeiClient(apiKey: $apiKey, url: $teiUrl);
+$results = $client->rerank(
+        query: 'What is the difference between Deep Learning and Machine Learning?',
+        texts: [
+            'Deep learning is...',
+            'cheese is made of',
+            'Deep Learning is not...'
+        ]
+
+    );
+```
+
+### Hugging Face Dataset Management
+
+```php
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
+
+$client = new HuggingFaceDatasetClient(apiKey: $apiKey);
+
+// Commit large dataset to huggingface repository
+$commit = $client->commit(
+    repository: $hfUser . '/test2',
+    dir: realpath('mon_dataset'),
+    files: $client->listFiles('./dir'),
+    summary: 'commit title',
+    commitMessage: 'commit message',
+    branch: 'main'
+);
+
+// get specific dataset page
+$paginatedRows = $client->rows(
+        dataset: 'nvidia/OpenCodeReasoning', 
+        split: 'split_0', 
+        config: 'split_0', 
+        offset: 3, 
+        length: 2 
+    );
+
+// Download Dataset locally
+$dest = $client->downloadDatasetFiles(
+    'google/civil_comments',
+    revision: 'main',
+    destination: '/tmp/downloaded_datasets/civil_comments'
+);
+```
+
+> [!TIP]
+> Combine **Hugging Face Datasets** with **Embeddings** and **Reranking** to build advanced search or finetuning pipelines directly in PHP.
 
 ---
 
-### 🤝 Contributors Welcome
+## Contributing
 
-The core is solid and ready for real-world testing. If you:
+**We welcome contributions!**  
+Help us make **PhpMistral** safer, richer, and more powerful.  
+Feel free to:
 
-- want to test integrations in your own stack,
-- find edge cases or inconsistencies,
-- or would like to contribute to docs, adapters, or test coverage...
+- Submit issues or ideas 💡
+- Improve documentation 📚
+- Add support for new providers or features 🚀
+- Fix bugs 🐛
 
-You're more than welcome to jump in 🙌
+> [!IMPORTANT]
+> Whether you're a beginner or an experienced developer, your help is valuable!  
+Join us in making **PhpMistral** the go-to PHP library for AI integrations.
 
 ---
 
-### 🚀 Get Started
+## License
 
-- 📖 [Read the early docs](https://github.com/partITech/php-mistral/blob/psr18/doc/mistral-client/menu.md)
-- 📂 [See real-world usage](https://github.com/partITech/php-mistral/tree/psr18/examples/Clients) – every backend is covered 🧰
+MIT License
