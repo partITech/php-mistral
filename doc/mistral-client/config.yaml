@@ -6,21 +6,19 @@ projectSource: "https://github.com/partITech/php-mistral"
 jumbotronSourceLinkCodeLink: "https://github.com/partITech/php-mistral"
 enableSearch: false
 jumbotron: true
-jumbotronHeader: "Mistral API, Vllm, Ollama, llama.cpp, HuggingFace inference client"
+jumbotronHeader: "Mistral API, Vllm, Ollama, llama.cpp, HuggingFace inference client, Anthropic, Xai"
 jumbotronTextLine: "Connect with or without streaming, FIM, function calling, Mixed content, Json format"
 jumbotronGetStartedLabel: "Get started"
 jumbotronGetStartedLink: "#main-content"
 jumbotronSourceLinkCodeLabel: "View on GitHub"
 jumbotronCodeLang: "php"
 jumbotronCodeContent: |
-  use Partitech\PhpMistral\MistralClient;
-  use Partitech\PhpMistral\Messages;
-  
   $client = new MistralClient(getenv('TOKEN'));
   
-  $messages = new Messages();
-  $messages->addUserMessage('What is the best French cheese?');
+  $messages = $client->getMessages()
+    ->addSystemMessage(content: 'You are a gentle bot who respond like a pirate')
+    ->addUserMessage(content: 'What is the best French cheese?');
   
-  $response = $client->chat($messages, [
-    'model' => 'mistral-large-latest',
-  ])"
+  foreach ( $client->chat(messages: $messages, params: $params, stream: true) as $chunk ) {
+    echo $chunk->getChunk();
+  }
