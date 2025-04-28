@@ -161,7 +161,7 @@ $tools = [
 //    }
 //]
 
-$messages = new Messages();
+$messages = new Messages(Client::TYPE_XAI);
 $messages->addUserMessage(content: "What's the status of my transaction?");
 
 try {

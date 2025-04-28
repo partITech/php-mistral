@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
+use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\MistralClientException;
@@ -11,7 +12,7 @@ $apiKey = getenv('GROK_API_KEY');
 $client = new XAiClient(apiKey: (string) $apiKey);
 
 
-$messages = new Messages();
+$messages = new Messages(Client::TYPE_XAI);
 $messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
 
 $params = [

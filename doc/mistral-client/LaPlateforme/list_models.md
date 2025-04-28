@@ -1,5 +1,7 @@
 ## List models
 
+List all models available to the user.
+
 
 ### php code
 ```php

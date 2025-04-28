@@ -14,7 +14,7 @@ $client = new VllmClient(apiKey: (string) $apiKey, url:  $url);
 
 
 $messages = new Messages();
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? Answer in JSON.');
+$messages = $client->newMessages()->addUserMessage('What are the ingredients that make up dijon mayonnaise? Answer in JSON');
 
 $params = [
     'model' => $model,
@@ -30,10 +30,10 @@ try {
         $messages,
         $params
     );
-} catch (MistralClientException $e) {
+    print_r(json_decode($chatResponse->getMessage()));
+    print_r($chatResponse->getGuidedMessage());
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r(json_decode($chatResponse->getMessage()));
-print_r($chatResponse->getGuidedMessage());

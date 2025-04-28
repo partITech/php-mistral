@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once './../SimpleListSchema.php';
 
+use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('GROK_API_KEY');
@@ -11,7 +11,7 @@ $apiKey = getenv('GROK_API_KEY');
 $client = new XAiClient(apiKey: (string) $apiKey);
 
 
-$messages = new Messages();
+$messages = new Messages(Client::TYPE_XAI);
 $messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? Answer in JSON.');
 
 $params = [
@@ -28,16 +28,17 @@ try {
         $messages,
         $params
     );
-} catch (MistralClientException $e) {
+    echo 'FingerPrint: ' . $chatResponse->getFingerPrint() . PHP_EOL;
+    print_r($chatResponse->getGuidedMessage());
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-echo $chatResponse->getFingerPrint() . PHP_EOL;
 /*
  * fp_6ca29cf396
  */
-print_r($chatResponse->getGuidedMessage());
+
 
 /*
 stdClass Object

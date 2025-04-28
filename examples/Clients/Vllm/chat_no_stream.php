@@ -13,7 +13,7 @@ $url    =  getenv('VLLM_API_URL');  // "http://localhost:40001"
 $client = new VllmClient(apiKey: (string) $apiKey, url:  $url);
 
 
-$messages = new Messages();
+$messages = $client->getMessages();
 $messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
 
 $params = [
@@ -29,9 +29,9 @@ try {
         $messages,
         $params
     );
-} catch (MistralClientException $e) {
+    print_r($chatResponse->getMessage());
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($chatResponse->getMessage());

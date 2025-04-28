@@ -1,38 +1,69 @@
-## Document understanding
+# Document Understanding with Mistral
 
+This example demonstrates how to leverage **Document Understanding** capabilities in Mistral to process documents such as PDFs, extracting insights or generating summaries by combining textual prompts with document content.
 
-### Usage
+> [!IMPORTANT]
+> This functionality allows you to provide **multiple types of input**—textual instructions and document files—enabling rich interactions like summarizing, questioning, or analyzing structured documents.
+
+## Example: Summarize a Document from a URL
+
+This example summarizes a PDF document provided via URL, combining user instructions and the document itself.
 
 ```php
-<?php
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Message;
+
+// Instantiate the Mistral client with your API key
 $client = new MistralClient($apiKey);
 
+// Create a new message with user instruction and document reference
 $message = $client->newMessage();
 $message->setRole('user');
-$message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'Resume this document.');
-$message->addContent(type: Message::MESSAGE_TYPE_DOCUMENT_URL,    content: 'https://arxiv.org/pdf/1805.04770');
+$message->addContent(
+    type: Message::MESSAGE_TYPE_TEXT,
+    content: 'Summarize this document.'
+);
+$message->addContent(
+    type: Message::MESSAGE_TYPE_DOCUMENT_URL,
+    content: 'https://arxiv.org/pdf/1805.04770'
+);
 
+// Add the message to the message list
 $messages = $client->getMessages()->addMessage($message);
 
+// Send the request using the chat endpoint
 try {
     $result = $client->chat(
         $messages,
         [
-            'model' => 'mistral-small-latest',
-            'max_tokens' => 1024,
-            'document_image_limit' => 8,
-            'document_page_limit'   => 64
+            'model' => 'mistral-small-latest',  // Selects the inference model
+            'max_tokens' => 1024,                // Maximum tokens for the response
+            'document_image_limit' => 8,         // Max number of images per document processed
+            'document_page_limit' => 64          // Max number of pages per document processed
         ]
     );
 
-    print($result->getMessage());
+    print($result->getMessage());                // Print the summarized result
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 ```
 
-### Result
+## Key Parameters
+
+| Parameter              | Type    | Description                                                                                          |
+|------------------------|---------|------------------------------------------------------------------------------------------------------|
+| `model`                | string  | The model to use for document understanding (e.g., `mistral-small-latest`).                          |
+| `max_tokens`           | int     | Maximum number of tokens in the generated response.                                                   |
+| `document_image_limit` | int     | Maximum number of images processed from the document (for image-based documents).                     |
+| `document_page_limit`  | int     | Maximum number of pages from the document that will be processed.                                     |
+
+> [!NOTE]
+> **Document Understanding** supports a variety of document types, including PDFs, Word documents, and images (JPEG, PNG, TIFF). When providing a **DOCUMENT_URL**, ensure that the file is publicly accessible.
+
+## Example Output
+
 ```text
 ### Summary of "Born-Again Neural Networks"
 
@@ -65,3 +96,19 @@ The work was supported by the National Science Foundation, C-BRIC, and the Intel
 **References:**
 The paper cites various works on KD, neural networks, and related fields, providing a comprehensive background for the study.
 ```
+
+> [!TIP]
+> You can adapt the user instruction (e.g., "Summarize this document", "Extract key points", "List important figures") depending on your use case.
+
+## Supported Document Input Types
+
+- `Message::MESSAGE_TYPE_DOCUMENT_URL`: Provide a document via a public URL.
+- `Message::MESSAGE_TYPE_DOCUMENT_BASE64`: Embed a document directly as base64 (for non-URL resources).
+
+> [!CAUTION]
+> Ensure that the document size and format comply with the Mistral API limitations (e.g., page limits, image limits). Large documents may require adjusting `document_page_limit` or splitting into smaller parts.
+
+## Additional Resources
+
+- [Mistral Document Capabilities Documentation](https://docs.mistral.ai/capabilities/document/)
+

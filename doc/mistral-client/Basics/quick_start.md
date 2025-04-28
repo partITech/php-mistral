@@ -1,52 +1,190 @@
-# Mistral PHP Client
+**PhpMistral** is an **open-source** PHP client designed to interact with various LLM inference servers (like Mistral, Hugging Face TGI, vLLM, Ollama, llama.cpp, xAI, and more), embedding servers, and Hugging Face datasets.  
+It provides a unified interface for chat completions (streaming & non-streaming), embeddings (dense & sparse), reranking, guided JSON generation, document generation, and Hugging Face dataset management.
 
-**Mistral PHP Client** is a powerful yet easy-to-use PHP library designed to seamlessly integrate with the [Mistral AI API](https://docs.mistral.ai/api/). It supports interactions with **Mistral: La plateforme**, and also connects to various inference servers including 
-[**Llama.cpp**](https://github.com/ggml-org/llama.cpp), [**HuggingFace**](https://huggingface.co/), [**Ollama**](https://ollama.com/), and [**vLLM**](https://github.com/vllm-project/vllm), offering flexibility for diverse deployment scenarios.
+> [!TIP]
+> Perfect for developers building AI-driven PHP applications: chatbots, document search, reranking, embeddings, or dataset management for finetuning.
 
 ---
 
 ## Key Features
 
-- **Chat Completions**: Generate conversational interactions using powerful Mistral language models.
-- **Real-Time Streaming**: Stream chat completions live, perfect for interactive and dynamic user experiences.
-- **Embeddings**: Convert text into numerical vectors, enabling semantic search, clustering, recommendation systems, and more.
-- **Fill-in-the-Middle**: Generate code intelligently by providing initial and final code segments, allowing precise and contextual completion.
-- **Pixtral Multimodal Support**: Process mixed-content inputs (images and text), ideal for applications that combine visual and textual interactions.
+- **Open-source**:  
+  - Free to use, modify, and contribute to.  
+- **Framework-agnostic**:  
+  - Compatible with any PHP framework (Laravel, Symfony, Slim, custom apps, etc.).  
+- **Multi-backend support**:  
+  - OpenAI, Mistral Platform, Hugging Face TGI, vLLM, Ollama, llama.cpp, xAI, and more.
+- **Chat completions**:  
+  - Streaming and non-streaming interactions.
+- **Embeddings**:  
+  - Dense embeddings and sparse embeddings (Splade pooling).
+- **Reranking API**:  
+  - Compare and rank multiple documents based on a query.
+- **Guided JSON generation**:  
+  - Ensure structured outputs based on a schema.
+- **Document generation (Mistral)**:  
+  - Generate structured documents directly from models.
+- **Pooling API (vLLM)**:  
+  - Efficient load balancing across multiple vLLM servers.
+- **Hugging Face Dataset API**:  
+  - Seamlessly interact with Hugging Face datasets, list files, download, manage, and search datasets directly from PHP.
+
+> [!IMPORTANT]
+> The Hugging Face Dataset API is a **must-have** for anyone working with finetuning or dataset manipulation. Easily list, fetch, and manage datasets from Hugging Face directly in your PHP applications.
+
+---
+## Supported Providers & Features
+
+### Core Features
+
+| Provider              | Chat (stream) | Chat (non-stream) | Embeddings | Sparse Embeddings |
+|-----------------------|---------------|-------------------|------------|-------------------|
+| Mistral Platform      | ✅             | ✅                 | ✅          |                   |
+| Hugging Face TGI      | ✅             | ✅                 | ✅          |                   |
+| vLLM                  | ✅             | ✅                 | ✅          |                   |
+| Ollama                | ✅             | ✅                 | ✅          |                   |
+| llama.cpp             | ✅             | ✅                 | ✅          |                   |
+| xAI                   | ✅             | ✅                 | ✅          |                   |
+| Text Embedding Inference |           |                   | ✅          | ✅                 |
+
+### Advanced Features
+
+| Provider              | Rerank | Guided JSON | Documents | Pooling | HF Datasets |
+|-----------------------|--------|-------------|-----------|---------|-------------|
+| Mistral Platform      | ✅      | ✅           | ✅         |         |             |
+| Hugging Face TGI      | ✅      | ✅           |           |         | ✅           |
+| vLLM                  | ✅      | ✅           |           | ✅       |             |
+| Ollama                | ✅      | ✅           |           |         |             |
+| llama.cpp             | ✅      | ✅           |           |         |             |
+| xAI                   | ✅      | ✅           |           |         |             |
+| Text Embedding Inference |    |             |           |         |             |
+
+---
 
 ## Installation
-
-Ensure your PHP environment is **version 8.3 or higher**.
-
-Install the package via Composer:
 
 ```bash
 composer require partitech/php-mistral
 ```
 
-## Quick Start
+---
 
-### Basic Example
+## Example Usages
 
-Here's how to quickly get started with a simple chat completion:
+### Chat Completion (Streaming)
 
 ```php
-use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\Messages;
+$client = new MistralClient($apiKey);
+$messages = $client->getMessages()->addUserMessage('What is the best French cheese?');
 
-$client = new MistralClient('YOUR_PRIVATE_MISTRAL_KEY');
-
-$messages = new Messages();
-$messages->addUserMessage('What is the best French cheese?');
-
-$response = $client->chat($messages, [
+$params = [
     'model' => 'mistral-large-latest',
-]);
+        'temperature' => 0.7,
+        'top_p' => 1,
+        'max_tokens' => null,
+        'safe_prompt' => false,
+        'random_seed' => 0
+];
 
-print_r($response->getMessage());
+try {
+    /** @var Message $chunk */
+    foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
+        echo $chunk->getChunk();
+    }
+} catch (MistralClientException|DateMalformedStringException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
 ```
 
-The `\Partitech\PhpMistral\Client` Class which is used by `\Partitech\PhpMistral\MistralClient` can be instantiated with url and timeout. It let you change whether you use La Plateforme 
-services or a self-hosted mistral-inference or dedicated service.
+### Dense Embedding
+
 ```php
-$client = new MistralClient(apiKey: $apiKey, url: $url, timeout: $timeout);
+use Partitech\PhpMistral\Clients\Tei\TeiClient;
+
+$client = new TeiClient(apiKey: $apiKey, url: $embeddingUrl);
+$embedding = $client->embed(inputs: "My name is Olivier and I");
 ```
+
+### Sparse Embedding (Splade Pooling)
+
+```php
+$client = new TeiClient(apiKey: (string) $apiKey, url: $teiUrl);
+$embedding = $client->embedSparse(inputs: 'What is Deep Learning?');
+var_dump($embedding);
+```
+
+### Rerank
+
+```php
+$client = new TeiClient(apiKey: $apiKey, url: $teiUrl);
+$results = $client->rerank(
+        query: 'What is the difference between Deep Learning and Machine Learning?',
+        texts: [
+            'Deep learning is...',
+            'cheese is made of',
+            'Deep Learning is not...'
+        ]
+
+    );
+```
+
+### Hugging Face Dataset Management
+
+```php
+use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
+
+$client = new HuggingFaceDatasetClient(apiKey: $apiKey);
+
+// Commit large dataset to huggingface repository
+$commit = $client->commit(
+    repository: $hfUser . '/test2',
+    dir: realpath('mon_dataset'),
+    files: $client->listFiles('./dir'),
+    summary: 'commit title',
+    commitMessage: 'commit message',
+    branch: 'main'
+);
+
+// get specific dataset page
+$paginatedRows = $client->rows(
+        dataset: 'nvidia/OpenCodeReasoning', 
+        split: 'split_0', 
+        config: 'split_0', 
+        offset: 3, 
+        length: 2 
+    );
+
+// Download Dataset locally
+$dest = $client->downloadDatasetFiles(
+    'google/civil_comments',
+    revision: 'main',
+    destination: '/tmp/downloaded_datasets/civil_comments'
+);
+```
+
+> [!TIP]
+> Combine **Hugging Face Datasets** with **Embeddings** and **Reranking** to build advanced search or finetuning pipelines directly in PHP.
+
+---
+
+## Contributing
+
+**We welcome contributions!**  
+Help us make **PhpMistral** safer, richer, and more powerful.  
+Feel free to:
+
+- Submit issues or ideas 💡
+- Improve documentation 📚
+- Add support for new providers or features 🚀
+- Fix bugs 🐛
+
+> [!IMPORTANT]
+> Whether you're a beginner or an experienced developer, your help is valuable!  
+Join us in making **PhpMistral** the go-to PHP library for AI integrations.
+
+---
+
+## License
+
+MIT License

@@ -5,18 +5,17 @@
 - [Chat](Basics/chat.md)
 - [Function calling](Basics/function_calling.md)
 - [Socket timeout](Basics/socket_timeout.md)
+- [Guided JSON output](Basics/guided_json.md)
 
 ---
 
 ## La Plateforme
-
 - [Embeddings](LaPlateforme/embeddings.md)
 - [Fill in the middle](LaPlateforme/fill_in_the_middle.md)
 - [Vision](LaPlateforme/pixtral.md)
 - [OCR](LaPlateforme/ocr.md)
 - [Document understanding](LaPlateforme/document_understanding.md)
 - [Structured JSON output](LaPlateforme/json_object.md)
-- [Guided JSON output](LaPlateforme/structured_json_output.md)
 - [Agent](LaPlateforme/agent.md)
 - [Files](LaPlateforme/files.md)
 - [List models](LaPlateforme/list_models.md)
@@ -28,13 +27,11 @@
 - [Get model](Anthropic/get_model.md)
 - [Multimodal](Anthropic/multimodal.md)
 - [Pdf](Anthropic/pdf.md)
-- [Sentiment analysis](Anthropic/sentiment_analysis.md)
 
 ## LLaMa.CPP
 - [Completion](LLaMaCPP/completion.md)
 - [Embeddings](LLaMaCPP/embeddings.md)
 - [FIM](LLaMaCPP/fim.md)
-- [Guided JSON output](LLaMaCPP/structured_json_output.md)
 - [Health](LLaMaCPP/health.md)
 - [Metrics](LLaMaCPP/metrics.md)
 - [Props](LLaMaCPP/props.md)
@@ -72,8 +69,6 @@
 - [Models](HuggingFaceTGI/models.md)
 - [Tokenize](HuggingFaceTGI/tokenize.md)
 
-
-
 ## Hugging Face Inference
 - [Generate](HuggingFaceInference/generate.md)
 - [Audio classification](HuggingFaceInference/audio_classification.md)
@@ -93,12 +88,32 @@
 - [Copy](Ollama/copy.md)
 - [Delete](Ollama/delete.md)
 - [Embed](Ollama/embed.md)
-- [Guided JSON](Ollama/guided_json.md)
 - [List](Ollama/list.md)
 - [Multimodal](Ollama/multimodal.md)
 - [Pull](Ollama/pull.md)
 - [Show](Ollama/show.md)
 - [Version](Ollama/version.md)
 
+## vLLM
+- [Completion](vLLM/completion.md)
+- [Embeddings](vLLM/embeddings.md)
+- [Multimodal](vLLM/multimodal.md)
+- [Pooling](vLLM/pooling.md)
+- [Rerank](vLLM/rerank.md)
+- [Score](vLLM/score.md)
+- [Tokenize | Detokenize](vLLM/tokenize_detokenize.md)
+- [Transcription](vLLM/transcription.md)
 
+## Xai
+
+- [Deferred completion](Xai/deferredCompletion.md)
+- [Get model](Xai/get_model.md)
+- [Get image generation model](Xai/get_image_generation_model.md)
+- [Get language model](Xai/get_language_model.md)
+- [Image generations](Xai/image_generation.md)
+- [List image generation models](Xai/list_image_generation_models.md)
+- [List language models](Xai/list_language_models.md)
+- [List models](Xai/list_models.md)
+- [Multimodal](Xai/multimodal.md)
+- [Tokenize text](Xai/tokenize.md)
 

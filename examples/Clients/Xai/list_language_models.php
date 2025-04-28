@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
-use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('GROK_API_KEY');
 
@@ -10,13 +9,11 @@ $client = new XAiClient(apiKey: (string) $apiKey);
 
 try {
     $result = $client->listLanguageModels();
+    print_r($result);
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
-
-
-print_r($result);
 
 /*
 Array

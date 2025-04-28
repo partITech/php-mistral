@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
 
 $apiKey = getenv('GROK_API_KEY');
@@ -19,12 +17,13 @@ try {
             'n' => 1
         ]
     );
+    print_r($result);
 } catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($result);
+
 
 /*
 Array

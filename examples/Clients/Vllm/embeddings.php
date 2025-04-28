@@ -20,12 +20,13 @@ for($i=0; $i<1; $i++) {
 
 try {
     $embeddingsBatchResponse = $client->embeddings($inputs, $embeddingModel);
+    print_r($embeddingsBatchResponse);
 } catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($embeddingsBatchResponse);
+
 /*
 Array
 (
@@ -1080,8 +1081,5 @@ Array
         )
 
 )
-
-Process finished with exit code 0
-
  */
 

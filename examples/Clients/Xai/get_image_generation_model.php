@@ -9,14 +9,15 @@ $apiKey = getenv('GROK_API_KEY');
 $client = new XAiClient(apiKey: (string) $apiKey);
 
 try {
-    $result = $client->getImageGenerationModel('grok-2-image-latest');
+    $result = $client->getImageGenerationModel(id: 'grok-2-image-latest');
+    print_r($result);
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
 
-print_r($result);
+
 
 /*
 Array

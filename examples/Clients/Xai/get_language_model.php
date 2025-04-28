@@ -6,17 +6,16 @@ use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('GROK_API_KEY');
 
-$client = new XAiClient(apiKey: (string) $apiKey);
+$client = new XAiClient(apiKey: $apiKey);
 
 try {
-    $result = $client->getLanguageModel('grok-3-fast-beta');
+    $result = $client->getLanguageModel(id: 'grok-3-fast-beta');
+    print_r($result);
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-
-print_r($result);
 
 /*
 Array

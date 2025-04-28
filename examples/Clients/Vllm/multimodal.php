@@ -11,13 +11,13 @@ $apiKey = getenv('VLLM_API_KEY');   // "personal_token"
 $url    =  getenv('VLLM_API_URL');  // "http://localhost:40001"
 $client = new VllmClient(apiKey: (string) $apiKey, url:  $url);
 
-$message = new Message();
+$message = $client->newMessage();
 $message->setRole('user');
 $message->addContent(type: Message::MESSAGE_TYPE_TEXT,   content: 'Proceed step by step. For each media, describe it carefully.');
 $message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://s3.amazonaws.com/cms.ipressroom.com/338/files/201808/5b894ee1a138352221103195_A680%7Ejogging-edit/A680%7Ejogging-edit_hero.jpg');
 $message->addContent(type: Message::MESSAGE_TYPE_IMAGE_URL,    content: 'https://www.wolframcloud.com/obj/resourcesystem/images/a0e/a0ee3983-46c6-4c92-b85d-059044639928/6af8cfb971db031b.png');
 $message->addContent(type: Message::MESSAGE_TYPE_BASE64, content: realpath('./../../medias/pixtral_image_example_charts.jpeg'));
-$messages = new Messages();
+$messages = $client->newMessages();
 $messages->addMessage($message);
 
 try {

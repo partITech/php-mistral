@@ -9,7 +9,7 @@ $apiKey = getenv('VLLM_API_KEY');   // "personal_token"
 $model  = getenv('VLLM_API_MODEL'); // "Mistral-Nemo-Instruct-2407"
 $url    =  getenv('VLLM_API_URL');  // "http://localhost:40001"
 
-$client = new VllmClient(apiKey: (string) $apiKey, url:  $url);
+$client = new VllmClient(apiKey: $apiKey, url:  $url);
 
 
 $params = [
@@ -25,13 +25,14 @@ try {
         prompt: 'The ingredients that make up dijon mayonnaise are ',
         params: $params
     );
+    print_r($chatResponse->getMessage());
+    print_r($chatResponse->getUsage());
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-print_r($chatResponse->getMessage());
-print_r($chatResponse->getUsage());
+
 
 
 try {

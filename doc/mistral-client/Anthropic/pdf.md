@@ -1,4 +1,29 @@
 ## Pdf
+Process PDFs with Claude. Extract text, analyze charts, and understand visual content from your documents.
+
+You can now ask Claude about any text, pictures, charts, and tables in PDFs you provide. Some sample use cases:
+
+- Analyzing financial reports and understanding charts/tables
+- Extracting key information from legal documents
+- Translation assistance for documents
+- Converting document information into structured formats
+
+### Check PDF requirements
+
+Claude works with any standard PDF. However, you should ensure your request size meets these requirements when using PDF support:
+
+| Requirement              | Limit                          |
+|--------------------------|--------------------------------|
+| Maximum request size     | 32MB                           |
+| Maximum pages per request| 100                            |
+| Format                   | Standard PDF (no passwords/encryption) |
+
+> [!NOTE]
+> Please note that both limits are on the entire request payload, including any other content sent alongside PDFs.
+
+Since PDF support relies on Claude’s vision capabilities, it is subject to the same limitations and considerations as other vision tasks.
+
+
 ### Document Base64
 #### php code
 ```php
@@ -102,7 +127,5 @@ try {
 }
 ```
 
-#### result
-```text
-
-```
+## Additional Resources
+[https://docs.anthropic.com/en/docs/build-with-claude/pdf-support](https://docs.anthropic.com/en/docs/build-with-claude/pdf-support)

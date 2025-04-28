@@ -10,13 +10,11 @@ $client = new XAiClient(apiKey: (string) $apiKey);
 
 try {
     $result = $client->listModels();
+    print_r($result);
 } catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
 }
-
-
-print_r($result);
 
 /*
 Array

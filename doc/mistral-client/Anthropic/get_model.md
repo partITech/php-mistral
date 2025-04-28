@@ -1,5 +1,7 @@
 ## Get model
+Get a specific model.
 
+The Models API response can be used to determine information about a specific model or resolve a model alias to a model ID.
 ### php code
 ```php
 use Partitech\PhpMistral\Clients\Anthropic\AnthropicClient;
@@ -25,3 +27,7 @@ Array
     [created_at] => 2025-02-24T00:00:00Z
 )
 ```
+
+
+## Additional Resources
+[https://docs.anthropic.com/en/api/models](https://docs.anthropic.com/en/api/models)

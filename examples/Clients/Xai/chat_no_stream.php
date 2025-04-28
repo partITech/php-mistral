@@ -10,9 +10,9 @@ $apiKey = getenv('GROK_API_KEY');
 $client = new XAiClient(apiKey: (string) $apiKey);
 
 
-$messages = new Messages();
-$messages->addSystemMessage('You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy.');
-$messages->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
+$messages = $client->getMessages()
+    ->addSystemMessage('You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy.')
+    ->addUserMessage('What are the ingredients that make up dijon mayonnaise? ');
 
 $params = [
     'model' => 'grok-3-latest',
@@ -25,9 +25,8 @@ try {
         $messages,
         $params
     );
+    print_r($chatResponse->getMessage());
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
-
-print_r($chatResponse->getMessage());

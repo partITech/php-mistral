@@ -1,5 +1,7 @@
 ## List models
+List available models.
 
+The Models API response can be used to determine which models are available for use in the API. More recently released models are listed first
 ### php code
 ```php
 use Partitech\PhpMistral\Clients\Anthropic\AnthropicClient;
@@ -77,3 +79,6 @@ Array
     [last_id] => claude-3-opus-20240229
 )
 ```
+
+## Additional Resources
+[https://docs.anthropic.com/en/api/models-list](https://docs.anthropic.com/en/api/models-list)

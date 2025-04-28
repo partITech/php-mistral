@@ -164,7 +164,7 @@ $tools = [
 //    }
 //]
 
-$messages = new Messages();
+$messages = $client->newMessages();
 $messages->addUserMessage(content: "What's the status of my transaction?");
 
 try {

@@ -17,20 +17,20 @@ $message->addContent(type: Message::MESSAGE_TYPE_BASE64, content: realpath('./..
 $messages = new Messages();
 $messages->addMessage($message);
 
-//try {
-//    $result = $client->chat(
-//        $messages,
-//        [
-//            'model' => 'grok-2-vision-latest',
-//            'max_tokens' => 1024,
-//        ]
-//    );
-//} catch (MistralClientException $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
-//
-//print($result->getMessage());
+try {
+    $result = $client->chat(
+        $messages,
+        [
+            'model' => 'grok-2-vision-latest',
+            'max_tokens' => 1024,
+        ]
+    );
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+print($result->getMessage());
 
 /*
 The image is a comparison of socio-economic indicators between disadvantaged areas and France as a whole, presented by Statista. Here are the details:
@@ -81,12 +81,13 @@ try {
             'max_tokens' => 1024,
         ]
     );
-} catch (MistralClientException $e) {
+    echo $result->getMessage();
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
 
-echo $result->getMessage();
+
 
 /**
  * The image shows three people jogging together along a green, nature-filled path. They appear to be enjoying a workout in a lush outdoor setting with trees and vegetation surrounding the trail. The runners are wearing athletic clothing - one in a gray shirt with black shorts, another in a bright yellow tank top with black shorts, and the third in a pink top with black leggings. They seem to be running at a comfortable pace, and the scene conveys a sense of health, fitness, and outdoor activity. The natural environment looks bright and vibrant, making it an appealing setting for outdoor exercise.
