@@ -50,11 +50,6 @@ This ensures **flexibility**, **interoperability**, and **future-proofing** of y
 - **Hugging Face Dataset API**:
   - Seamlessly interact with Hugging Face datasets, list files, download, manage, and search datasets directly from PHP.
 
-> [!IMPORTANT]
-> The Hugging Face Dataset API is a **must-have** for anyone working with finetuning or dataset manipulation. Easily list, fetch, and manage datasets from Hugging Face directly in your PHP applications.
-
----
-
 ## Supported Providers & Features
 
 ### Core Features
