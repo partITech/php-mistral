@@ -4,8 +4,8 @@ require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('GROK_API_KEY');
 
