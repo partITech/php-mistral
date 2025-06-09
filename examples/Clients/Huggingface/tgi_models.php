@@ -3,13 +3,14 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $tgiUrl = getenv('TGI_URL');
 $client = new TgiClient(url: $tgiUrl);
 try {
     $models = $client->models();
     print_r($models);
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (MistralClientException $e) {
     echo $e->getMessage();
 }
 

@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
-use Partitech\PhpMistral\MistralClientException;
 
 $tgiUrl = getenv('TGI_URL');
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
