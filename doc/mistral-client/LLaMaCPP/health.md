@@ -14,7 +14,7 @@ The **Health API** allows you to verify whether the Llama.cpp server is reachabl
 
 ```php
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $llamacppUrl = getenv('LLAMACPP_URL');
 $llamacppApiKey = getenv('LLAMACPP_API_KEY');
