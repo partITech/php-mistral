@@ -3,9 +3,10 @@
 List all models available to the authenticating API key with minimalized information, including model names (ID), creation times, etc.
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('GROK_API_KEY');
 

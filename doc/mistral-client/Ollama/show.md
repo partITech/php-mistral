@@ -1,9 +1,10 @@
 ## Show
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $ollamaUrl = getenv('OLLAMA_URL');
 

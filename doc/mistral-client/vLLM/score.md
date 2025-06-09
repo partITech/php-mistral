@@ -14,7 +14,7 @@ The **Score API** is useful for tasks like:
 
 ```php
 use Partitech\PhpMistral\Clients\Vllm\VllmClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey       = getenv('VLLM_API_KEY');          // Your vLLM token
 $rerankModel  = getenv('VLLM_RERANK_MODEL');     // Example: "BAAI/bge-reranker-v2-m3"

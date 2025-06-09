@@ -13,7 +13,7 @@ The transcription process sends an audio file (e.g., `.mp3`, `.wav`) to a model 
 
 ```php
 use Partitech\PhpMistral\Clients\Vllm\VllmClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('VLLM_API_KEY');   // Your vLLM token
 $urlApiTranscription = getenv('VLLM_API_TRANSCRIPTION_URL'); // vLLM transcription endpoint

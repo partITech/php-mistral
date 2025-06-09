@@ -107,7 +107,7 @@ $tools = [new Tool('function', $retrievePaymentStatusFunction), new Tool('functi
 //    }
 //]
 
-$messages = new Messages();
+$messages = $client->getMessages();
 $messages->addUserMessage(content: "What's the status of my transaction?");
 
 try {

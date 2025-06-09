@@ -3,14 +3,14 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\Parameter;
 use Partitech\PhpMistral\Tools\Tool;
 
 $temperature = 0.3;
-//docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/Mistral-Nemo-Instruct-2407.Q4_K_S.gguf -c 10000 --host 0.0.0.0 --port 8080 --jinja
+//docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/Mistral-Nemo-Instruct-2407.Q4_K_S.gguf -c 50000 --host 0.0.0.0 --port 8080 --jinja --chat-template-file /models/mistralai-Mistral-Nemo-Instruct-2407.jinja
 
 $llamacppUrl = getenv('LLAMACPP_URL');
 $llamacppApiKey = getenv('LLAMACPP_API_KEY');

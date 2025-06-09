@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $llamacppUrl = getenv('LLAMACPP_URL');
 $llamacppApiKey = getenv('LLAMACPP_API_KEY');

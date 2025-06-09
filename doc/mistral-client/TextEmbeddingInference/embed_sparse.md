@@ -9,7 +9,7 @@ The `TeiClient` provides a method called `embedSparse()` to generate **sparse em
 
 ```php
 use Partitech\PhpMistral\Clients\Tei\TeiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 // Load TEI SPLADE pooling endpoint and API key
 $teiUrl = getenv('TEI_SPLADE_POOLING_URI');

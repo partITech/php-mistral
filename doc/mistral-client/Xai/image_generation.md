@@ -3,9 +3,10 @@
 Generate an image based on a prompt. This is the method for making generation requests to image generation models.
 
 ### Code
+
 ```php
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('GROK_API_KEY');
 

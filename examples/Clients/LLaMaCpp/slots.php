@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 // docker run -p 8080:8080 -v ./models:/models ghcr.io/ggml-org/llama.cpp:server -m /models/llama-3.2-3b-instruct-q8_0.gguf -c 512 --host 0.0.0.0 --port 8080  --slots
 $llamacppUrl = getenv('LLAMACPP_URL');

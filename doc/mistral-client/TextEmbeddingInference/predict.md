@@ -11,7 +11,7 @@ This example demonstrates how to use the `predict()` method to analyze the emoti
 
 ```php
 use Partitech\PhpMistral\Clients\Tei\TeiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 // Load TEI endpoint for sentiment analysis and API key
 $teiUrl = getenv('TEI_SENTIMENT_ANALYSIS_URI');

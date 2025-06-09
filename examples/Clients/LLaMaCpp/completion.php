@@ -11,7 +11,7 @@ $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 $params = [
     'temperature' => 0.7,
     'top_p' => 1,
-    'max_tokens' => 1000,
+    'max_tokens' => 25,
     'seed' => 15,
 ];
 

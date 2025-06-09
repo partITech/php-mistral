@@ -11,7 +11,7 @@ This example demonstrates how to generate a 1024-dimensional embedding for a giv
 
 ```php
 use Partitech\PhpMistral\Clients\Tei\TeiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 // Load TEI endpoint for embeddings and API key
 $teiUrl = getenv('TEI_EMBEDDINGS_URI');

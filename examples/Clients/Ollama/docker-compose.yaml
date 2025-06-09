@@ -1,7 +1,7 @@
 services:
-  ## start container and pull mistral : ollama pull mistral
+  ## start a container and pull mistral: ollama pull mistral-small3.1
   ollama:
-    image: ollama/ollama:0.6.3
+    image: ollama/ollama:0.8.0
     volumes:
       - .cache/huggingface:/data
     ports:

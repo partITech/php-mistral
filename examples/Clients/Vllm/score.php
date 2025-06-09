@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Vllm\VllmClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('VLLM_API_KEY');   // "personal_token"
 $model  = getenv('VLLM_API_MODEL'); // "Mistral-Nemo-Instruct-2407"
