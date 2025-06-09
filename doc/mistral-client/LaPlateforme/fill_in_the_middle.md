@@ -21,7 +21,6 @@ The model fills the gap between the **prompt** and the **suffix**.
 
 ```php
 use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
 
 $client = new MistralClient($apiKey);
 $model_name = "codestral-2405";
@@ -44,7 +43,7 @@ try {
             'random_seed'  => 0
         ]
     );
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
