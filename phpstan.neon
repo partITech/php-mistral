@@ -1,0 +1,24 @@
+includes:
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+  # Niveau d’analyse (0 à 9 ou max)
+  level: max
+
+  # Répertoires à analyser
+  paths:
+    - src
+
+  # Exclure le dossier Legacy
+  excludePaths:
+    - src/Legacy/*
+    - tests/*
+    - doc/*
+    - examples/*
+
+  # Si vous aviez besoin de charger un fichier PHP en bootstrap, faites :
+  # bootstrapFiles:
+  #   - config/phpstan-bootstrap.php
+
+  # Baseline pour geler l’existant (facultatif)
+  # baseline: phpstan-baseline.neon
