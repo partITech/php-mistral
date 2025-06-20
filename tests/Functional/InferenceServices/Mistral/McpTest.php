@@ -3,10 +3,8 @@
 namespace Tests\Functional\InferenceServices\Mistral;
 
 use Exception;
-use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
-use Partitech\PhpMistral\Mcp\McpConfig;
 use Tests\Traits\McpTrait;
 
 /**
