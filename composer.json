@@ -1,22 +1,34 @@
 {
     "name": "partitech/php-mistral",
-    "description": "Connect to MistralAi inference or to Llama.cpp",
+    "description": "Connect to Mistral | Anthropic | Xai | Hugging Face | LamaC++ | Vllm | Ollama",
     "license": "MIT",
     "autoload": {
         "psr-4": {
             "Partitech\\PhpMistral\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6",
         "symfony/http-client": "^7.2",
         "guzzlehttp/guzzle": "^7.9",
         "php-http/curl-client": "^2.3",
         "php-http/message": "^1.16",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "symfony/dotenv": "^7.3",
+        "ext-posix": "*",
+        "phpstan/phpstan": "^2.1"
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "COMPOSER_PROCESS_TIMEOUT=900 phpunit --testdox",
+        "test-lamacpp": "COMPOSER_PROCESS_TIMEOUT=900 phpunit --testdox tests/Functional/Clients/LLaMaCpp",
+        "test-ollama": "COMPOSER_PROCESS_TIMEOUT=900 phpunit --testdox tests/Functional/Clients/Ollama",
+        "test-vllm": "COMPOSER_PROCESS_TIMEOUT=900 phpunit --testdox tests/Functional/Clients/vLLM",
+        "analyse": "phpstan analyse --configuration=phpstan.neon"
     },
     "require": {
         "php": ">=8.3",
@@ -32,11 +44,20 @@
         "nyholm/psr7": "^1.8",
         "php-http/multipart-stream-builder": "^1.4",
         "ext-zip": "*",
-        "czproject/git-php": "^4.4"
+        "czproject/git-php": "^4.4",
+        "logiscape/mcp-sdk-php": "^1.1",
+        "monolog/monolog": "^3.9"
     },
     "config": {
         "allow-plugins": {
             "php-http/discovery": true
         }
+    },
+    "extra": {
+        "exclude-from-classmap": [
+            "/tests/",
+            "/vendor/phpunit/",
+            "/vendor/symfony/dotenv/"
+        ]
     }
 }
