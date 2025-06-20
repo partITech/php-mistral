@@ -6,3 +6,5 @@
 /code_export_examples_Clients_Ollama.md
 /test.md
 /.env
+/tests/var/translated/
+/var/logs/
