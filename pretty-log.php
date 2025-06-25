@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-
+// tail -f var/logs/php-mistral.log | ./pretty-log.php
 // Open the standard input stream (PHP's virtual "php://stdin")
 $stdin = fopen('php://stdin', 'r');
 if (!$stdin) {
