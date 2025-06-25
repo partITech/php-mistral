@@ -22,3 +22,6 @@ parameters:
 
   # Baseline pour geler l’existant (facultatif)
   # baseline: phpstan-baseline.neon
+  featureToggles:
+    # nécessaire si bleedingEdge.neon écrase checkMissingIterableValueType
+    disableCheckMissingIterableValueType: false
