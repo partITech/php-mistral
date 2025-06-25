@@ -1,9 +1,14 @@
 <?php
 namespace Partitech\PhpMistral\Clients\HuggingFace;
 
+use Generator;
 use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Clients\SSEClient;
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Clients\Tgi\TgiResponse;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Messages;
 use Psr\Http\Message\ResponseInterface;
 
 // https://huggingface.co/docs/api-inference/parameters
@@ -14,26 +19,46 @@ class HuggingFaceClient extends TgiClient
 {
     protected string $clientType = Client::TYPE_HUGGINGFACE;
     protected const string ENDPOINT = 'https://router.huggingface.co';
+    protected string $responseClass = TgiResponse::class;
 
     public function __construct(
-        ?string $apiKey=null,
+        ?string $apiKey = null,
         string $url = self::ENDPOINT,
-        ?string $provider=null,
-        int|float|null $timeout = null,
+        ?string $provider = null,
         bool $useCache = false,
         bool $waitForModel = false,
-    )
-    {
-        if($useCache){
+    ) {
+        if ($useCache) {
             $this->additionalHeaders['x-use-cache'] = 'true';
         }
-        if($waitForModel){
+        if ($waitForModel) {
             $this->additionalHeaders['x-wait-for-model'] = 'true';
         }
         $this->provider = $provider;
-        parent::__construct($apiKey, $url, $timeout);
+        parent::__construct($apiKey, $url);
     }
 
+
+    public function chatStream(Messages $messages, array $params = []): Generator
+    {
+        $request = $this->makeChatCompletionRequest(
+            definition: $this->chatParametersDefinition,
+            messages: $messages,
+            params: $params
+        );
+
+        $result = $this->request(method: 'POST', path: 'models/'.$params['model'].'/'. $this->chatCompletionEndpoint, parameters: $request, stream: true);
+        if(is_array($result)){
+            var_dump($result);
+            exit();
+        }
+        $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($result);
+        return $this->wrapStreamGenerator($streamResult);
+    }
+    public function chat(Messages $messages, array $params = [], bool $stream=false, null|string $prependUrl = null): Response|Generator
+    {
+        return parent::chat($messages, $params, $stream, 'models/'.$params['model'].'/');
+    }
 
     /**
      * @throws MistralClientException
@@ -85,7 +110,7 @@ class HuggingFaceClient extends TgiClient
      */
     public function listDatasetFiles(string $dataset, string $revision = 'main'): array
     {
-        $path = "/api/datasets/{$dataset}/revision/{$revision}";
+        $path = "/api/datasets/$dataset/revision/$revision";
         $response = $this->request('GET', $path);
         return $response['siblings'] ?? [];
     }

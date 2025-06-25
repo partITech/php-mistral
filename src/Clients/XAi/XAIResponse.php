@@ -24,22 +24,4 @@ class XAIResponse extends Response
 
         return $response;
     }
-
-
-    public function getGuidedMessage(?bool $associative = null): null|object|array
-    {
-        if(is_array($this->getMessage()) && array_is_list($this->getMessage())){
-            foreach($this->getMessage() as $messagePart){
-                if(isset($messagePart['type']) && $messagePart['type'] ==='tool_use' && isset($messagePart['input']) && is_array($messagePart['input'])){
-                    return $messagePart['input'];
-                }
-            }
-        }
-
-        if (is_string($this->getMessage()) && json_validate($this->getMessage())) {
-            return json_decode($this->getMessage(), $associative);
-        }
-
-        return null;
-    }
 }

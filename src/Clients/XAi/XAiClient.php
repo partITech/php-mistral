@@ -3,14 +3,12 @@
 namespace Partitech\PhpMistral\Clients\XAi;
 
 use ArrayObject;
-use DateMalformedStringException;
-use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
-use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tokens;
 use Psr\Http\Message\ResponseInterface;
 
@@ -56,48 +54,32 @@ class XAiClient extends Client
         $return['temperature'] = 0;
     }
 
-    /**
-     * @throws DateMalformedStringException
-     * @throws MistralClientException
-     */
-    public function chat(Messages $messages, array $params = [], bool $stream=false): XAIResponse|Generator
-    {
 
-        $request = $this->makeChatCompletionRequest(
-            definition: $this->chatParametersDefinition,
-            messages: $messages,
-            params: $params
-        );
-
-        $result = $this->request('POST', '/v1/chat/completions', $request, $stream);
-
-        if($stream){
-            return $this->getStream($result);
-        }else{
-            return XAIResponse::createFromArray($result);
-        }
-    }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|\Partitech\PhpMistral\Exceptions\MaximumRecursionException
      */
     public function deferredCompletion(string $requestId): Response
     {
-        $result = $this->request('GET', '/v1/chat/deferred-completion/' . $requestId , [], false);
+        $result = $this->request('GET', '/v1/chat/deferred-completion/' . $requestId);
 
-        return XAIResponse::createFromArray($result);
+        return XAIResponse::createFromArray($result, $this->clientType);
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|\Partitech\PhpMistral\Exceptions\MaximumRecursionException
      */
     public function imageGenerations(string $prompt, array $params = []): array|string|ResponseInterface
     {
         $params['prompt'] = $prompt;
-        return $this->request('POST', '/v1/images/generations', $params, false);
+        return $this->request('POST', '/v1/images/generations', $params);
     }
 
 
+    /**
+     * @throws MaximumRecursionException
+     * @throws MistralClientException
+     */
     public function listModels(): array
     {
         return $this->request('GET', 'v1/models');
@@ -105,6 +87,7 @@ class XAiClient extends Client
 
     /**
      * @throws MistralClientException
+     * @throws MaximumRecursionException
      */
     public function getModel(string $id): array
     {
@@ -114,6 +97,7 @@ class XAiClient extends Client
 
     /**
      * @throws MistralClientException
+     * @throws MaximumRecursionException
      */
     public function listLanguageModels(): array
     {
@@ -122,6 +106,7 @@ class XAiClient extends Client
 
     /**
      * @throws MistralClientException
+     * @throws MaximumRecursionException
      */
     public function getLanguageModel(string $id): array
     {
@@ -130,6 +115,7 @@ class XAiClient extends Client
 
     /**
      * @throws MistralClientException
+     * @throws MaximumRecursionException
      */
     public function listImageGenerationModels(): array
     {
@@ -139,6 +125,7 @@ class XAiClient extends Client
 
     /**
      * @throws MistralClientException
+     * @throws MaximumRecursionException
      */
     public function getImageGenerationModel(string $id): array
     {
@@ -147,6 +134,7 @@ class XAiClient extends Client
 
     /**
      * @throws MistralClientException
+     * @throws MaximumRecursionException
      */
     public function tokenize(string $model, string $prompt): Tokens
     {

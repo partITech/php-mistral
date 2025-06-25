@@ -4,6 +4,7 @@ namespace Partitech\PhpMistral;
 
 use ArrayObject;
 use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Tools\ToolCallCollection;
 
 class Messages
 {
@@ -21,6 +22,11 @@ class Messages
     {
         $this->type = $type;
         $this->messages = new ArrayObject();
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**
@@ -117,11 +123,11 @@ class Messages
         return $this;
     }
 
-    public function addAssistantMessage(null|string|array $content, null|array $toolCalls = null): self
+    public function addAssistantMessage(null|string|array $content, null|array|ToolCallCollection $toolCalls = null): self
     {
         $message = new Message($this->type);
         $message->setRole(self::ROLE_ASSISTANT);
-        $message->setContent($content);
+        $message->setContent(trim($content));
         $message->setToolCalls($toolCalls);
         $this->addMessage($message);
         return $this;
@@ -161,5 +167,29 @@ class Messages
     {
         return $this->document;
     }
+    public function getSystemMessageContent(): ?string
+    {
+        foreach ($this->messages as $index => $message) {
+            if ($message instanceof Message && $message->getRole() === self::ROLE_SYSTEM) {
+                $this->messages->offsetUnset($index);
+                return $message->getContent();
+            }
+        }
+        return null;
+    }
+
+    public function removeSystemMessage(): self
+    {
+        $filtered = [];
+        foreach ($this->messages as $message) {
+            if ($message->role() !== self::ROLE_SYSTEM) {
+                $filtered[] = $message;
+            }
+        }
+
+        $this->messages = new ArrayObject($filtered);
+        return $this;
+    }
+
 
 }

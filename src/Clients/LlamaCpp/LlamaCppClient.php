@@ -8,18 +8,21 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tokens;
 
 class LlamaCppClient extends Client
 {
-    private array $chatParametersDefinition = [
+    protected string $clientType = Client::TYPE_LLAMACPP;
+    protected string $responseClass = LlamaCppResponse::class;
+    protected array $chatParametersDefinition = [
         'prompt'                        => 'mixed', // string | array of string/int
         'temperature'                   => ['double', [0.0, null]],
-        'dynatemp_range'               => ['double', [0.0, null]],
-        'dynatemp_exponent'            => ['double', [0.0, null]],
+        'dynatemp_range'                => ['double', [0.0, null]],
+        'dynatemp_exponent'             => ['double', [0.0, null]],
         'top_k'                         => ['integer', [0, null]],
         'top_p'                         => ['double', [0.0, 1.0]],
         'min_p'                         => ['double', [0.0, 1.0]],
@@ -29,13 +32,13 @@ class LlamaCppClient extends Client
         'stream'                        => 'boolean',
         'stop'                          => 'array',
         'typical_p'                     => ['double', [0.0, 1.0]],
-        'repeat_penalty'               => ['double', [0.0, null]],
-        'repeat_last_n'                => 'integer',
-        'presence_penalty'             => ['double', [0.0, null]],
-        'frequency_penalty'            => ['double', [0.0, null]],
-        'dry_multiplier'               => ['double', [0.0, null]],
+        'repeat_penalty'                => ['double', [0.0, null]],
+        'repeat_last_n'                 => 'integer',
+        'presence_penalty'              => ['double', [0.0, null]],
+        'frequency_penalty'             => ['double', [0.0, null]],
+        'dry_multiplier'                => ['double', [0.0, null]],
         'dry_base'                      => ['double', [0.0, null]],
-        'dry_allowed_length'           => 'integer',
+        'dry_allowed_length'            => 'integer',
         'dry_penalty_last_n'           => 'integer',
         'dry_sequence_breakers'        => 'array',
         'xtc_probability'              => ['double', [0.0, 1.0]],
@@ -63,6 +66,7 @@ class LlamaCppClient extends Client
         'input_extra'                  => 'array',
         'input_prefix'                 => 'string',
         'input_suffix'                 => 'string',
+        'max_tokens'                   => 'integer',
     ];
     public function __construct(string $apiKey, string $url = self::ENDPOINT)
     {
@@ -75,7 +79,7 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function health(): array|true
     {
@@ -88,7 +92,7 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws MistralClientException|DateMalformedStringException
+     * @throws MistralClientException|DateMalformedStringException|MaximumRecursionException
      */
     public function completion(string $prompt, array $params = [], bool $stream=false): Response|Generator
     {
@@ -102,12 +106,12 @@ class LlamaCppClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return LlamaCppResponse::createFromArray($result);
+            return LlamaCppResponse::createFromArray($result, $this->clientType);
         }
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function tokenize(string $prompt, bool $addSpecial = false): Tokens
     {
@@ -124,7 +128,7 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function detokenize(array|ArrayObject|Tokens $tokens): Tokens
     {
@@ -152,7 +156,7 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function embeddings(array $input): array
     {
@@ -161,7 +165,7 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function rerank(string $query,
                            array  $documents,
@@ -186,7 +190,7 @@ class LlamaCppClient extends Client
 
     /**
      * @throws MistralClientException
-     * @throws DateMalformedStringException
+     * @throws DateMalformedStringException|MaximumRecursionException
      */
     public function fim(array $params = [], bool $stream=false): Response|Generator
     {
@@ -199,37 +203,37 @@ class LlamaCppClient extends Client
         if($stream){
             return $this->getStream(stream: $result);
         }else{
-            return LlamaCppResponse::createFromArray($result);
+            return LlamaCppResponse::createFromArray($result, $this->clientType);
         }
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function props(): array
     {
-        return $this->request('GET', 'props', []);
+        return $this->request('GET', 'props');
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function slots(): array
     {
-        return $this->request('GET', 'slots', []);
+        return $this->request('GET', 'slots');
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function metrics(): array
     {
-        return $this->request('GET', 'metrics', []);
+        return $this->request('GET', 'metrics');
     }
 
     /**
      * @throws DateMalformedStringException
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator
     {
@@ -244,7 +248,7 @@ class LlamaCppClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return LlamaCppResponse::createFromArray($result);
+            return LlamaCppResponse::createFromArray($result, $this->clientType);
         }
     }
 

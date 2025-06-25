@@ -1,6 +1,6 @@
 <?php
 
-namespace Partitech\PhpMistral;
+namespace Partitech\PhpMistral\Exceptions;
 
 use Exception;
 use Throwable;

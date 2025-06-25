@@ -7,21 +7,19 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\File;
 use Partitech\PhpMistral\Files;
-use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\UuidInterface;
 use Throwable;
 
-ini_set('default_socket_timeout', '-1');
-
-
 class MistralClient extends Client
 {
     protected string $clientType = self::TYPE_MISTRAL;
+    protected string $finishedToolCallReason = 'tool_calls';
 
     protected const string ENDPOINT = 'https://api.mistral.ai';
     protected array $chatParametersDefinition = [
@@ -70,6 +68,10 @@ class MistralClient extends Client
         $return['temperature'] = 0;
     }
 
+    /**
+     * @throws MaximumRecursionException
+     * @throws MistralClientException
+     */
     public function listModels(): array
     {
         return $this->request('GET', 'v1/models');
@@ -78,7 +80,7 @@ class MistralClient extends Client
     /**
      * Send a DELETE request to the Mistral API.
      *
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function delete(string $path): array|ResponseInterface
     {
@@ -114,7 +116,7 @@ class MistralClient extends Client
     /**
      * List all files.
      *
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function listFiles(array $query=[]): Files
     {
@@ -153,7 +155,7 @@ class MistralClient extends Client
         foreach($list['data'] as $file){
             try{
                 $files->addFile((new File())->fromResponse($file));
-            } catch (Throwable $e){
+            } catch (Throwable){
                 // avoid error ?
             }
         }
@@ -245,30 +247,8 @@ class MistralClient extends Client
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
-     */
-    public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator
-    {
-        $request = $this->makeChatCompletionRequest(
-            definition: $this->chatParametersDefinition,
-            messages: $messages,
-            params: $params
-        );
-
-        $result = $this->request('POST', $this->chatCompletionEndpoint, $request, $stream);
-
-        if($stream){
-            return $this->getStream($result);
-        }else{
-            return Response::createFromArray($result);
-        }
-    }
-
-
-    /**
-     * @throws MistralClientException
-     * @throws DateMalformedStringException
+     * @throws DateMalformedStringException|MaximumRecursionException
      */
     public function fim(array $params = [], bool $stream=false): Response|Generator
     {
@@ -281,13 +261,13 @@ class MistralClient extends Client
         if($stream){
             return $this->getStream(stream: $result);
         }else{
-            return Response::createFromArray($result);
+            return Response::createFromArray($result, $this->clientType);
         }
     }
 
     /**
      * @throws MistralClientException
-     * @throws DateMalformedStringException
+     * @throws DateMalformedStringException|MaximumRecursionException
      */
     public function agent(Messages $messages, string $agent, array $params = [], bool $stream=false): Response|Generator
     {
@@ -303,24 +283,24 @@ class MistralClient extends Client
         if($stream){
             return $this->getStream(stream: $result);
         }else{
-            return Response::createFromArray($result);
+            return Response::createFromArray($result, $this->clientType);
         }
     }
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function ocr(Messages $messages, array $params = []): Response
     {
         $params = $this->makeChatCompletionRequest(definition: $this->chatParametersDefinition, messages: $messages, params: $params);
         $result = $this->request('POST', $this->ocrCompletionEndpoint, $params);
-        return Response::createFromArray($result);
+        return Response::createFromArray($result, $this->clientType);
     }
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function embeddings(array $datas, string $model = 'mistral-embed'): array
     {
@@ -329,7 +309,7 @@ class MistralClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function moderation(string $model, string|array $input, bool $filter = true): array
     {
@@ -345,7 +325,7 @@ class MistralClient extends Client
         $moderationResult = [];
         foreach($result['results'] as $inputResult){
             // only get key categories of moderated items
-            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));;
+            $moderationResult[] = array_keys(array_filter($inputResult['categories'], fn($value) => (bool)$value));
         }
 
         return $moderationResult;
@@ -353,7 +333,7 @@ class MistralClient extends Client
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function chatModeration(string $model, Messages $messages, bool $filter = true): array
     {
@@ -373,11 +353,16 @@ class MistralClient extends Client
     }
 
 
+    /**
+     * @throws MaximumRecursionException
+     * @throws MistralClientException
+     */
     public function classifications(string $model, string|array $input, bool $filter = true): array
     {
         if(is_string($input)){
             $input=[$input];
         }
+
         $result = $this->request('POST', 'v1/classifications', ['model' => $model, 'input' => $input]);
 
         if($filter === false){

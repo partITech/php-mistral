@@ -8,17 +8,17 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tokens;
 use Throwable;
-
-ini_set('default_socket_timeout', '-1');
-
 
 class VllmClient extends Client
 {
     protected string $clientType = Client::TYPE_VLLM;
+    protected string $responseClass = VllmResponse::class;
+
     protected array $chatParametersDefinition = [
         'n'                          => 'integer',
         'best_of'                    => 'integer',
@@ -52,7 +52,7 @@ class VllmClient extends Client
 
     /**
      * @throws DateMalformedStringException
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function completion(string $prompt, array $params = [], bool $stream=false): Response|Generator
     {
@@ -66,40 +66,16 @@ class VllmClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return Response::createFromArray($result);
+            return Response::createFromArray($result, $this->clientType);
         }
     }
-
-
-    /**
-     * @throws DateMalformedStringException
-     * @throws MistralClientException
-     */
-    public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator
-    {
-
-        $request = $this->makeChatCompletionRequest(
-            definition: $this->chatParametersDefinition,
-            messages: $messages,
-            params: $params
-        );
-
-        $result = $this->request('POST', $this->chatCompletionEndpoint, $request, $stream);
-
-        if($stream){
-            return $this->getStream($result);
-        }else{
-            return Response::createFromArray($result);
-        }
-    }
-
 
     protected function handleGuidedJson(array &$return, mixed $json, Messages $messages): void
     {
 
         if($json instanceof ObjectSchema){
             $return['guided_json'] = json_encode($json);
-        }else if(is_string($json)){
+        }elseif(is_string($json)){
             $return['guided_json'] = $json;
         }
         $return['temperature'] = 0;
@@ -107,7 +83,7 @@ class VllmClient extends Client
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function embeddings(array $input, string $model = 'mistral-embed'): array
     {
@@ -138,7 +114,7 @@ class VllmClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function tokenize(string $model, string $prompt): Tokens
     {
@@ -153,7 +129,7 @@ class VllmClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function detokenize(array|ArrayObject|Tokens $tokens,?string $model=null): Tokens
     {
@@ -190,7 +166,7 @@ class VllmClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function pooling(array $datas, string $model = 'mistral-embed'): array
     {
@@ -199,7 +175,7 @@ class VllmClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function score(string $model,
                           string $text1,
@@ -213,7 +189,7 @@ class VllmClient extends Client
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function rerank(string $model,
                            string $query,

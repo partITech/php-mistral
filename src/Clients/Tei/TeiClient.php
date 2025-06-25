@@ -4,8 +4,8 @@ namespace Partitech\PhpMistral\Clients\Tei;
 // https://github.com/huggingface/text-embeddings-inference
 
 use Partitech\PhpMistral\Clients\Client;
-use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 class TeiClient extends Client
 {
@@ -18,7 +18,7 @@ class TeiClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function embed(string|array $inputs): array
     {
@@ -28,7 +28,7 @@ class TeiClient extends Client
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function rerank(string $query, array $texts): array
     {
@@ -37,7 +37,7 @@ class TeiClient extends Client
 
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function getRerankedContent(string $query, array $texts, ?int $top=null): array
     {
@@ -51,7 +51,7 @@ class TeiClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function predict(string|array $inputs): array
     {
@@ -59,7 +59,7 @@ class TeiClient extends Client
     }
 
     /**
-     * @throws MistralClientException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function embedSparse(string|array $inputs): array
     {
