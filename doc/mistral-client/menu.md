@@ -4,6 +4,7 @@
 - [Multiturn messages](Basics/multiturn_messages.md)
 - [Chat](Basics/chat.md)
 - [Function calling](Basics/function_calling.md)
+- [MCP](Basics/mcp.md)
 - [Socket timeout](Basics/socket_timeout.md)
 - [Guided JSON output](Basics/guided_json.md)
 
