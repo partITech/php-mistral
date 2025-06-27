@@ -73,12 +73,14 @@ Now that your JSON config file is ok, Let’s see how to use it in practice.
 4. build your system and user messages
 5. Use the chat() pethode as usual, or the new chatStream() method.
 
-> [!CAUTION] The chatStream() method is introduced for mcp recurtion. Due to the nature of PHP wiuth the `yield` generator function, we cannot mix yield and return a Response Object in the same method. As soon as use use the yield keyword the entire function definition is changed by PHP. 
+> [!CAUTION] 
+> The chatStream() method is introduced for mcp recurtion. Due to the nature of PHP wiuth the `yield` generator function, we cannot mix yield and return a Response Object in the same method. As soon as use use the yield keyword the entire function definition is changed by PHP. 
 > So, for a streamed response use the chatStream() method if you need MCP. 
 
 
 
-> [!IMPORTANT] Depending on your inference backend and the model you are using, the model **may fail to interpret tool responses**.
+> [!IMPORTANT] 
+> Depending on your inference backend and the model you are using, the model **may fail to interpret tool responses**.
 > This can result in an **infinite loop**, where the model keeps calling the same tool with the same arguments, over and over.
 >
 > This issue has been specifically observed with **Text Generation Inference (TGI)** from Hugging Face:
