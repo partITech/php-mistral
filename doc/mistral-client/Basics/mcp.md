@@ -29,6 +29,11 @@ The Model Context Protocol (MCP) was introduced by Anthropic on November 25, 202
 
 PHP-Mistral supports MCP through its **Function Calling** mechanism (see [Basics/function\_calling.md](Basics/function_calling.md)). Each “tool” is declared so the model can dynamically choose which function to invoke and with what arguments.
 
+For this example, we will use the [filesystem](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem) MCP server from https://github.com/modelcontextprotocol github repository. You can find the built image on the [docker hub](https://hub.docker.com/r/mcp/filesystem)  
+
+The main mcp server configuration. You need to declare a command and arguments to be able to use it.
+For a webservice you will need to use the "url" declaration instead of command. See the documentation at [logiscape/mcp-sdk-php](https://github.com/logiscape/mcp-sdk-php) 
+which is the main php package used for the MCP integration.
 
 ```json
 {
@@ -50,7 +55,47 @@ PHP-Mistral supports MCP through its **Function Calling** mechanism (see [Basics
   }
 }
 ```
+Now that your JSON config file is ok, Let’s see how to use it in practice.
 
+1. Firstly, you need to create an MCPConfig object. Simply json_decode your main config file. You can create an array by hand if needed. But the main MCPConfig object is ready to accept a copy/paste of a large amount of config files provided by the mcp servers.
+(This is the type of configuration used by Claude).
+
+2. Create a client to select your inference provider
+3. Generate your parameters. Feed the `tool` key with your McpConfig object. Your client will use this object and  create the json array needed to tell your LLM "hey this is the tools you should use". 
+> [!TIP]
+> Some models will have a lot of pain to use your tools. Specifically the small ones. Depending on your context size, you can add in your prompt the liste of tools the LLM can use. This can lead to better understanding on some case.
+> Simply use the getList() method to get the entire list of tools configured by your servers, and pass a list in json format :
+> ```php
+> $toolList = json_encode($mcpConfig->getList());
+> $messages = $this->client->getMessages()
+>                  ->addSystemMessage('You are Qwen, created by Alibaba Cloud. You are a helpful assistant. You have access to the directory \/projects\/workspace\/ . here is the list of tools you can use :[AVAILABLE_TOOLS]' . $tools . '[/AVAILABLE_TOOLS]')
+> ```
+4. build your system and user messages
+5. Use the chat() pethode as usual, or the new chatStream() method.
+
+> [!CAUTION] The chatStream() method is introduced for mcp recurtion. Due to the nature of PHP wiuth the `yield` generator function, we cannot mix yield and return a Response Object in the same method. As soon as use use the yield keyword the entire function definition is changed by PHP. 
+> So, for a streamed response use the chatStream() method if you need MCP. 
+
+
+
+> [!IMPORTANT] Depending on your inference backend and the model you are using, the model **may fail to interpret tool responses**.
+> This can result in an **infinite loop**, where the model keeps calling the same tool with the same arguments, over and over.
+>
+> This issue has been specifically observed with **Text Generation Inference (TGI)** from Hugging Face:
+>
+> * [TGI issue #2461 – Infinite tool calling loop](https://github.com/huggingface/text-generation-inference/issues/2461)
+> * [TGI issue #2986 – Function calling never resolves](https://github.com/huggingface/text-generation-inference/issues/2986)
+>
+> However, **this behavior is not limited to TGI**. It can occur with **any inference engine or LLM**, depending on the model's reasoning capabilities and the structure of your tool responses.
+>
+> ✅ **Best practice**: always set a maximum recursion limit to avoid runaway loops.
+>
+> This is not only a technical safeguard — each tool recursion may trigger a new API call, causing **rapid budget consumption** if not controlled.
+>
+> ```php
+> $client->setMcpMaxRecursion(7);
+> ```
+ 
 
 ```php
 use Partitech\PhpMistral\Mcp\McpConfig;
@@ -109,7 +154,7 @@ foreach ($client->chatStream(messages: $messages, params: $params) as $chunk) {
 }
 ```
 
-For a non stream execution : 
+For a non-stream execution : 
 ```php
 
 $response = $client->chat(messages: $messages, params: $params);
