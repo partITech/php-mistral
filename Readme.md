@@ -55,7 +55,10 @@ This ensures **flexibility**, **interoperability**, and **future-proofing** of y
   - Efficient load balancing across multiple vLLM servers.
 - **Hugging Face Dataset API**:  
   - Seamlessly interact with Hugging Face datasets, list files, download, manage, and search datasets directly from PHP.
-
+- **MCP (Model Context Protocol) support**:
+  * Call external tools through MCP-compatible servers like Claude and docker-based or exec runners.
+- **Recursion safety for tool calls**:
+  * Avoid infinite loops with `setMcpMaxRecursion()`.
 ---
 
 ## Supported Providers & Features
