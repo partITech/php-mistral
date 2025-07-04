@@ -63,10 +63,10 @@ class FunctionCallTest extends Setup
 
             // Assert that there is at least one tool call in the response
             $this->assertNotEmpty($toolCalls, 'There should be at least one tool call in the response.');
-            $this->assertIsArray($toolCalls, 'The tool calls should be an array.');
+            $this->assertIsIterable($toolCalls, 'The tool calls should be an array.');
 
             // Check details of the first tool call
-            $toolCall = $toolCalls[0];
+            $toolCall = $toolCalls->first()->toArray();
 
             // Assert the presence of a function in the tool call
             $this->assertArrayHasKey('function', $toolCall, 'The tool call should include a "function" key.');
