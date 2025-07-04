@@ -14,12 +14,12 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6",
-        "symfony/http-client": "^7.2",
+        "symfony/http-client": "^6.3 || ^7.0",
         "guzzlehttp/guzzle": "^7.9",
         "php-http/curl-client": "^2.3",
         "php-http/message": "^1.16",
         "ext-curl": "*",
-        "symfony/dotenv": "^7.3",
+        "symfony/dotenv": "^6.3 || ^7.0",
         "ext-posix": "*",
         "phpstan/phpstan": "^2.1"
     },
@@ -31,14 +31,14 @@
         "analyse": "phpstan analyse --configuration=phpstan.neon"
     },
     "require": {
-        "php": ">=8.3",
+        "php": ">=8.2",
         "ext-fileinfo": "*",
         "ext-http": "*",
-        "symfony/mime": "^7.2",
+        "symfony/mime": "^6.3 || ^7.0",
         "ramsey/uuid": "^4.7",
         "knplabs/php-json-schema": "^0.1.0",
-        "psr/http-client-implementation": "*",
-        "psr/http-factory-implementation": "*",
+        "psr/http-client-implementation": "^1.0",
+        "psr/http-factory-implementation": "^1.0",
         "php-http/discovery": "^1.20",
         "psr/http-client": "^1.0",
         "nyholm/psr7": "^1.8",
