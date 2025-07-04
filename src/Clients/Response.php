@@ -14,7 +14,7 @@ use Throwable;
 
 class Response
 {
-    public const array THINKING_WORDS = [
+    public const THINKING_WORDS = [
         '<think>',
         '</think>'
     ];

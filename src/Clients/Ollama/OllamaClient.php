@@ -32,7 +32,7 @@ class OllamaClient extends Client
 
     ];
 
-    protected const string ENDPOINT = 'http://localhost:8080';
+    protected const ENDPOINT = 'http://localhost:8080';
 
     public function __construct(string $url = self::ENDPOINT)
     {

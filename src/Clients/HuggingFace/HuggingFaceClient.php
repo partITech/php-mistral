@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 class HuggingFaceClient extends TgiClient
 {
     protected string $clientType = Client::TYPE_HUGGINGFACE;
-    protected const string ENDPOINT = 'https://router.huggingface.co';
+    protected const ENDPOINT = 'https://router.huggingface.co';
     protected string $responseClass = TgiResponse::class;
 
     public function __construct(

@@ -10,14 +10,14 @@ use Partitech\PhpMistral\Tools\ToolCallFunction;
 
 class Message
 {
-    public const string MESSAGE_TYPE_TEXT            = 'text';
-    public const string MESSAGE_TYPE_IMAGE_URL       = 'image_url';
-    public const string MESSAGE_TYPE_VIDEO_URL       = 'video_url';
-    public const string MESSAGE_TYPE_INPUT_AUDIO     = 'input_audio';
-    public const string MESSAGE_TYPE_AUDIO_URL       = 'audio_url';
-    public const string MESSAGE_TYPE_BASE64          = 'base64_image';
-    public const string MESSAGE_TYPE_DOCUMENT_URL    = 'document_url';
-    public const string MESSAGE_TYPE_DOCUMENT_BASE64 = 'document_base64'; // only used by anthropic for pdf documents
+    public const MESSAGE_TYPE_TEXT            = 'text';
+    public const MESSAGE_TYPE_IMAGE_URL       = 'image_url';
+    public const MESSAGE_TYPE_VIDEO_URL       = 'video_url';
+    public const MESSAGE_TYPE_INPUT_AUDIO     = 'input_audio';
+    public const MESSAGE_TYPE_AUDIO_URL       = 'audio_url';
+    public const MESSAGE_TYPE_BASE64          = 'base64_image';
+    public const MESSAGE_TYPE_DOCUMENT_URL    = 'document_url';
+    public const MESSAGE_TYPE_DOCUMENT_BASE64 = 'document_base64'; // only used by anthropic for pdf documents
     private bool $urlAsArray = false;
 
 

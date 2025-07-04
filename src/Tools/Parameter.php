@@ -4,8 +4,8 @@ namespace Partitech\PhpMistral\Tools;
 
 class Parameter
 {
-    public const string DEFAULT_TYPE = 'string';
-    public const string STRING_TYPE = 'string';
+    public const DEFAULT_TYPE = 'string';
+    public const STRING_TYPE = 'string';
     private ?string $type;
     private ?string $name;
     private ?string $description;

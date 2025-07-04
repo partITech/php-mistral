@@ -29,17 +29,17 @@ class Client extends Psr17Factory implements ClientInterface
     private ClientInterface         $client;
     private RequestFactoryInterface $request;
     private StreamFactoryInterface  $streamFactory;
-    public const string DEFAULT_CHAT_MODEL = 'open-mistral-7b';
-    public const string DEFAULT_FIM_MODEL  = 'codestral-2405';
-    public const string TOOL_CHOICE_ANY    = 'any';
-    public const string TOOL_CHOICE_AUTO   = 'auto';
-    public const string TOOL_CHOICE_TOOL   = 'tool';
-    public const string TOOL_CHOICE_NONE   = 'none';
+    public const DEFAULT_CHAT_MODEL = 'open-mistral-7b';
+    public const DEFAULT_FIM_MODEL  = 'codestral-2405';
+    public const TOOL_CHOICE_ANY    = 'any';
+    public const TOOL_CHOICE_AUTO   = 'auto';
+    public const TOOL_CHOICE_TOOL   = 'tool';
+    public const TOOL_CHOICE_NONE   = 'none';
 
-    public const int RESPONSE_FORMAT_JSON = 0;
+    public const RESPONSE_FORMAT_JSON = 0;
 
-    protected const string END_OF_STREAM = "[DONE]";
-    protected const string ENDPOINT      = '';
+    protected const END_OF_STREAM = "[DONE]";
+    protected const ENDPOINT      = '';
 
     protected string $chatCompletionEndpoint = 'v1/chat/completions';
     protected string $completionEndpoint     = 'v1/completions';
@@ -49,34 +49,34 @@ class Client extends Psr17Factory implements ClientInterface
     protected string $documentKeyword        = 'document';
     protected string $guidedJsonKeyword      = 'guided_json';
 
-    public const string GUIDED_JSON_TYPE_JSON_ENCODE = 'json_encode';
-    public const string GUIDED_JSON_TYPE_ARRAY       = 'array';
-    public const string GUIDED_JSON_TYPE_HUGGINGFACE = 'huggingface';
-    public const string GUIDED_JSON_TYPE_MISTRAL     = 'mistral';
+    public const GUIDED_JSON_TYPE_JSON_ENCODE = 'json_encode';
+    public const GUIDED_JSON_TYPE_ARRAY       = 'array';
+    public const GUIDED_JSON_TYPE_HUGGINGFACE = 'huggingface';
+    public const GUIDED_JSON_TYPE_MISTRAL     = 'mistral';
     private bool|string $explicitlyForceJsonFormat = false;
     protected string    $guidedJsonEncodeType      = self::GUIDED_JSON_TYPE_MISTRAL;
-    public const string FILE_PURPOSE_FINETUNE = 'fine-tune';
-    public const string FILE_PURPOSE_BATCH    = 'batch';
-    public const string FILE_PURPOSE_OCR      = 'ocr';
+    public const FILE_PURPOSE_FINETUNE = 'fine-tune';
+    public const FILE_PURPOSE_BATCH    = 'batch';
+    public const FILE_PURPOSE_OCR      = 'ocr';
 
     protected ?string $chunkPrefixKey = 'data: ';
     protected ?string $apiKey         = null;
     protected string  $url;
-    public const string ENCODING_FORMAT_FLOAT  = 'float';
-    public const string ENCODING_FORMAT_BASE64 = 'base64';
+    public const ENCODING_FORMAT_FLOAT  = 'float';
+    public const ENCODING_FORMAT_BASE64 = 'base64';
     protected bool $messageMultiModalUrlTypeArray = false;
 
 
-    public const string TYPE_ANTHROPIC   = 'Anthropic';
-    public const string TYPE_XAI         = 'XAi';
-    public const string TYPE_OPENAI      = 'OpenAI';
-    public const string TYPE_TGI         = 'TGI';
-    public const string TYPE_TEI         = 'TEI';
-    public const string TYPE_OLLAMA      = 'OLLAMA';
-    public const string TYPE_LLAMACPP    = 'LLAMACPP';
-    public const string TYPE_VLLM        = 'VLLM';
-    public const string TYPE_MISTRAL     = 'Mistral';
-    public const string TYPE_HUGGINGFACE = 'HuggingFace';
+    public const TYPE_ANTHROPIC   = 'Anthropic';
+    public const TYPE_XAI         = 'XAi';
+    public const TYPE_OPENAI      = 'OpenAI';
+    public const TYPE_TGI         = 'TGI';
+    public const TYPE_TEI         = 'TEI';
+    public const TYPE_OLLAMA      = 'OLLAMA';
+    public const TYPE_LLAMACPP    = 'LLAMACPP';
+    public const TYPE_VLLM        = 'VLLM';
+    public const TYPE_MISTRAL     = 'Mistral';
+    public const TYPE_HUGGINGFACE = 'HuggingFace';
 
 
     protected ?string    $provider          = null;
