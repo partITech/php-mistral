@@ -29,7 +29,7 @@ class AnthropicClient extends Client
         'stop'                  => 'string',
         'temperature'           => ['double', [0, 1]],
     ];
-    protected const string ENDPOINT = 'https://api.anthropic.com/';
+    protected const ENDPOINT = 'https://api.anthropic.com/';
 
     public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
     {

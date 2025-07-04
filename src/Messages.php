@@ -8,10 +8,10 @@ use Partitech\PhpMistral\Tools\ToolCallCollection;
 
 class Messages
 {
-    public const string ROLE_USER='user';
-    public const string ROLE_ASSISTANT='assistant';
-    public const string ROLE_TOOL='tool';
-    public const string ROLE_SYSTEM='system';
+    public const ROLE_USER='user';
+    public const ROLE_ASSISTANT='assistant';
+    public const ROLE_TOOL='tool';
+    public const ROLE_SYSTEM='system';
 
     private ArrayObject $messages;
     private ?array $document=null;

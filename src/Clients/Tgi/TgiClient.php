@@ -23,7 +23,7 @@ class TgiClient extends Client
 {
     protected string $clientType = Client::TYPE_TGI;
     protected string $responseClass = TgiResponse::class;
-    protected const string ENDPOINT = 'http://localhost:8080';
+    protected const ENDPOINT = 'http://localhost:8080';
 
     protected array $chatParametersDefinition = [
         'frequency_penalty'              => ['double', [-2.0, 2.0]],

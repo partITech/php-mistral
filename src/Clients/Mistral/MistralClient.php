@@ -21,7 +21,7 @@ class MistralClient extends Client
     protected string $clientType = self::TYPE_MISTRAL;
     protected string $finishedToolCallReason = 'tool_calls';
 
-    protected const string ENDPOINT = 'https://api.mistral.ai';
+    protected const ENDPOINT = 'https://api.mistral.ai';
     protected array $chatParametersDefinition = [
     'temperature'        => ['numeric', [0, 0.7]],
     'top_p'              => ['numeric', [0, 1]], // Default: 1

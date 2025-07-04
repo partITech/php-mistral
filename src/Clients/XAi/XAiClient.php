@@ -18,7 +18,7 @@ class XAiClient extends Client
     protected string $clientType = Client::TYPE_XAI;
     protected string $responseClass = XAIResponse::class;
 
-    protected const string ENDPOINT = 'https://api.x.ai/';
+    protected const ENDPOINT = 'https://api.x.ai/';
 
     protected array $chatParametersDefinition = [
         'temperature'           => ['double', [0, 1]],

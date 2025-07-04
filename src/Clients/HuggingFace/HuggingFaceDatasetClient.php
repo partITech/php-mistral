@@ -17,12 +17,12 @@ use Throwable;
 
 class HuggingFaceDatasetClient extends Client
 {
-    protected const string ENDPOINT_HUGGINGFACE = 'https://huggingface.co';
-    protected const string ENDPOINT_DATASET_SERVER = 'https://datasets-server.huggingface.co';
+    protected const ENDPOINT_HUGGINGFACE = 'https://huggingface.co';
+    protected const ENDPOINT_DATASET_SERVER = 'https://datasets-server.huggingface.co';
 
-    public const string REPOSITORY_TYPE_MODEL = 'model';
-    public const string REPOSITORY_TYPE_DATASET = 'dataset';
-    public const string REPOSITORY_TYPE_SPACE = 'space';
+    public const REPOSITORY_TYPE_MODEL = 'model';
+    public const REPOSITORY_TYPE_DATASET = 'dataset';
+    public const REPOSITORY_TYPE_SPACE = 'space';
 
     public function __construct(?string $apiKey = null)
     {

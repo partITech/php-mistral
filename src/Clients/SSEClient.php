@@ -19,7 +19,7 @@ class SSEClient
     private string $clientType;
     private ?Response $response = null;
 
-    protected const string END_OF_STREAM = "[DONE]";
+    protected const END_OF_STREAM = "[DONE]";
 
     /**
      * Constructor to initialize the SSEClient.
