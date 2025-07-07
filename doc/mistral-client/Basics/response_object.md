@@ -193,6 +193,131 @@ Array
 
 ---
 
+## Example: Complex Guided JSON
+
+```php
+class ResponseObjectSchema extends ObjectSchema
+{
+    public function __construct()
+    {
+        $ingredient = JsonSchema::create(
+            'ingredient',
+            'ingredient',
+            ['sheep milk'],
+            [
+                'type' => 'object',
+                'properties' => [
+                    "name" => JsonSchema::text(),
+                    "origins" =>
+                        JsonSchema::collection(
+                            JsonSchema::create(
+                                'ingredient origin',
+                                'ingredient origin',
+                                ["France"],
+                                JsonSchema::text()
+                            )
+                        )
+                    ,
+                ],
+                'additionalProperties' => false,
+            ]
+        );
+
+        $this->addProperty(
+            'product',
+            JsonSchema::create(
+                'product name',
+                'product name',
+                [],
+                JsonSchema::text()
+            ),
+            true
+        );
+        $this->addProperty(
+            'product_location',
+            JsonSchema::create(
+                'product location',
+                'product location',
+                [],
+                JsonSchema::text()
+            ),
+            true
+        );
+        $this->addProperty(
+            'ingredients',
+            JsonSchema::collection($ingredient),
+            true
+        );
+    }
+
+    public function getTitle(): string
+    {
+        return 'best French cheese';
+    }
+    public function getDescription(): string
+    {
+        return 'best French cheese';
+    }
+}
+
+$messages = $client
+    ->getMessages()
+    ->addUserMessage('What is the best French cheese? Return the product and produce location in JSON format');
+
+$params = [
+    'model' => 'mistral-large-latest',
+    'temperature' => 0.7,
+    'top_p' => 1,
+    'max_tokens' => null,
+    'safe_prompt' => false,
+    'random_seed' => null,
+    'response_format' => [
+        'type' => 'json_object'
+    ],
+    'guided_json' => new ResponseObjectSchema(),
+];
+
+try {
+    $chatResponse = $client->chat(
+        $messages,
+        $params
+    );
+} catch (MistralClientException $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+// ...
+
+$guidedData = $response->getGuidedMessage(true);
+
+print_r($guidedData);
+```
+
+```php
+Array
+(
+    [product] => Roquefort
+    [product_location] => Roquefort-sur-Soulzon, France
+    [ingredients] => Array
+        (
+            [0] => Array
+                (
+                    [name] => sheep milk
+                    [origins] => Array
+                        (
+                            [0] => France
+                        )
+
+                )
+
+        )
+
+)
+```
+
+---
+
 ## Example: Streaming with Chunks
 
 ```php

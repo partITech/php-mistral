@@ -104,9 +104,9 @@ $auto = $chatResponse->getGuidedMessage();
 $object = $chatResponse->getGuidedMessage(associative: false);
 $array = $chatResponse->getGuidedMessage(associative: true);
 
-var_dump($auto);
-var_dump($object);
-var_dump($array);
+// var_dump($auto);
+// var_dump($object);
+print_r($array);
 
 echo $chatResponse->getMessage();
 var_dump(json_decode($chatResponse->getMessage()));
