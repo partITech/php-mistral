@@ -105,6 +105,15 @@ echo $response->getObject();
 
 ---
 
+### `getType()`
+
+Returns the **chunk type** of the streamed response (typically `chat.completion.chunk`).
+
+```php
+echo $response->getType();
+```
+---
+
 ### `getToolCalls()`
 
 If **function calling** (tool usage) was triggered, this method returns the related data.

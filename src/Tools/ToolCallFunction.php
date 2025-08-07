@@ -3,6 +3,7 @@
 namespace Partitech\PhpMistral\Tools;
 
 use JsonSerializable;
+use Partitech\PhpMistral\Utils\Json;
 
 final class ToolCallFunction implements JsonSerializable
 {
@@ -34,11 +35,11 @@ final class ToolCallFunction implements JsonSerializable
             ];
         }
 
-        if(is_string($data['function']['arguments']) && json_validate($data['function']['arguments'])){
+        if(is_string($data['function']['arguments']) && Json::validate($data['function']['arguments'])){
             $data['function']['arguments'] = json_decode($data['function']['arguments'], true);
         }
 
-        if(is_string($data['function']['arguments']) && !json_validate($data['function']['arguments'])){
+        if(is_string($data['function']['arguments']) && !Json::validate($data['function']['arguments'])){
             $data['function']['arguments'] = [$data['function']['arguments']];
         }
 

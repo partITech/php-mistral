@@ -5,7 +5,7 @@ OUTPUT_PREFIX="code_export"
 # Directories to process
 DIRECTORIES=("src" "tests" "examples/")
 # File extensions to include (PHP, YAML, Twig, etc.)
-EXTENSIONS=("php" "yaml" "yml" "xml" "twig" "json" "env")
+EXTENSIONS=("php" "yaml" "yml" "xml" "twig" "json")
 
 # Function to add a file to the markdown file
 append_file_to_output() {

@@ -1,7 +1,6 @@
 <?php
 namespace Partitech\PhpMistral\Clients\Ollama;
 
-use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;

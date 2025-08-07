@@ -3,13 +3,16 @@
 namespace Partitech\PhpMistral\Clients;
 
 use ArrayObject;
-use DateMalformedStringException;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
+use Exception;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Tools\ToolCallCollection;
 use Partitech\PhpMistral\Tools\ToolCallFunction;
+use Partitech\PhpMistral\Utils\Json;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 use Throwable;
 
 class Response
@@ -26,14 +29,14 @@ class Response
     private string      $fingerPrint;
     private ArrayObject $choices;
     private ?array      $pages;
-
+    private ?string      $clientType;
 
     private array $usage = [];
 
     public function __construct(null|string $clientType = null)
     {
         $this->choices = new ArrayObject();
-
+        $this->clientType = $clientType;
         if (is_string($clientType)) {
             $this->createFirstMessage($clientType);
         }
@@ -79,7 +82,7 @@ class Response
 
     public static function createFromJson(string $json, bool $stream = false): ?self
     {
-        if (json_validate($json)) {
+        if (Json::validate($json)) {
             $datas           = json_decode($json, true);
             $datas['stream'] = $stream;
             try {
@@ -109,16 +112,20 @@ class Response
     }
 
     /**
-     * @throws DateMalformedStringException
+     * @throws Exception
      */
     public static function updateFromArray(self $response, array $data): Response
     {
-        if (isset($data['id'])) {
+        if (isset($data['id']) && $response->getId() === null) {
             $response->setId($data['id']);
         }
 
         if (isset($data['object'])) {
             $response->setObject($data['object']);
+        }
+
+        if (isset($data['conversation_id'])) {
+            $response->setId($data['conversation_id']);
         }
 
         if (isset($data['created'])) {
@@ -150,7 +157,7 @@ class Response
         }
 
         $message = $response->getChoices()->count() > 0 ? $response->getChoices()[$response->getChoices()->count(
-        ) - 1] : new Message();
+        ) - 1] : new Message($response->clientType);
 
         // Mistral platform response
         if (isset($data['choices'])) {
@@ -230,11 +237,110 @@ class Response
             $response->updateLastMessage($message);
         }
 
+        if(isset($data['outputs'])) {
+            foreach ($data['outputs'] as $output) {
+                $message = new Message($response->clientType);
+
+                if(isset($output['role'])){
+                    $message->setRole($output['role']);
+                }
+
+                if(isset($output['content']) && is_string($output['content']) ){
+                    $message->setContent($output['content']);
+                }
+
+
+                if(isset($output['id'])){
+                    $message->setId($output['id']);
+                }
+
+                if(isset($output['created_at'])){
+                    $message->setCreatedAt(new DateTimeImmutable($output['created_at']));
+                }
+
+                if(isset($output['completed_at'])){
+                    $message->setCompletedAt(new DateTimeImmutable($output['completed_at']));
+                }
+
+                if(isset($output['type']) &&  $output['type'] === 'tool.tool_reference' ){
+                    $message->addReference($output);
+                }
+
+                if(isset($output['type']) &&  $output['type'] === 'message.output' && isset($output['content']) && is_array($output['content'])){
+                    foreach ( $output['content'] as $content) {
+                        if($content['type'] === 'text'){
+                            $message->updateContent($content['text']);
+                        }
+
+                        if($content['type'] === 'tool_reference'){
+                            $message->addReference($content);
+                        }
+                    }
+                }
+
+
+                if(isset($output['type']) &&  $output['type'] === 'tool.execution' ){
+                    $toolCallFunction = ToolCallFunction::fromArray(
+                        [
+                            'type' => 'tool_use',
+                            'id' => $output['id'],
+                            'name' => $output['name'],
+                            'arguments' => $output['arguments'],
+                            'input' => [],
+                        ]
+                    );
+                    $message->addToolCall($toolCallFunction);
+                }
+
+
+                if ($response->getChoices()->count() === 0) {
+                    $response->addMessage($message);
+                } else {
+                    $response->updateLastMessage($message);
+                }
+            }
+        }
+
+        if(isset($data['type']) && ($data['type'] === 'message.output.delta' || $data['type'] === 'conversation.response.done')){
+            $message->setType($data['type']);
+            if(isset($data['created_at']) && is_string($data['created_at'])){
+                $message->setCreatedAt(new DateTimeImmutable($data['created_at']));
+            }
+
+            if(isset($data['created_at']) && is_int($data['created_at'])){
+                $message->setCreatedAt((new DateTimeImmutable())->setTimestamp($data['created_at']));
+            }
+
+            if(isset($data['id'])){
+                $message->setId($data['id']);
+            }
+
+            if(isset($data['role'])){
+                $message->setRole($data['role']);
+            }
+
+            if(isset($data['content']) && is_string($data['content']) ){
+                $message->setContent($data['content']);
+                $message->setChunk($data['content']);
+            }
+
+            if(isset($data['content']) && is_array($data['content']) && isset($data['content']['type']) && $data['content']['type'] === 'tool_reference' ){
+                $message->addReference($data['content']);
+            }
+
+
+            if ($response->getChoices()->count() === 0) {
+                $response->addMessage($message);
+            } else {
+                $response->updateLastMessage($message);
+            }
+        }
+
         return $response;
     }
 
     /**
-     * @throws DateMalformedStringException
+     * @throws Exception
      */
     public static function isoToTimestamp($isoDateString): int
     {
@@ -259,7 +365,7 @@ class Response
         return $this->choices->count() === 0 ? null : $this->getLastMessage()->getToolCalls();
     }
 
-    private function getLastMessage(): Message
+    public function getLastMessage(): Message
     {
         return $this->choices[$this->choices->count() - 1];
     }
@@ -283,10 +389,7 @@ class Response
         return $this;
     }
 
-    public function getObject(): string
-    {
-        return $this->object;
-    }
+
 
     public function setObject(string $object): self
     {
@@ -354,7 +457,7 @@ class Response
             }
         }
 
-        if (is_string($this->getMessage()) && json_validate($this->getMessage())) {
+        if (is_string($this->getMessage()) && Json::validate($this->getMessage())) {
             return json_decode($this->getMessage(), $associative);
         }
 
@@ -410,4 +513,35 @@ class Response
     {
         return $this->choices->count() === 0 ? null : $this->getLastMessage()->getStopReason();
     }
+
+    public function getType(): ?string
+    {
+        if($this->choices->count() === 0){
+            return null;
+        }
+
+        if($this->getLastMessage()->getType()!==null){
+            return $this->getLastMessage()->getType();
+        }elseif ($this->getObject()!==null){
+            return $this->getObject();
+        }
+
+        return null;
+    }
+
+    public function getObject(): string
+    {
+        return $this->object;
+    }
+
+    public function getReferences(): ?array
+    {
+        return $this->choices->count() === 0 ? null : $this->getLastMessage()->getReferences();
+    }
+
+    public function getFirstMessage(): Message
+    {
+        return $this->choices->getIterator()->current();
+    }
+
 }

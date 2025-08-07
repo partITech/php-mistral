@@ -2,15 +2,11 @@
 
 namespace Partitech\PhpMistral\Clients\LlamaCpp;
 
-use DateMalformedStringException;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Message;
 
 class LlamaCppResponse extends Response
 {
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function updateFromArray(self|Response $response, array $data): Response
     {
         if (isset($data['choices'])) {

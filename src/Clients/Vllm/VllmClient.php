@@ -3,7 +3,6 @@
 namespace Partitech\PhpMistral\Clients\Vllm;
 
 use ArrayObject;
-use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
@@ -51,7 +50,6 @@ class VllmClient extends Client
     ];
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException|MaximumRecursionException
      */
     public function completion(string $prompt, array $params = [], bool $stream=false): Response|Generator

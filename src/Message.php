@@ -2,11 +2,13 @@
 
 namespace Partitech\PhpMistral;
 
+use DateTimeImmutable;
 use http\Exception\InvalidArgumentException;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Tools\FunctionTool;
 use Partitech\PhpMistral\Tools\ToolCallCollection;
 use Partitech\PhpMistral\Tools\ToolCallFunction;
+use Partitech\PhpMistral\Utils\Json;
 
 class Message
 {
@@ -22,6 +24,9 @@ class Message
 
 
     private ?string            $role             = null;
+    private mixed              $id               = null;
+
+
     private null|string|array  $content          = null;
     private ?string            $chunk            = null;
     private ToolCallCollection $toolCalls;
@@ -29,18 +34,24 @@ class Message
     private ?string            $stopReason       = null;
 
     private ?string $toolCallId = null;
-    private ?string $name       = null;
-    private string  $type;
+    private ?string            $name       = null;
+    private string             $clientType;
+    private ?DateTimeImmutable $createdAt=null;
+
+    private ?DateTimeImmutable $completedAt=null;
+    private ?string $type=null;
+    private array $references = [];
+
 
     public function __construct(string $type = Client::TYPE_OPENAI)
     {
-        $this->toolCalls = new ToolCallCollection();
-        $this->type      = $type;
+        $this->toolCalls  = new ToolCallCollection();
+        $this->clientType = $type;
     }
 
-    public function getType(): string
+    public function getClientType(): string
     {
-        return $this->type;
+        return $this->clientType;
     }
 
     /**
@@ -158,6 +169,17 @@ class Message
         return $this;
     }
 
+    public function addReference(array $reference): self
+    {
+        $this->references[] = $reference;
+
+        return $this;
+    }
+
+    public function getReferences():array
+    {
+        return $this->references;
+    }
     /**
      * @param array|ToolCallCollection|null $toolCalls
      * @return Message
@@ -179,7 +201,7 @@ class Message
             $this->partialToolCalls[$index] = null;
         }
         $this->partialToolCalls[$index] .= $partial;
-        if (json_validate($this->partialToolCalls[$index])) {
+        if (Json::validate($this->partialToolCalls[$index])) {
             $arguments = json_decode($this->partialToolCalls[$index], true);
             $this->toolCalls->updateArguments(index: $index, arguments: $arguments);
         }
@@ -242,7 +264,7 @@ class Message
                 'text' => $content
             ];
         } elseif ($type === self::MESSAGE_TYPE_IMAGE_URL) {
-            if ($this->type === Client::TYPE_ANTHROPIC) {
+            if ($this->clientType === Client::TYPE_ANTHROPIC) {
                 $msgContent = [
                     'type'   => 'image',
                     'source' => [
@@ -275,7 +297,7 @@ class Message
                 'audio_url' => ['url' => $content]
             ];
         } elseif ($type === self::MESSAGE_TYPE_DOCUMENT_URL) {
-            if ($this->type === Client::TYPE_ANTHROPIC) {
+            if ($this->clientType === Client::TYPE_ANTHROPIC) {
                 $msgContent = [
                     'type'   => 'document',
                     'source' => [
@@ -302,7 +324,7 @@ class Message
             }
 
             $base64Data = base64_encode(file_get_contents($content));
-            if ($this->type === Client::TYPE_ANTHROPIC) {
+            if ($this->clientType === Client::TYPE_ANTHROPIC) {
                 $msgContent = [
                     'type'   => 'document',
                     'source' => [
@@ -325,7 +347,7 @@ class Message
             }
 
             $base64Data = base64_encode(file_get_contents($content));
-            if ($this->type === Client::TYPE_ANTHROPIC) {
+            if ($this->clientType === Client::TYPE_ANTHROPIC) {
                 $msgContent = [
                     'type'   => 'image',
                     'source' => [
@@ -334,7 +356,7 @@ class Message
                         'data'       => $base64Data
                     ]
                 ];
-            } elseif ($this->type === Client::TYPE_XAI) {
+            } elseif ($this->clientType === Client::TYPE_XAI) {
                 $msgContent = [
                     'type'      => 'image_url',
                     'image_url' => [
@@ -489,5 +511,76 @@ class Message
 
         return null;
     }
+    /**
+     * @return mixed
+     */
+    public function getId(): mixed
+    {
+        return $this->id;
+    }
 
+    /**
+     * @param mixed $id
+     * @return Message
+     */
+    public function setId(mixed $id): Message
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getCreatedAt(): ?DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $createdAt
+     * @return Message
+     */
+    public function setCreatedAt(?DateTimeImmutable $createdAt): Message
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getCompletedAt(): ?DateTimeImmutable
+    {
+        return $this->completedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $completedAt
+     * @return Message
+     */
+    public function setCompletedAt(?DateTimeImmutable $completedAt): Message
+    {
+        $this->completedAt = $completedAt;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string|null $type
+     * @return Message
+     */
+    public function setType(?string $type): Message
+    {
+        $this->type = $type;
+        return $this;
+    }
 }
