@@ -10,7 +10,7 @@ $client = new MistralConversationClient(apiKey: getenv('MISTRAL_API_KEY'));
 $conversation = $client->getConversation('conv_id');
 ```
 
-### Lister les conversations 
+### List all conversations 
 Return an `MistralConversations` object wich is an iterable list of `MistralConversation`
 ```php
 $client = new MistralConversationClient(apiKey: getenv('MISTRAL_API_KEY'));
@@ -21,7 +21,7 @@ print_r($conversations);
 
 
 ### Conversation information
-Renvoie les métadonnées d'une conversation : agent utilisé, modèle, date de création, durée, etc.
+Returns the metadata of a conversation: agent used, model, creation date, duration, etc.
 
 ```php
 $client = new MistralConversationClient(apiKey: getenv('MISTRAL_API_KEY'));
