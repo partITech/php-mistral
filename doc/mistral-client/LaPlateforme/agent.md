@@ -103,9 +103,7 @@ Notre ville lumière, pour l'éternité.
 
 **Create an agent**
 
-L'api de mistral vous permet également de créer un agent. la méthode `createAgent` vous retournera un objet MistralAgent que vous pourrez utiliser dans
-`MistralClient::agent()` ou dans `MistralConversation::setAgent()`.
-
+The Mistral API also allows you to create an agent. The `createAgent` method will return a `MistralAgent` object that you can use in `MistralClient::agent()` or `MistralConversation::setAgent()`.
 
 ```php
 $agent = (new MistralAgent(name: 'Simple Agent', model: 'mistral-medium-latest'))
