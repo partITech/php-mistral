@@ -3,7 +3,6 @@
 namespace Partitech\PhpMistral\Clients\LlamaCpp;
 
 use ArrayObject;
-use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
@@ -92,7 +91,7 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws MistralClientException|DateMalformedStringException|MaximumRecursionException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function completion(string $prompt, array $params = [], bool $stream=false): Response|Generator
     {
@@ -190,7 +189,7 @@ class LlamaCppClient extends Client
 
     /**
      * @throws MistralClientException
-     * @throws DateMalformedStringException|MaximumRecursionException
+     * @throws MaximumRecursionException
      */
     public function fim(array $params = [], bool $stream=false): Response|Generator
     {
@@ -232,7 +231,6 @@ class LlamaCppClient extends Client
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException|MaximumRecursionException
      */
     public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator

@@ -2,16 +2,13 @@
 
 namespace Partitech\PhpMistral\Clients\Tgi;
 
-use DateMalformedStringException;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Tools\ToolCallFunction;
 
 class TgiResponse extends Response
 {
-    /**
-     * @throws DateMalformedStringException
-     */
+
     public static function updateFromArray(self|Response $response, array $data): Response
     {
         $response = parent::updateFromArray($response, $data);

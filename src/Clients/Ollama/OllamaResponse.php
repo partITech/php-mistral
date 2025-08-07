@@ -2,15 +2,11 @@
 
 namespace Partitech\PhpMistral\Clients\Ollama;
 
-use DateMalformedStringException;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Message;
 
 class OllamaResponse extends Response
 {
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function updateFromArray(self|Response $response, array $data): Response
     {
         $response = parent::updateFromArray($response, $data);

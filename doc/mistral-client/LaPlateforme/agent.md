@@ -100,3 +100,39 @@ De la liberté et de l'égalité,
 Paris, tu es notre capitale,
 Notre ville lumière, pour l'éternité.
 ```
+
+**Create an agent**
+
+L'api de mistral vous permet également de créer un agent. la méthode `createAgent` vous retournera un objet MistralAgent que vous pourrez utiliser dans
+`MistralClient::agent()` ou dans `MistralConversation::setAgent()`.
+
+
+```php
+$agent = (new MistralAgent(name: 'Simple Agent', model: 'mistral-medium-latest'))
+->setDescription('A simple Agent with persistent state.');
+->setInstructions('You speak in a mix of french and english')
+->setDescription('Une conversation de test')
+->setTools([])
+->setCompletionArgs(['temperature' => 0.3]);
+
+$agentClient = new MistralAgentClient(apiKey: $apiKey);
+$newAgent = null;
+try {
+    $newAgent = $agentClient->createAgent($agent);
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+}
+```
+
+**List agents**
+
+Return a list of `MistralAgent`
+```php
+$client = new MistralAgentClient(apiKey: getenv('MISTRAL_API_KEY'));
+$agents = $client->listAgents(page: 0, pageSize: 100);
+foreach ($agents as $agent) {
+    echo "#{$agent->getId()} - {$agent->getName()} - {$agent->getVersion()}" . PHP_EOL;
+}
+```
+
+

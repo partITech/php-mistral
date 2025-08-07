@@ -57,7 +57,7 @@ class XAiClient extends Client
 
 
     /**
-     * @throws MistralClientException|\Partitech\PhpMistral\Exceptions\MaximumRecursionException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function deferredCompletion(string $requestId): Response
     {
@@ -67,7 +67,7 @@ class XAiClient extends Client
     }
 
     /**
-     * @throws MistralClientException|\Partitech\PhpMistral\Exceptions\MaximumRecursionException
+     * @throws MistralClientException|MaximumRecursionException
      */
     public function imageGenerations(string $prompt, array $params = []): array|string|ResponseInterface
     {

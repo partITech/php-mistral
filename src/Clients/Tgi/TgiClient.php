@@ -3,7 +3,6 @@ namespace Partitech\PhpMistral\Clients\Tgi;
 
 
 use ArrayObject;
-use DateMalformedStringException;
 use Exception;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
@@ -75,7 +74,6 @@ class TgiClient extends Client
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
      */
     public function generate(string $prompt, array $params = [], bool $stream=false): Response|Generator
@@ -103,7 +101,6 @@ class TgiClient extends Client
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
      * @throws Exception
      */

@@ -16,17 +16,17 @@ class Messages
     private ArrayObject $messages;
     private ?array $document=null;
 
-    private string $type;
+    private string $clientType;
 
     public function __construct(string $type = Client::TYPE_OPENAI)
     {
-        $this->type = $type;
-        $this->messages = new ArrayObject();
+        $this->clientType = $type;
+        $this->messages   = new ArrayObject();
     }
 
-    public function getType(): string
+    public function getClientType(): string
     {
-        return $this->type;
+        return $this->clientType;
     }
 
     /**
@@ -67,7 +67,7 @@ class Messages
 
     public function addSystemMessage(string $content): self
     {
-        $message = new Message(type: $this->type);
+        $message = new Message(type: $this->clientType);
         $message->setRole(self::ROLE_SYSTEM);
         $message->setContent($content);
         $this->addMessage($message);
@@ -76,7 +76,7 @@ class Messages
 
     public function addUserMessage(string $content): self
     {
-        $message = new Message(type: $this->type);
+        $message = new Message(type: $this->clientType);
         $message->setRole(self::ROLE_USER);
         $message->setContent($content);
         $this->addMessage($message);
@@ -102,8 +102,8 @@ class Messages
 
     public function addToolMessage(string $name, string|array $content, string $toolCallId): self
     {
-        $message = new Message($this->type);
-        if($this->type===CLIENT::TYPE_ANTHROPIC){
+        $message = new Message($this->clientType);
+        if($this->clientType===CLIENT::TYPE_ANTHROPIC){
             $message->setRole(self::ROLE_USER);
             $message->setContent([[
                 'type' => 'tool_result',
@@ -125,7 +125,7 @@ class Messages
 
     public function addAssistantMessage(null|string|array $content, null|array|ToolCallCollection $toolCalls = null): self
     {
-        $message = new Message($this->type);
+        $message = new Message($this->clientType);
         $message->setRole(self::ROLE_ASSISTANT);
         $message->setContent(trim($content));
         $message->setToolCalls($toolCalls);

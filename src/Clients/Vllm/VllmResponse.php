@@ -2,7 +2,6 @@
 
 namespace Partitech\PhpMistral\Clients\Vllm;
 
-use DateMalformedStringException;
 use Partitech\PhpMistral\Clients\Response;
 
 /**
@@ -24,9 +23,6 @@ class VllmResponse extends Response
      * @param array $data The data to update the response with.
      *
      * @return Response The updated response object.
-     *
-     * @throws DateMalformedStringException Throws this exception if the parent
-     *                                      method encounters issues related to dates.
      */
     public static function updateFromArray(self|Response $response, array $data): Response
     {

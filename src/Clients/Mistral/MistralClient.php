@@ -2,7 +2,6 @@
 
 namespace Partitech\PhpMistral\Clients\Mistral;
 
-use DateMalformedStringException;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
@@ -248,7 +247,7 @@ class MistralClient extends Client
 
     /**
      * @throws MistralClientException
-     * @throws DateMalformedStringException|MaximumRecursionException
+     * @throws MaximumRecursionException
      */
     public function fim(array $params = [], bool $stream=false): Response|Generator
     {
@@ -267,11 +266,15 @@ class MistralClient extends Client
 
     /**
      * @throws MistralClientException
-     * @throws DateMalformedStringException|MaximumRecursionException
+     * @throws MaximumRecursionException
      */
-    public function agent(Messages $messages, string $agent, array $params = [], bool $stream=false): Response|Generator
+    public function agent(Messages $messages, string|MistralAgent $agent, array $params = [], bool $stream=false): Response|Generator
     {
-        $params['agent_id'] = $agent;
+        if($agent instanceof MistralAgent){
+            $params['agent_id'] = $agent->getId();
+        }else{
+            $params['agent_id'] = $agent;
+        }
         $request = $this->makeChatCompletionRequest(
             definition: $this->chatParametersDefinition,
             messages: $messages,
@@ -286,7 +289,6 @@ class MistralClient extends Client
             return Response::createFromArray($result, $this->clientType);
         }
     }
-
 
     /**
      * @throws MistralClientException|MaximumRecursionException

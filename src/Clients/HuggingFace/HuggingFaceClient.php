@@ -48,10 +48,6 @@ class HuggingFaceClient extends TgiClient
         );
 
         $result = $this->request(method: 'POST', path: 'models/'.$params['model'].'/'. $this->chatCompletionEndpoint, parameters: $request, stream: true);
-        if(is_array($result)){
-            var_dump($result);
-            exit();
-        }
         $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($result);
         return $this->wrapStreamGenerator($streamResult);
     }

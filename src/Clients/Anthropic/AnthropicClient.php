@@ -10,9 +10,6 @@ use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Tools\Tool;
 use Partitech\PhpMistral\Tools\ToolCallCollection;
 
-ini_set('default_socket_timeout', '-1');
-
-
 class AnthropicClient extends Client
 {
     protected string $chatCompletionEndpoint = '/v1/messages';

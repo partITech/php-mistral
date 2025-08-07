@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\Messages;

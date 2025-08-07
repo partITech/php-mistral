@@ -15,6 +15,7 @@ use Partitech\PhpMistral\Exceptions\ToolExecutionException;
 use Partitech\PhpMistral\Mcp\McpConfig;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Utils\Json;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
@@ -60,6 +61,7 @@ class Client extends Psr17Factory implements ClientInterface
     public const FILE_PURPOSE_OCR      = 'ocr';
 
     protected ?string $chunkPrefixKey = 'data: ';
+    protected ?string $eventPrefixKey = 'event: ';
     protected ?string $apiKey         = null;
     protected string  $url;
     public const ENCODING_FORMAT_FLOAT  = 'float';
@@ -177,7 +179,7 @@ class Client extends Psr17Factory implements ClientInterface
         // if is valid JSON response, return as an array.
         $contents = $response->getBody()->getContents();
 
-        if (json_validate($contents)) {
+        if (Json::validate($contents)) {
             return json_decode($contents, true);
         }
 
@@ -281,7 +283,7 @@ class Client extends Psr17Factory implements ClientInterface
 
     public function setRequestQuery(RequestInterface $request, string $method, array $parameters): RequestInterface
     {
-        if (isset($parameters['query']) && $method == 'GET') {
+        if (isset($parameters['query']) && ($method == 'GET' || $method == 'PATCH')) {
             $uri     = $request->getUri()->withQuery(http_build_query($parameters['query']));
             $request = $request->withUri($uri);
             unset($parameters['query']);
@@ -383,7 +385,6 @@ class Client extends Psr17Factory implements ClientInterface
 
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
      */
     public function getStream(ResponseInterface $stream): Generator
@@ -404,25 +405,31 @@ class Client extends Psr17Factory implements ClientInterface
                 continue;
             }
 
-            if(!is_null($this->chunkPrefixKey) && !json_validate($chunk)){
+            if(!is_null($this->chunkPrefixKey) && !Json::validate($chunk)){
                 if(!str_contains($chunk, $this->chunkPrefixKey)){
                     continue;
                 }
 
-                $datas = explode($this->chunkPrefixKey, $chunk);
+                $datas = [];
+                preg_match_all('/(data|event):(.*)/', $chunk, $matches, PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    if ($match[1] === 'data') {
+                        $datas[] = trim($match[2]);
+                    }
+                }
             }else {
                 $datas = $chunk;
             }
 
             if(is_string($datas)){
-                if(json_validate($datas)){
+                if(Json::validate($datas)){
                     yield $response = $responseClass::createFromJson($datas, true);
                 }
                 continue;
             }
             foreach ($datas as $data) {
                 $data = trim($data);
-                if (empty($data)){
+                if (empty($data) || Json::validate($data) === false) {
                     continue;
                 }
 
@@ -432,7 +439,9 @@ class Client extends Psr17Factory implements ClientInterface
                 }else{
                     $data = json_decode($data, true);
                 }
-
+                if(is_null($data)){
+                    continue;
+                }
                 $data['stream'] = true;
                 /** Response $response */
                 if ($response === null) {

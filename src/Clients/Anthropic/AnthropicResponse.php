@@ -2,7 +2,6 @@
 
 namespace Partitech\PhpMistral\Clients\Anthropic;
 
-use DateMalformedStringException;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
@@ -11,9 +10,6 @@ use Partitech\PhpMistral\Tools\ToolCallFunction;
 class AnthropicResponse extends Response
 {
     protected string $finishedToolCallReason = 'tool_calls';
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function updateFromArray(self|Response $response, array $data): Response
     {
         $response = parent::updateFromArray($response, $data);

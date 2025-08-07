@@ -2,14 +2,11 @@
 
 namespace Partitech\PhpMistral\Clients\XAi;
 
-use DateMalformedStringException;
 use Partitech\PhpMistral\Clients\Response;
 
 class XAIResponse extends Response
 {
-    /**
-     * @throws DateMalformedStringException
-     */
+
     public static function updateFromArray(self|Response $response, array $data): Response
     {
         $response = parent::updateFromArray($response, $data);
