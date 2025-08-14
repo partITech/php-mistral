@@ -1,0 +1,20 @@
+{
+    "name": "knplabs/php-json-schema",
+    "description": "PHP json-schema implementation",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "KnpLabs\\JsonSchema\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Knp Labs",
+            "email": "hello@knplabs.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    }
+}

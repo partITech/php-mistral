@@ -1,0 +1,26 @@
+{
+	"name": "czproject/git-php",
+	"type": "library",
+	"description": "Library for work with Git repository in PHP.",
+	"keywords": ["git"],
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Jan Pecha",
+			"email": "janpecha@email.cz"
+		}
+	],
+	"funding": [
+		{"type": "stripe", "url": "https://donate.stripe.com/7sIcO2a9maTSg2A9AA"},
+		{"type": "other", "url": "https://www.janpecha.cz/donate/git-php/"}
+	],
+	"require": {
+		"php": ">=7.4.0"
+	},
+	"autoload": {
+		"classmap": ["src/"]
+	},
+	"require-dev": {
+		"nette/tester": "^2.4"
+	}
+}
