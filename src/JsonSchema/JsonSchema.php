@@ -12,4 +12,70 @@ class JsonSchema extends \KnpLabs\JsonSchema\JsonSchema
             // 'minLength' => 1,
         ];
     }
+
+    //https://json-schema.org/understanding-json-schema/reference/enum
+    public static function enum(iterable $enum): array
+    {
+        return [
+            'enum' => $enum,
+        ];
+    }
+
+    //https://json-schema.org/understanding-json-schema/reference/const
+    public static function const(mixed $value): array
+    {
+        return [
+            'const' => $value,
+        ];
+    }
+
+    //https://json-schema.org/understanding-json-schema/reference/null
+    public static function null(): array
+    {
+        return [
+            'type' => 'null',
+        ];
+    }
+
+    // https://json-schema.org/understanding-json-schema/reference/string#regexp
+    public static function pattern(string $pattern): array
+    {
+        return [
+            'type'    => 'string',
+            'pattern' => $pattern,
+        ];
+    }
+
+    // https://json-schema.org/understanding-json-schema/reference/combining#allOf
+    public static function allOf(...$schemas): array
+    {
+        return [
+            'allOf' => $schemas,
+        ];
+    }
+
+    // https://json-schema.org/understanding-json-schema/reference/combining#anyOf
+    public static function anyOf(...$schemas): array
+    {
+        return [
+            'anyOf' => $schemas,
+        ];
+    }
+
+
+    // https://json-schema.org/understanding-json-schema/reference/combining#oneOf
+    public static function oneOf(...$schemas): array
+    {
+        return [
+            'oneOf' => $schemas,
+        ];
+    }
+
+    // https://json-schema.org/understanding-json-schema/reference/combining#not
+    public static function not($schema): array
+    {
+        return [
+            'not' => $schema,
+        ];
+    }
 }

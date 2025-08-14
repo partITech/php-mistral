@@ -1,6 +1,7 @@
 ## Models
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 
@@ -9,7 +10,7 @@ $client = new TgiClient(url: $tgiUrl);
 try {
     $models = $client->models();
     print_r($models);
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
 }
 ```

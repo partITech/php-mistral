@@ -2,6 +2,8 @@
 
 namespace Partitech\PhpMistral\Tools;
 
+use InvalidArgumentException;
+
 class FunctionTool
 {
     public string $name;
@@ -11,16 +13,26 @@ class FunctionTool
         'required' => [],
         'properties' => []
     ];
+    public array $schema;
+    private string $type;
 
-    public function __construct(string $name, string $description, array $parameters)
+
+
+    public function __construct(string $name, string $description, ?array $parameters=null, ?array $schema=null, string $type='function')
     {
         $this->name = $name;
         $this->description = $description;
-        foreach ($parameters as $parameter) {
-            if (!($parameter instanceof Parameter)) {
-                throw new \InvalidArgumentException('All parameters must be of type Parameter');
+        $this->type = $type;
+
+        if(!is_null($schema)){
+            $this->parameters = $schema;
+        }else{
+            foreach ($parameters as $parameter) {
+                if (!($parameter instanceof Parameter)) {
+                    throw new InvalidArgumentException('All parameters must be of type Parameter');
+                }
+                $this->addParameter($parameter);
             }
-            $this->addParameter($parameter);
         }
     }
 
@@ -59,6 +71,11 @@ class FunctionTool
     public function getParameters(): array
     {
         return $this->parameters;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
 }

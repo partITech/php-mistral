@@ -11,7 +11,7 @@ The `rerank()` method returns a list of documents with their **indexes** and **r
 
 ```php
 use Partitech\PhpMistral\Clients\Tei\TeiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 // Load TEI rerank endpoint and API key
 $teiUrl = getenv('TEI_RERANK_URI');

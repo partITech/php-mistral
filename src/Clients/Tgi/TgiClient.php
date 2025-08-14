@@ -3,13 +3,13 @@ namespace Partitech\PhpMistral\Clients\Tgi;
 
 
 use ArrayObject;
-use DateMalformedStringException;
+use Exception;
 use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Partitech\PhpMistral\Tokens;
 
 
@@ -22,7 +22,7 @@ class TgiClient extends Client
 {
     protected string $clientType = Client::TYPE_TGI;
     protected string $responseClass = TgiResponse::class;
-    protected const string ENDPOINT = 'http://localhost:8080';
+    protected const ENDPOINT = 'http://localhost:8080';
 
     protected array $chatParametersDefinition = [
         'frequency_penalty'              => ['double', [-2.0, 2.0]],
@@ -74,7 +74,6 @@ class TgiClient extends Client
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
      */
     public function generate(string $prompt, array $params = [], bool $stream=false): Response|Generator
@@ -97,15 +96,15 @@ class TgiClient extends Client
         if($stream){
             return $this->getStream($result);
         }else{
-            return TgiResponse::createFromArray($result);
+            return TgiResponse::createFromArray($result, $this->clientType);
         }
     }
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
+     * @throws Exception
      */
-    public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator
+    public function chat(Messages $messages, array $params = [], bool $stream=false, null|string $prependUrl = null): Response|Generator
     {
         $request = $this->makeChatCompletionRequest(
             definition: $this->chatParametersDefinition,
@@ -113,12 +112,22 @@ class TgiClient extends Client
             params: $params
         );
 
-        $result = $this->request('POST', $this->chatCompletionEndpoint, $request, $stream);
+        $result = $this->request('POST', $prependUrl.$this->chatCompletionEndpoint, $request, $stream);
 
         if($stream){
             return $this->getStream($result);
         }else{
-            return TgiResponse::createFromArray($result);
+            $response =  TgiResponse::createFromArray($result, $this->clientType);
+
+            if($response->shouldTriggerMcp()){
+                $this->triggerMcp($response);
+                $this->mcpCurrentRecursion++;
+                return $this->chat(messages:  $this->messages, params: $params, stream: $stream, prependUrl: $prependUrl);
+            }else{
+                $this->messages->addMessage($response->getChoices()->getIterator()->current());
+            }
+
+            return $response;
         }
     }
 
@@ -174,7 +183,7 @@ class TgiClient extends Client
      */
     public function models(): array
     {
-        return $this->request('GET', '/v1/models', stream: false);
+        return $this->request('GET', '/v1/models');
     }
 
 

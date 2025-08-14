@@ -2,8 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceClient;
-use Partitech\PhpMistral\Clients\Tgi\TgiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 // Using Huggingface inference

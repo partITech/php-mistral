@@ -3,8 +3,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;

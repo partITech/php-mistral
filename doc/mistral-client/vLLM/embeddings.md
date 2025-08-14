@@ -13,7 +13,7 @@ This example generates embeddings for the input sentence "What is the best Frenc
 
 ```php
 use Partitech\PhpMistral\Clients\Vllm\VllmClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('VLLM_API_KEY');
 $urlApiEmbedding = getenv('VLLM_API_EMBEDDING_URL');

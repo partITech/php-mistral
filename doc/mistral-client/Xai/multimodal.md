@@ -7,11 +7,11 @@ The difference is having image in the message content body instead of text.
 
 ### Base64 image content
 #### Code
+
 ```php
-use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('GROK_API_KEY');
 
@@ -80,11 +80,11 @@ The image is a comparison of socio-economic indicators between disadvantaged are
 
 ### Url image content
 #### Code
+
 ```php
-use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('GROK_API_KEY');
 

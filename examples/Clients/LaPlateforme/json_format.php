@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\JsonSchema\JsonSchema;
 
 $apiKey = getenv('MISTRAL_API_KEY');

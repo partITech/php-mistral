@@ -75,7 +75,7 @@ try {
             'max_tokens' => 1024,
         ]
     );
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

@@ -3,9 +3,10 @@
 Tokenize text with the specified model. The result is a Partitech\PhpMistral\Tokens object.
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('GROK_API_KEY');
 

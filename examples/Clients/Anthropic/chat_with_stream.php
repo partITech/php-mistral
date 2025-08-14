@@ -4,7 +4,6 @@ require_once './../SimpleListSchema.php';
 
 use Partitech\PhpMistral\Clients\Anthropic\AnthropicClient;
 use Partitech\PhpMistral\Clients\Response;
-use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('ANTHROPIC_API_KEY');
 $client = new AnthropicClient(apiKey: (string)$apiKey);
@@ -17,7 +16,7 @@ try {
     foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
         echo $chunk->getChunk();
     }
-} catch (MistralClientException|DateMalformedStringException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

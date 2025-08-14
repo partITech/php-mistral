@@ -1,6 +1,7 @@
 ## Metrics
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 
@@ -10,7 +11,7 @@ $tgiUrl = getenv('TGI_URL');
 $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {
     echo $client->metrics();
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
 }
 

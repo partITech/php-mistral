@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
 
-$llamacppUrl = getenv('LLAMACPP_URL');
+$llamacppUrl = getenv('LLAMACPP_RERANK_URL');
 $llamacppApiKey = getenv('LLAMACPP_API_KEY');
 
 $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);

@@ -3,7 +3,6 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);

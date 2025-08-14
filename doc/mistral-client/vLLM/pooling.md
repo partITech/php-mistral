@@ -11,7 +11,7 @@ The **Pooling API** is similar to the Embeddings API but can produce more comple
 
 ```php
 use Partitech\PhpMistral\Clients\Vllm\VllmClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey          = getenv('VLLM_API_KEY');           // Your vLLM token
 $url             = getenv('VLLM_API_EMBEDDING_URL'); // Example: "http://localhost:40002"

@@ -1,10 +1,9 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Message;
-use Partitech\PhpMistral\MistralClientException;
-use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Clients\XAi\XAiClient;
+use Partitech\PhpMistral\Message;
+use Partitech\PhpMistral\Messages;
 
 $apiKey = getenv('GROK_API_KEY');
 

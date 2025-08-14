@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\HuggingFace\HuggingFaceDatasetClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('HF_TOKEN');
 

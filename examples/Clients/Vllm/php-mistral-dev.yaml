@@ -1,6 +1,6 @@
 services:
   vllm:
-    image: vllm/vllm-openai:v0.7.3
+    image: vllm/vllm-openai:v0.9.1
     command: |
       --model PyrTools/Ministral-8B-Instruct-2410-AWQ
       --max_num_batched_tokens 1024
@@ -20,8 +20,7 @@ services:
       - SERVED_MODEL_NAME
       - MAX_MODEL_LEN
       - VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
-      #- NVIDIA_VISIBLE_DEVICES=0,1
-      - NVIDIA_VISIBLE_DEVICES=0,1
+      - NVIDIA_VISIBLE_DEVICES=0
     volumes:
       - /llm:/llm
       - /Data:/Data

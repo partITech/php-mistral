@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 $tgiUrl = getenv('TGI_URL');
@@ -11,7 +12,7 @@ $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {
     $tokens = $client->tokenize(inputs: "My name is Olivier and I");
     var_dump($tokens);
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (MistralClientException $e) {
     echo $e->getMessage();
 }
 

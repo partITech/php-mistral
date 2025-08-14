@@ -1,6 +1,7 @@
 ## Tokenize
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
 
@@ -11,7 +12,7 @@ $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {
     $tokens = $client->tokenize(inputs: "My name is Olivier and I");
     var_dump($tokens);
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
 }
 ```

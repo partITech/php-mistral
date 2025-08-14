@@ -21,13 +21,12 @@ $client->embeddings(
 
 ```php
 use Partitech\PhpMistral\MistralClient;
-use Partitech\PhpMistral\MistralClientException;
 
 $client = new MistralClient($apiKey);
 
 try {
     $embeddingsBatchResponse = $client->embeddings(["What is the best French cheese?"]);
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }

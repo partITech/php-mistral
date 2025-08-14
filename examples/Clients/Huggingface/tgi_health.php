@@ -11,7 +11,7 @@ $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {
     $health = $client->health();
     var_dump($health);
-} catch (\Partitech\PhpMistral\MistralClientException $e) {
+} catch (\Partitech\PhpMistral\Exceptions\MistralClientException $e) {
 
 }
 

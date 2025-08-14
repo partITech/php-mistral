@@ -1,9 +1,9 @@
 ## Info
 
 ### Code
+
 ```php
 use Partitech\PhpMistral\Clients\Tgi\TgiClient;
-use Partitech\PhpMistral\MistralClientException;
 
 $apiKey = getenv('HUGGINGFACE_TGI_TOKEN');
 $tgiUrl = getenv('TGI_URL');
@@ -12,7 +12,7 @@ $client = new TgiClient(apiKey: (string) $apiKey, url: $tgiUrl);
 try {
     $info = $client->info();
     print_r($info);
-} catch (MistralClientException $e) {
+} catch (\Throwable $e) {
     echo $e->getMessage();
 }
 ```

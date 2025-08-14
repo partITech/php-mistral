@@ -1,0 +1,10 @@
+/examples/docker/.env
+/examples/docker/.cache/
+/examples/docker/models/
+/code_export_src.md
+/code_export_tests.md
+/code_export_examples_Clients_Ollama.md
+/test.md
+/.env
+/tests/var/translated/
+/var/logs/

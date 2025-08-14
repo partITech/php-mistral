@@ -4,23 +4,29 @@ namespace Partitech\PhpMistral;
 
 use ArrayObject;
 use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Tools\ToolCallCollection;
 
 class Messages
 {
-    public const string ROLE_USER='user';
-    public const string ROLE_ASSISTANT='assistant';
-    public const string ROLE_TOOL='tool';
-    public const string ROLE_SYSTEM='system';
+    public const ROLE_USER='user';
+    public const ROLE_ASSISTANT='assistant';
+    public const ROLE_TOOL='tool';
+    public const ROLE_SYSTEM='system';
 
     private ArrayObject $messages;
     private ?array $document=null;
 
-    private string $type;
+    private string $clientType;
 
     public function __construct(string $type = Client::TYPE_OPENAI)
     {
-        $this->type = $type;
-        $this->messages = new ArrayObject();
+        $this->clientType = $type;
+        $this->messages   = new ArrayObject();
+    }
+
+    public function getClientType(): string
+    {
+        return $this->clientType;
     }
 
     /**
@@ -61,7 +67,7 @@ class Messages
 
     public function addSystemMessage(string $content): self
     {
-        $message = new Message(type: $this->type);
+        $message = new Message(type: $this->clientType);
         $message->setRole(self::ROLE_SYSTEM);
         $message->setContent($content);
         $this->addMessage($message);
@@ -70,7 +76,7 @@ class Messages
 
     public function addUserMessage(string $content): self
     {
-        $message = new Message(type: $this->type);
+        $message = new Message(type: $this->clientType);
         $message->setRole(self::ROLE_USER);
         $message->setContent($content);
         $this->addMessage($message);
@@ -96,8 +102,8 @@ class Messages
 
     public function addToolMessage(string $name, string|array $content, string $toolCallId): self
     {
-        $message = new Message($this->type);
-        if($this->type===CLIENT::TYPE_ANTHROPIC){
+        $message = new Message($this->clientType);
+        if($this->clientType===CLIENT::TYPE_ANTHROPIC){
             $message->setRole(self::ROLE_USER);
             $message->setContent([[
                 'type' => 'tool_result',
@@ -117,11 +123,11 @@ class Messages
         return $this;
     }
 
-    public function addAssistantMessage(null|string|array $content, null|array $toolCalls = null): self
+    public function addAssistantMessage(null|string|array $content, null|array|ToolCallCollection $toolCalls = null): self
     {
-        $message = new Message($this->type);
+        $message = new Message($this->clientType);
         $message->setRole(self::ROLE_ASSISTANT);
-        $message->setContent($content);
+        $message->setContent(trim($content));
         $message->setToolCalls($toolCalls);
         $this->addMessage($message);
         return $this;
@@ -161,5 +167,29 @@ class Messages
     {
         return $this->document;
     }
+    public function getSystemMessageContent(): ?string
+    {
+        foreach ($this->messages as $index => $message) {
+            if ($message instanceof Message && $message->getRole() === self::ROLE_SYSTEM) {
+                $this->messages->offsetUnset($index);
+                return $message->getContent();
+            }
+        }
+        return null;
+    }
+
+    public function removeSystemMessage(): self
+    {
+        $filtered = [];
+        foreach ($this->messages as $message) {
+            if ($message->role() !== self::ROLE_SYSTEM) {
+                $filtered[] = $message;
+            }
+        }
+
+        $this->messages = new ArrayObject($filtered);
+        return $this;
+    }
+
 
 }

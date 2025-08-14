@@ -4,8 +4,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 
 // export MISTRAL_API_KEY=

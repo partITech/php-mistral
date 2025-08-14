@@ -13,7 +13,7 @@ Tokenization is the process of converting a string into a sequence of tokens (us
 
 ```php
 use Partitech\PhpMistral\Clients\Vllm\VllmClient;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $apiKey = getenv('VLLM_API_KEY');   // Your vLLM token
 $url    = getenv('VLLM_API_URL');   // Your vLLM API endpoint

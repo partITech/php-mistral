@@ -4,6 +4,7 @@
 - [Multiturn messages](Basics/multiturn_messages.md)
 - [Chat](Basics/chat.md)
 - [Function calling](Basics/function_calling.md)
+- [MCP](Basics/mcp.md)
 - [Socket timeout](Basics/socket_timeout.md)
 - [Guided JSON output](Basics/guided_json.md)
 
@@ -17,6 +18,7 @@
 - [Document understanding](LaPlateforme/document_understanding.md)
 - [Structured JSON output](LaPlateforme/json_object.md)
 - [Agent](LaPlateforme/agent.md)
+- [Conversation](LaPlateforme/conversations.md)
 - [Files](LaPlateforme/files.md)
 - [List models](LaPlateforme/list_models.md)
 - [Moderation](LaPlateforme/moderation.md)

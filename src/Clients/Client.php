@@ -1,97 +1,113 @@
 <?php
 namespace Partitech\PhpMistral\Clients;
 
-ini_set('default_socket_timeout', '-1');
-
 use DateMalformedStringException;
+use Exception;
 use Generator;
 use Http\Discovery\Psr17Factory;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Message\MultipartStream\MultipartStreamBuilder;
 use KnpLabs\JsonSchema\ObjectSchema;
+use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Exceptions\ToolExecutionException;
+use Partitech\PhpMistral\Mcp\McpConfig;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
-use Partitech\PhpMistral\MistralClientException;
+use Partitech\PhpMistral\Utils\Json;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Throwable;
 
 class Client extends Psr17Factory implements ClientInterface
 {
-    private ClientInterface $client;
+    private ClientInterface         $client;
     private RequestFactoryInterface $request;
-    private StreamFactoryInterface $streamFactory;
-    const string DEFAULT_CHAT_MODEL = 'open-mistral-7b';
-    const string DEFAULT_FIM_MODEL = 'codestral-2405';
-    const string TOOL_CHOICE_ANY = 'any';
-    const string TOOL_CHOICE_AUTO = 'auto';
-    const string TOOL_CHOICE_TOOL = 'tool';
-    const string TOOL_CHOICE_NONE = 'none';
+    private StreamFactoryInterface  $streamFactory;
+    public const DEFAULT_CHAT_MODEL = 'open-mistral-7b';
+    public const DEFAULT_FIM_MODEL  = 'codestral-2405';
+    public const TOOL_CHOICE_ANY    = 'any';
+    public const TOOL_CHOICE_AUTO   = 'auto';
+    public const TOOL_CHOICE_TOOL   = 'tool';
+    public const TOOL_CHOICE_NONE   = 'none';
 
-    const int RESPONSE_FORMAT_JSON = 0;
+    public const RESPONSE_FORMAT_JSON = 0;
 
-    protected const string END_OF_STREAM = "[DONE]";
-    protected const string ENDPOINT = '';
+    protected const END_OF_STREAM = "[DONE]";
+    protected const ENDPOINT      = '';
 
     protected string $chatCompletionEndpoint = 'v1/chat/completions';
-    protected string $completionEndpoint = 'v1/completions';
-    protected string $ocrCompletionEndpoint = 'v1/ocr';
-    protected string $fimCompletionEndpoint = 'v1/fim/completions';
-    protected string $promptKeyword = 'messages';
-    protected string $documentKeyword = 'document';
-    protected string $guidedJsonKeyword = 'guided_json';
+    protected string $completionEndpoint     = 'v1/completions';
+    protected string $ocrCompletionEndpoint  = 'v1/ocr';
+    protected string $fimCompletionEndpoint  = 'v1/fim/completions';
+    protected string $promptKeyword          = 'messages';
+    protected string $documentKeyword        = 'document';
+    protected string $guidedJsonKeyword      = 'guided_json';
 
-    public const string GUIDED_JSON_TYPE_JSON_ENCODE  = 'json_encode';
-    public const string GUIDED_JSON_TYPE_ARRAY  = 'array';
-    public const string GUIDED_JSON_TYPE_HUGGINGFACE  = 'huggingface';
-    public const string GUIDED_JSON_TYPE_MISTRAL  = 'mistral';
-    private bool|string $explicitlyForceJsonFormat=false;
-    protected string $guidedJsonEncodeType = self::GUIDED_JSON_TYPE_MISTRAL;
-    public const string FILE_PURPOSE_FINETUNE='fine-tune';
-    public const string FILE_PURPOSE_BATCH='batch';
-    public const string FILE_PURPOSE_OCR='ocr';
+    public const GUIDED_JSON_TYPE_JSON_ENCODE = 'json_encode';
+    public const GUIDED_JSON_TYPE_ARRAY       = 'array';
+    public const GUIDED_JSON_TYPE_HUGGINGFACE = 'huggingface';
+    public const GUIDED_JSON_TYPE_MISTRAL     = 'mistral';
+    private bool|string $explicitlyForceJsonFormat = false;
+    protected string    $guidedJsonEncodeType      = self::GUIDED_JSON_TYPE_MISTRAL;
+    public const FILE_PURPOSE_FINETUNE = 'fine-tune';
+    public const FILE_PURPOSE_BATCH    = 'batch';
+    public const FILE_PURPOSE_OCR      = 'ocr';
 
     protected ?string $chunkPrefixKey = 'data: ';
-    protected ?string $apiKey=null;
-    protected string $url;
-    public const string ENCODING_FORMAT_FLOAT='float';
-    public const string ENCODING_FORMAT_BASE64='base64';
-    protected bool $messageMultiModalUrlTypeArray=false;
+    protected ?string $eventPrefixKey = 'event: ';
+    protected ?string $apiKey         = null;
+    protected string  $url;
+    public const ENCODING_FORMAT_FLOAT  = 'float';
+    public const ENCODING_FORMAT_BASE64 = 'base64';
+    protected bool $messageMultiModalUrlTypeArray = false;
 
 
-    public const string TYPE_ANTHROPIC = 'Anthropic';
-    public const string TYPE_XAI = 'XAi';
-    public const string TYPE_OPENAI = 'OpenAI';
-    public const string TYPE_TGI = 'TGI';
-    public const string TYPE_TEI = 'TEI';
-    public const string TYPE_OLLAMA = 'OLLAMA';
-    public const string TYPE_LLAMACPP = 'LLAMACPP';
-    public const string TYPE_VLLM = 'VLLM';
-    public const string TYPE_MISTRAL = 'Mistral';
-    public const string TYPE_HUGGINGFACE = 'HuggingFace';
+    public const TYPE_ANTHROPIC   = 'Anthropic';
+    public const TYPE_XAI         = 'XAi';
+    public const TYPE_OPENAI      = 'OpenAI';
+    public const TYPE_TGI         = 'TGI';
+    public const TYPE_TEI         = 'TEI';
+    public const TYPE_OLLAMA      = 'OLLAMA';
+    public const TYPE_LLAMACPP    = 'LLAMACPP';
+    public const TYPE_VLLM        = 'VLLM';
+    public const TYPE_MISTRAL     = 'Mistral';
+    public const TYPE_HUGGINGFACE = 'HuggingFace';
 
 
+    protected ?string    $provider          = null;
+    protected ?string    $urlModel          = null;
+    protected array      $additionalHeaders = [];
+    protected array      $params            = [];
+    protected string     $clientType        = self::TYPE_OPENAI;
+    protected ?McpConfig $mcpConfig         = null;
 
-    protected ?string $provider=null;
-    protected ?string $urlModel=null;
-    protected array $additionalHeaders = [];
-    protected array $params = [];
-    protected string $clientType = self::TYPE_OPENAI;
     protected Messages $messages;
+
+    /** @var array<string, mixed> */
+    protected array  $currentParams = [];
     protected string $responseClass = Response::class;
-    public function __construct(?string $apiKey=null, string $url = self::ENDPOINT)
+
+    protected int           $mcpMaxRecursion     = 3;
+    protected int           $mcpCurrentRecursion = 0;
+    private LoggerInterface $logger;
+
+    public function __construct(?string $apiKey = null, string $url = self::ENDPOINT)
     {
         parent::__construct();
-        $this->client = Psr18ClientDiscovery::find();
-        $this->request = Psr17FactoryDiscovery::findRequestFactory();
+        $this->client        = Psr18ClientDiscovery::find();
+        $this->request       = Psr17FactoryDiscovery::findRequestFactory();
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
-        $this->apiKey = $apiKey;
-        $this->url = $url;
-        $this->messages = $this->newMessages();
+        $this->apiKey        = $apiKey;
+        $this->url           = $url;
+        $this->messages      = $this->newMessages();
+        $this->logger        = new NullLogger();
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface
@@ -109,8 +125,8 @@ class Client extends Psr17Factory implements ClientInterface
 
     public function isMultipart(array $parameters): bool
     {
-        foreach($parameters as $parameter) {
-            if(is_resource($parameter)){
+        foreach ($parameters as $parameter) {
+            if (is_resource($parameter)) {
                 return true;
             }
         }
@@ -118,67 +134,36 @@ class Client extends Psr17Factory implements ClientInterface
         return false;
     }
 
+
     /**
+     * @throws MaximumRecursionException
      * @throws MistralClientException
      */
-    protected function request(
+    public function request(
         string $method,
         string $path,
-        array  $parameters = [],
-        ?bool  $stream = false
-    ): array|ResponseInterface|string
-    {
-        $uri = rtrim($this->url, '/');
-        if(!is_null($this->provider)){
-            $uri .= '/' . $this->provider;
-        }
-
-        if(!is_null($this->urlModel)){
-            $uri .= '/models/' . $this->urlModel;
-        }
-
-        $uri .= '/' . ltrim($path, '/');
-
+        array $parameters = [],
+        ?bool $stream = false
+    ): array|ResponseInterface|string {
+        $this->checkRecursionLimit();
+        $uri = $this->buildUri($path);
         $request = $this->request->createRequest($method, $uri);
-
-        if(!is_null($this->apiKey)){
-            $request = $request->withHeader('Authorization', 'Bearer ' . $this->apiKey);
-        }
-
-        foreach($this->additionalHeaders as $header => $headerValue){
-            $request = $request->withHeader($header, $headerValue);
-        }
-
-        if (isset($parameters['query']) && $method=='GET') {
-            $uri = $request->getUri()->withQuery(http_build_query($parameters['query']));
-            $request = $request->withUri($uri);
-            unset($parameters['query']);
-        }
-
-        // File multipart building if ressource is in the parameter's list.
-        if(is_array($parameters) && $this->isMultipart($parameters)) {
-            $multipartStream = $this->getMultipartStream($parameters);
-            $request = $request->withBody($this->streamFactory->createStream($multipartStream->build()));
-            $request = $request->withHeader('Content-Type', 'multipart/form-data; boundary=' . $multipartStream->getBoundary());
-
-        }else if(is_array($parameters) && isset($parameters['data-binary'])){
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $parameters['data-binary']);
-            finfo_close($finfo);
-            $request = $request->withBody($this->streamFactory->createStreamFromFile($parameters['data-binary']))
-                ->withHeader('Content-Type', 'application/octet-stream')
-                ->withHeader('Content-Type', $mimeType);
-        }else if(count($parameters)>=1){
-            if($stream){
-                $parameters['stream'] = true;
-            }
-            $request = $request->withBody($this->streamFactory->createStream(json_encode($parameters)));
-            $request = $request->withHeader('Content-Type', 'application/json');
-        }
-
+        $request = $this->setRequestHeaders($request, $this->apiKey, $this->additionalHeaders);
+        $request = $this->setRequestQuery($request, $method, $parameters);
+        $request = $this->setRequestMultipart($request, $parameters);
+        $request = $this->setRequestDataBinary($request, $parameters);
+        $request = $this->setRequestParameters($request, $parameters, $stream);
         try {
+
+            $this->logger->info(
+                'Sending HTTP request',
+                ['url' => (string)$request->getUri(), 'payload' => json_decode(json_encode($parameters))]
+            );
+
             $response = $this->client->sendRequest($request);
+            $this->logger->info('Response received', ['status_code' => $response->getStatusCode()]);
         } catch (Throwable $e) {
+            $this->logger->error('Request failed', ['error' => $e->getMessage()]);
             throw new MistralClientException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -186,15 +171,15 @@ class Client extends Psr17Factory implements ClientInterface
             throw new MistralClientException($response->getBody()->getContents(), $statusCode);
         }
 
-        if($stream === true){
+        if ($stream === true) {
             return $response;
         }
 
         // Non - stream response handling.
-        // if is valid json response, return as array.
+        // if is valid JSON response, return as an array.
         $contents = $response->getBody()->getContents();
 
-        if(json_validate($contents)){
+        if (Json::validate($contents)) {
             return json_decode($contents, true);
         }
 
@@ -202,21 +187,93 @@ class Client extends Psr17Factory implements ClientInterface
         return $contents;
     }
 
+    public function setRequestMultipart(RequestInterface $request,  ?array $parameters): RequestInterface
+    {
+        if (is_array($parameters) && $this->isMultipart($parameters)) {
+            $multipartStream = $this->getMultipartStream($parameters);
+            $request         = $request->withBody($this->streamFactory->createStream($multipartStream->build()));
+            $request         = $request->withHeader(
+                'Content-Type',
+                'multipart/form-data; boundary=' . $multipartStream->getBoundary()
+            );
+        }
+        return $request;
+    }
+    public function setRequestDataBinary(RequestInterface $request,  ?array $parameters): RequestInterface
+    {
+        if (is_array($parameters) && isset($parameters['data-binary'])) {
+            $mimeType = $this->getMimeType($parameters['data-binary']);
+            $request = $request
+                ->withBody($this->streamFactory->createStreamFromFile($parameters['data-binary']))
+                ->withHeader('Content-Type', 'application/octet-stream')
+                ->withHeader('Content-Type', $mimeType);
+        }
+
+        return $request;
+    }
+
+    private function getMimeType($data): string
+    {
+        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $data);
+        finfo_close($finfo);
+        return $mimeType;
+    }
+
+
+    public function setRequestParameters(RequestInterface $request,  ?array $parameters, bool $stream): RequestInterface
+    {
+        if (is_array($parameters) && !isset($parameters['data-binary']) &&
+            !str_contains($request->getHeaderLine('Content-Type'), 'multipart/form-data') &&
+            count($parameters) > 0
+        ) {
+            if ($stream) {
+                $parameters['stream'] = true;
+            }
+            $request = $request->withBody($this->streamFactory->createStream(json_encode($parameters)));
+            $request = $request->withHeader('Content-Type', 'application/json');
+        }
+        return $request;
+    }
+
+    private function checkRecursionLimit(): void
+    {
+        if ($this->mcpMaxRecursion > 0 && $this->mcpCurrentRecursion > $this->mcpMaxRecursion) {
+            throw new MaximumRecursionException(
+                'Maximum recursion reached (' . ($this->mcpCurrentRecursion - 1) . '/' . $this->mcpMaxRecursion . ')'
+            );
+        }
+    }
+
+
+    private function buildUri(string $path): string
+    {
+        $uri = rtrim($this->url, '/');
+        if (!is_null($this->provider)) {
+            $uri .= '/' . $this->provider;
+        }
+        if (!is_null($this->urlModel)) {
+            $uri .= '/models/' . $this->urlModel;
+        }
+        return $uri . '/' . ltrim($path, '/');
+    }
+
+
     public function getMultipartStream(array $parameters): MultipartStreamBuilder
     {
         $multipartStream = new MultipartStreamBuilder($this->streamFactory);
-        foreach($parameters as $name => $parameter){
-            if(is_resource($parameter)){
-                $meta = stream_get_meta_data($parameter);
+        foreach ($parameters as $name => $parameter) {
+            if (is_resource($parameter)) {
+                $meta            = stream_get_meta_data($parameter);
                 $multipartStream = $multipartStream->addResource(
                     'file',
                     $parameter,
                     [
                         'filename' => basename($meta['uri']),
-                        'headers' => ['Content-Type' => 'application/octet-stream']
+                        'headers'  => ['Content-Type' => 'application/octet-stream']
                     ]
                 );
-            }else{
+            } else {
                 $multipartStream = $multipartStream->addResource($name, $parameter);
             }
         }
@@ -224,8 +281,33 @@ class Client extends Psr17Factory implements ClientInterface
         return $multipartStream;
     }
 
+    public function setRequestQuery(RequestInterface $request, string $method, array $parameters): RequestInterface
+    {
+        if (isset($parameters['query']) && ($method == 'GET' || $method == 'PATCH')) {
+            $uri     = $request->getUri()->withQuery(http_build_query($parameters['query']));
+            $request = $request->withUri($uri);
+            unset($parameters['query']);
+        }
+
+        return $request;
+    }
+
+    public function setRequestHeaders(RequestInterface $request, ?string $apiKey, array $additionalHeaders): RequestInterface
+    {
+        if(!is_null($apiKey)){
+            $request = $request->withHeader('Authorization', 'Bearer ' . $apiKey);
+        }
+
+        foreach($additionalHeaders as $header => $headerValue){
+            $request = $request->withHeader($header, $headerValue);
+        }
+
+        return $request;
+    }
+
     protected function makeChatCompletionRequest(array $definition, ?Messages $messages=null, array $params=[], bool $stream = false): array
     {
+        $this->currentParams = $params;
         $return = [];
         $return['stream'] = $stream??false;
         if(isset($params['model'])){
@@ -234,11 +316,6 @@ class Client extends Psr17Factory implements ClientInterface
         if(isset($params['agent_id'])){
             $return['agent_id'] = $params['agent_id'];
         }
-
-//        $return = [
-//            'stream' => $stream,
-//            'model' => $params['model']
-//        ];
 
         foreach($params as $key => $val){
             if(($verifiedParam = $this->checkType($definition, $key, $val)) !== false){
@@ -263,6 +340,10 @@ class Client extends Psr17Factory implements ClientInterface
         }
 
         $discussion = $messages->format();
+        if($messages->getMessages()->count() > 0){
+            $this->messages = $messages;
+        }
+
         if(is_array($discussion) && count($discussion) > 0){
             $return[$this->promptKeyword] = $discussion;
         }
@@ -272,7 +353,6 @@ class Client extends Psr17Factory implements ClientInterface
             unset($return['stream']);
         }
 
-
         return $return;
     }
 
@@ -281,6 +361,9 @@ class Client extends Psr17Factory implements ClientInterface
         if (isset($params['tools'])) {
             if (is_string($params['tools'])) {
                 $return['tools'] = json_decode($params['tools'], true);
+            } elseif ($params['tools'] instanceof McpConfig) {
+                $this->mcpConfig = $params['tools'];
+                $return['tools'] = $params['tools']->getTools();
             } elseif (is_array($params['tools'])) {
                 $return['tools'] = $params['tools'];
             }
@@ -298,14 +381,10 @@ class Client extends Psr17Factory implements ClientInterface
         }
     }
 
-    protected function handleGuidedJson(array &$return,string $json, Messages $messages): void
-    {
-        return;
-    }
+    protected function handleGuidedJson(array &$return,string $json, Messages $messages): void {}
 
 
     /**
-     * @throws DateMalformedStringException
      * @throws MistralClientException
      */
     public function getStream(ResponseInterface $stream): Generator
@@ -326,39 +405,121 @@ class Client extends Psr17Factory implements ClientInterface
                 continue;
             }
 
-            if(!is_null($this->chunkPrefixKey) && !json_validate($chunk)){
+            if(!is_null($this->chunkPrefixKey) && !Json::validate($chunk)){
                 if(!str_contains($chunk, $this->chunkPrefixKey)){
                     continue;
                 }
 
-                $datas = explode($this->chunkPrefixKey, $chunk);
+                $datas = [];
+                preg_match_all('/(data|event):(.*)/', $chunk, $matches, PREG_SET_ORDER);
+                foreach ($matches as $match) {
+                    if ($match[1] === 'data') {
+                        $datas[] = trim($match[2]);
+                    }
+                }
             }else {
                 $datas = $chunk;
             }
 
             if(is_string($datas)){
-                if(json_validate($datas)){
+                if(Json::validate($datas)){
                     yield $response = $responseClass::createFromJson($datas, true);
                 }
                 continue;
             }
             foreach ($datas as $data) {
                 $data = trim($data);
-                if (empty($data) || $data === self::END_OF_STREAM) {
+                if (empty($data) || Json::validate($data) === false) {
                     continue;
                 }
-                $data = json_decode($data, true);
+
+                // Hugging Face nor TGI send a finish reason. So, we fake it for easier use in mcp.
+                if( $data === self::END_OF_STREAM && $response !== null && $response->getToolCalls()!==null && !$response->getToolCalls()->isEmpty() ) {
+                    $data = ['finish_reason' => 'tool_calls'];
+                }else{
+                    $data = json_decode($data, true);
+                }
+                if(is_null($data)){
+                    continue;
+                }
                 $data['stream'] = true;
+                /** Response $response */
                 if ($response === null) {
-                    $response = $responseClass::createFromArray($data);
+                    $response = ($this->responseClass)::createFromArray($data, $this->clientType);
                 } else {
-                    $response = $responseClass::updateFromArray($response, $data);
+                    $response = ($this->responseClass)::updateFromArray($response, $data);
                 }
 
-                yield $response;
+                if(!empty($response->getChunk()) || $response->getStopReason() !== null){
+                    yield $response;
+                }
+
+            }
+        }
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function triggerMcp(Response $stream): void
+    {
+        $uniqId = 'tool_' . uniqid();
+        foreach ($stream->getToolCalls()->getIterator() as $index => $toolCall) {
+            if (empty($toolCall->getId()) || $toolCall->getId() === '0') {
+                $toolCall->setId($uniqId. '_' . $index);
+            }
+        }
+
+        // Add to the message turns the tool_call response from llm
+        $this->getMessages()->addAssistantMessage(
+            content:   $stream->getMessage(),
+            toolCalls: $stream->getToolCalls()
+        );
+
+        foreach($stream->getToolCalls()->getIterator() as $toolCall){
+
+            try{
+                $handledResult = $this->mcpConfig->handleToolCall($toolCall);
+            }catch (ToolExecutionException $e){
+                throw new Exception($e->getMessage(), $e->getCode(), $e);
+            }
+
+            if(in_array($this->clientType, [self::TYPE_TGI, self::TYPE_HUGGINGFACE]) ){
+                // prevent infinite loop with TG and Huggingface as they cannot handle tool message correctly
+                $this->getMessages()->addUserMessage(
+                    content: "Successfully executed **{$toolCall->getName()}** with id {$toolCall->getId()} :\n\n{$handledResult->getContent()}\n\n Do not execute this tool again with theses parameters :\n\n" . json_encode($toolCall->getArguments()) . "\n\n"
+                );
+            }else{
+                // Add to turns the Mcp result
+                $this->getMessages()->addToolMessage(
+                    name: $toolCall->getName(),
+                    content: $handledResult->getContent(),
+                    toolCallId: $toolCall->getId()
+                );
             }
         }
     }
+
+    /**
+     * @throws Exception
+     */
+    public function wrapStreamGenerator(Generator $generator): Generator
+    {
+        /** @var Response $chunk */
+        foreach ($generator as $chunk) {
+            if ($chunk->shouldTriggerMcp()) {
+                $this->triggerMcp($chunk);
+                $this->mcpCurrentRecursion++;
+                yield from  $this->chatStream(messages: $this->getMessages(), params: $this->currentParams);
+            }elseif($chunk->getChunk() !== null){
+                yield $chunk;
+            }
+        }
+    }
+
+
+
 
     public function setGuidedJsonKeyword(string $guidedJsonKeyword): self
     {
@@ -488,7 +649,7 @@ class Client extends Psr17Factory implements ClientInterface
             fclose($fileHandle);
 
             return file_exists($filePath) ? $filePath : false;
-        } catch (\Throwable $e) {
+        } catch (Throwable) {
             return false;
         }
     }
@@ -526,5 +687,77 @@ class Client extends Psr17Factory implements ClientInterface
     public function newMessages():Messages
     {
         return new Messages(type: $this->clientType);
+    }
+
+
+    /**
+     * @throws MistralClientException
+     * @throws Exception
+     */
+    public function chatStream(Messages $messages, array $params = []): Generator
+    {
+
+        $request = $this->makeChatCompletionRequest(
+            definition: $this->chatParametersDefinition,
+            messages: $messages,
+            params: $params
+        );
+
+        $result = $this->request('POST', $this->chatCompletionEndpoint, $request, true);
+        $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($result);
+        return $this->wrapStreamGenerator($streamResult);
+    }
+
+    public function getMcpMaxRecursion(): int
+    {
+        return $this->mcpMaxRecursion;
+    }
+
+    /**
+     * @param int $max
+     * @return Client
+     */
+    public function setMcpMaxRecursion(int $max): Client
+    {
+        $this->mcpMaxRecursion = $max;
+        return $this;
+    }
+
+
+    /**
+     * @throws MistralClientException
+     * @throws MaximumRecursionException
+     * @throws Exception
+     */
+    public function chat(Messages $messages, array $params = [], bool $stream=false): Response|Generator
+    {
+        $request = $this->makeChatCompletionRequest(
+            definition: $this->chatParametersDefinition,
+            messages: $messages,
+            params: $params
+        );
+
+        $result = $this->request('POST', $this->chatCompletionEndpoint, $request, $stream);
+
+        if($stream){
+            return  (new SSEClient($this->responseClass, $this->clientType))->getStream($result);
+        }else{
+            $response = ($this->responseClass)::createFromArray($result, $this->clientType);
+            if($response->shouldTriggerMcp()){
+                $this->triggerMcp($response);
+                $this->mcpCurrentRecursion++;
+                return $this->chat(messages:  $this->messages, params: $params, stream: $stream);
+            }else{
+                $this->messages->addMessage($response->getChoices()->getIterator()->current());
+            }
+
+            return $response;
+        }
+    }
+
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+        return $this;
     }
 }
