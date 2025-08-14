@@ -7,23 +7,23 @@ use Countable;
 use IteratorAggregate;
 use OutOfBoundsException;
 
-class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
+class MistralLibraries implements IteratorAggregate, Countable, ArrayAccess
 {
     /** @var MistralConversation[] */
     private array $items;
 
-    public function __construct(array $conversations)
+    public function __construct(array $libraries)
     {
-        $this->items = $conversations;
+        $this->items = $libraries;
     }
 
     public static function fromArray(array $data): self
     {
-        $conversations = array_map(
-            fn(array $c) => MistralConversation::fromArray($c),
-            $data
+        $libraries = array_map(
+            fn(array $c) => MistralLibrary::fromArray($c),
+            $data['data']
         );
-        return new self($conversations);
+        return new self($libraries);
     }
 
     public function getIterator(): ArrayIterator
@@ -46,7 +46,7 @@ class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
         return $this->items[count($this->items) - 1] ?? null;
     }
 
-    public function getItem(int $index): MistralConversation
+    public function getItem(int $index): MistralLibrary
     {
         if (!isset($this->items[$index])) {
             throw new OutOfBoundsException("Index $index is out of bounds.");
@@ -55,13 +55,12 @@ class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
     }
 
     // ArrayAccess interface methods
-
     public function offsetExists($offset): bool
     {
         return isset($this->items[$offset]);
     }
 
-    public function offsetGet($offset): MistralConversation
+    public function offsetGet($offset): MistralLibrary
     {
         if (!isset($this->items[$offset])) {
             throw new OutOfBoundsException("Index $offset is out of bounds.");
@@ -86,13 +85,23 @@ class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
     /**
      * Add a MistralLibrary to the collection.
      *
-     * @param MistralConversation $conversation The conversation to add.
+     * @param MistralLibrary $library The library to add.
      * @return self
      */
-    public function add(MistralConversation $conversation): self
+    public function add(MistralLibrary $library): self
     {
-        $this->items[] = $conversation;
+        $this->items[] = $library;
         return $this;
+    }
+
+    public function getById(string $id): ?MistralLibrary
+    {
+        foreach ($this->items as $library) {
+            if ($library->getId() === $id) {
+                return $library;
+            }
+        }
+        return null;
     }
 
 }

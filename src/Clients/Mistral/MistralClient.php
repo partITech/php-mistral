@@ -112,6 +112,7 @@ class MistralClient extends Client
         return false;
     }
 
+
     /**
      * List all files.
      *
@@ -379,4 +380,49 @@ class MistralClient extends Client
 
         return $moderationResult;
     }
+
+    public function createLibrary(string $name, ?string $description=null, ?int $chunkSize=null):MistralLibrary
+    {
+        try {
+
+            $result = $this->request('POST', 'v1/libraries', ['name' => $name, 'description' => $description, 'chunk_size' => $chunkSize]);
+        }catch(\Throwable $e){
+            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
+        }
+
+        return MistralLibrary::fromArray($result);
+    }
+
+
+    public function listLibraries(): MistralLibraries
+    {
+        try {
+            $result = $this->request('GET', 'v1/libraries');
+            return MistralLibraries::fromArray($result);
+        }catch(\Throwable $e){
+            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
+        }
+    }
+
+    public function updateLibrary(MistralLibrary $library): MistralLibrary
+    {
+        try {
+            $result = $this->request('PUT', 'v1/libraries/' . $library->getId(), ['name' => $library->getName(), 'description' => $library->getDescription()]);
+            return MistralLibrary::fromArray($result);
+        }catch(\Throwable $e){
+            throw new MistralClientException(message: $e->getMessage(), code: $e->getCode());
+        }
+    }
+
+    public function deleteLibrary(MistralLibrary $library): bool
+    {
+        try {
+            $result = $this->request('DELETE', 'v1/libraries/' . $library->getId());
+            return true;
+        }catch(\Throwable $e){
+            return false;
+        }
+    }
+
+
 }

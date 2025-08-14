@@ -2,7 +2,6 @@
 
 namespace Partitech\PhpMistral;
 
-use DateMalformedStringException;
 use DateTime;
 use DateTimeInterface;
 use InvalidArgumentException;
@@ -21,9 +20,6 @@ class File
     private ?int $numLines;
     private string $source;
 
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function fromResponse(array $response): self
     {
 

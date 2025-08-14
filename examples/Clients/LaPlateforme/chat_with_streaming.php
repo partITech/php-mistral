@@ -24,7 +24,7 @@ try {
     foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
         echo $chunk->getChunk();
     }
-} catch (MistralClientException|DateMalformedStringException $e) {
+} catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
 }
