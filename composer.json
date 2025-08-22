@@ -32,8 +32,7 @@
     },
     "require": {
         "php": ">=8.2",
-        "ext-fileinfo": "*",
-        "ext-http": "*",
+        "ext-fileinfo": "*",   
         "symfony/mime": "^6.3 || ^7.0",
         "ramsey/uuid": "^4.7",
         "knplabs/php-json-schema": "^0.1.0",
