@@ -78,4 +78,19 @@ class JsonSchema extends \KnpLabs\JsonSchema\JsonSchema
             'not' => $schema,
         ];
     }
+
+    public static function string(?string $format = null): array
+    {
+        $result = [
+            ...self::text()
+            // maxLength is unsupported on Mistral "La plateforme".
+            // 'maxLength' => 255,
+        ];
+
+        if (null !== $format) {
+            $result['format'] = $format;
+        }
+
+        return $result;
+    }
 }
