@@ -98,8 +98,11 @@ class McpServerConfig implements JsonSerializable
         return $this->command;
     }
 
-    public function getArgs(): ?array
+    public function getArgs(): array
     {
+        if(is_null($this->args)){
+            return [];
+        }
         return $this->args;
     }
 
