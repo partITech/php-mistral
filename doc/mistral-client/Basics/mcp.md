@@ -101,7 +101,7 @@ Once your JSON config is configured properly, the following steps guide you thro
 
 ```php
 use Partitech\PhpMistral\Mcp\McpConfig;
-use Partitech\PhpMistral\Clients\MistralClient;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 
 // 1. Retrieve UID/GID
 $currentUid = posix_getuid();
