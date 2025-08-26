@@ -23,22 +23,12 @@ class McpServerConfig implements JsonSerializable
 
         if (isset($definition['url'], $definition['args'])) {
             $this->url = $definition['url'];
-            $this->args = array_map(function ($arg) use ($variables) {
-                return preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($variables) {
-                    $key = $matches[1];
-                    return $variables[$key] ?? $matches[0];
-                }, $arg);
-            }, $definition['args']);
+            $this->args = $this->processArgs($definition['args'], $variables);
         }
 
         if (isset($definition['command'], $definition['args'])) {
             $this->command = $definition['command'];
-            $this->args = array_map(function ($arg) use ($variables) {
-                return preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($variables) {
-                    $key = $matches[1];
-                    return $variables[$key] ?? $matches[0];
-                }, $arg);
-            }, $definition['args']);
+            $this->args = $this->processArgs($definition['args'], $variables);
         }
 
 
@@ -47,6 +37,19 @@ class McpServerConfig implements JsonSerializable
         }
 
         $this->setSession();
+    }
+
+    /**
+     * Process args by replacing variable placeholders with their corresponding values.
+     */
+    private function processArgs(array $args, array $variables): array
+    {
+        return array_map(function ($arg) use ($variables) {
+            return preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($variables) {
+                $key = $matches[1];
+                return $variables[$key] ?? $matches[0];
+            }, $arg);
+        }, $args);
     }
 
     public function setSession():self
