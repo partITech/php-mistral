@@ -21,8 +21,14 @@ class McpServerConfig implements JsonSerializable
     {
         $this->name = $name;
 
-        if (isset($definition['url'])) {
+        if (isset($definition['url'], $definition['args'])) {
             $this->url = $definition['url'];
+            $this->args = array_map(function ($arg) use ($variables) {
+                return preg_replace_callback('/\$\{([^}]+)\}/', function ($matches) use ($variables) {
+                    $key = $matches[1];
+                    return $variables[$key] ?? $matches[0];
+                }, $arg);
+            }, $definition['args']);
         }
 
         if (isset($definition['command'], $definition['args'])) {
