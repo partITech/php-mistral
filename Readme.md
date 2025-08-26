@@ -92,7 +92,7 @@ This ensures **flexibility**, **interoperability**, and **future-proofing** of y
 ## Installation
 
 ```bash
-composer require partitech/php-mistral
+composer require partitech/php-mistral:^0.1
 ```
 
 
