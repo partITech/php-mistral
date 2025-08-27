@@ -279,13 +279,26 @@ class Response
                 }
 
 
-                if(isset($output['type']) &&  $output['type'] === 'tool.execution' ){
+                if(isset($output['type']) &&  $output['type'] === 'tool.execution'){
                     $toolCallFunction = ToolCallFunction::fromArray(
                         [
                             'type' => 'tool_use',
                             'id' => $output['id'],
                             'name' => $output['name'],
                             'arguments' => $output['arguments'],
+                            'input' => [],
+                        ]
+                    );
+                    $message->addToolCall($toolCallFunction);
+                }
+
+                if(isset($output['type']) && $output['type'] === 'function.call'){
+                    $toolCallFunction = ToolCallFunction::fromArray(
+                        [
+                            'type' => 'tool_use',
+                            'id' => $output['tool_call_id'],
+                            'name' => $output['name'],
+                            'arguments' =>  $output['arguments'],
                             'input' => [],
                         ]
                     );
@@ -301,7 +314,26 @@ class Response
             }
         }
 
-        if(isset($data['type']) && ($data['type'] === 'message.output.delta' || $data['type'] === 'conversation.response.done')){
+        if(isset($data['type']) && in_array($data['type'], ['function.call.delta'])){
+            if ($message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']) === null) {
+
+                $message->setType($data['type']);
+                $toolCallFunction = ToolCallFunction::fromArray($data);
+                $message->addToolCall($toolCallFunction);
+
+            } else {
+                $toolCall = $message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']);
+                $message->setType($data['type']);
+                $message->updateToolCalls(
+                    $data['arguments'],
+                    $toolCall->getIndex()
+                );
+
+            }
+
+        }
+
+        if(isset($data['type']) && in_array($data['type'], ['message.output.delta', 'conversation.response.done', 'conversation.response.started'])){
             $message->setType($data['type']);
             if(isset($data['created_at']) && is_string($data['created_at'])){
                 $message->setCreatedAt(new DateTimeImmutable($data['created_at']));
@@ -313,6 +345,10 @@ class Response
 
             if(isset($data['id'])){
                 $message->setId($data['id']);
+            }
+
+            if(isset($data['conversation_id'])){
+                $message->setId($data['conversation_id']);
             }
 
             if(isset($data['role'])){
@@ -328,6 +364,9 @@ class Response
                 $message->addReference($data['content']);
             }
 
+            if(isset($data['type']) && in_array($data['type'], ['message.output.delta', 'conversation.response.done']) && $message->getStopReason() === null){
+                $message->setStopReason('stop');
+            }
 
             if ($response->getChoices()->count() === 0) {
                 $response->addMessage($message);

@@ -35,12 +35,37 @@ final class ToolCallFunction implements JsonSerializable
             ];
         }
 
-        if(is_string($data['function']['arguments']) && Json::validate($data['function']['arguments'])){
+        // La plateforme Conversation response no streaming
+        if(isset($data['function']) && is_string($data['function']['arguments']) && Json::validate($data['function']['arguments'])){
             $data['function']['arguments'] = json_decode($data['function']['arguments'], true);
         }
 
-        if(is_string($data['function']['arguments']) && !Json::validate($data['function']['arguments'])){
+        // La plateforme Conversation streaming
+        if(isset($data['type']) && $data['type'] === 'function.call.delta' ){
+
+            if(isset($data['output_index'])){
+                $data['index'] = $data['output_index'];
+            }
+
+            if(isset($data['tool_call_id'])){
+                $data['id'] = $data['tool_call_id'];
+            }
+
+            $data['function'] = [
+                'name' => $data['name'],
+                'arguments' => $data['arguments']
+            ];
+
+        }elseif(is_string($data['function']['arguments']) && !Json::validate($data['function']['arguments'])){
             $data['function']['arguments'] = [$data['function']['arguments']];
+        }
+
+        if(is_string($data['arguments']) && Json::validate($data['arguments'])){
+            $data['function']['arguments'] = json_decode($data['arguments'], true);
+        }
+
+        if(empty($data['function']['arguments'])){
+            $data['function']['arguments'] = [];
         }
 
         return new self(
