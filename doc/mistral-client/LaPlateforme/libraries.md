@@ -1,5 +1,6 @@
 # PhpMistral – API **Library** & **DocumentClient**
 
+> [!NOTE]
 > Libraries API to create and manage libraries - index your documents to enhance agent capabilities.
 
 ---
@@ -15,7 +16,7 @@ $client = new MistralClient(apiKey: (string) $apiKey);
 // Document client (upload, list, status, etc.)
 $documentClient = new MistralDocumentClient(apiKey: (string) $apiKey);
 ```
-
+> [!TIP]
 > With Symfony, register these as services and inject `MISTRAL_API_KEY` through the container.
 
 ---
@@ -66,6 +67,7 @@ $client->deleteLibrary($library);
 
 ## Documents (DocumentClient)
 
+> [!IMPORTANT]
 > All operations below take a **target library** as parameter.
 
 ### 1) Upload a document
@@ -202,15 +204,7 @@ try {
     $doc = $documentClient->upload($library, $file);
 
     // 3) Poll status, then fetch text
-    $deadline = time() + 120;
-    do {
-        $status = $documentClient->getStatus($doc);
-        if (($status['processing_status'] ?? null) === 'succeeded') break;
-        if (($status['processing_status'] ?? null) === 'failed') {
-            throw new RuntimeException('Processing failed');
-        }
-        usleep(500_000);
-    } while (time() < $deadline);
+    sleep(10);
 
     $text = $documentClient->getTextContent($doc);
 
