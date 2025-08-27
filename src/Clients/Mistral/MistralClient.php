@@ -11,7 +11,6 @@ use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\File;
 use Partitech\PhpMistral\Files;
 use Partitech\PhpMistral\Messages;
-use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\UuidInterface;
 use Throwable;
 
@@ -74,16 +73,6 @@ class MistralClient extends Client
     public function listModels(): array
     {
         return $this->request('GET', 'v1/models');
-    }
-
-    /**
-     * Send a DELETE request to the Mistral API.
-     *
-     * @throws MistralClientException|MaximumRecursionException
-     */
-    public function delete(string $path): array|ResponseInterface
-    {
-        return $this->request('DELETE', $path);
     }
 
     /**

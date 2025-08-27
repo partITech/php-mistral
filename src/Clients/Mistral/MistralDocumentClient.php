@@ -7,19 +7,45 @@ use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 final class MistralDocumentClient extends Client
 {
-    public function listDocuments(string $libraryId, array $query = []): array
+    protected string $clientType = self::TYPE_MISTRAL;
+    protected const ENDPOINT = 'https://api.mistral.ai';
+
+    public function __construct(string $apiKey, string $url = self::ENDPOINT)
     {
-        $res = $this->request('GET', "/v1/libraries/{$libraryId}/documents", ['query' => $query]);
-        $pagination = (array)($res['pagination'] ?? []);
-        $docs = [];
-        foreach (($res['data'] ?? []) as $row) {
-            $docs[] = MistralDocument::fromArray((array)$row);
-        }
-        return ['pagination' => $pagination, 'data' => $docs];
+        parent::__construct($apiKey, $url);
     }
 
-    public function uploadDocument(string $libraryId, $file): MistralDocument
+    public function list(MistralLibrary|string $library, ?string $search = null, int $pageSize = 100, int $page = 0, string $sortBy = 'created_at', string $sortOrder = 'desc' ): MistralDocuments
     {
+        if(is_string($library)){
+            $libraryId = $library;
+        }else{
+            $libraryId = $library->getId();
+        }
+
+        $query = [];
+        if(!is_null($search)){
+            $query['search'] = $search;
+
+        }
+
+        $query['page_size'] = $pageSize;
+        $query['page'] = $page;
+        $query['sort_by'] = $sortBy;
+        $query['sort_order'] = $sortOrder;
+
+        $res = $this->request('GET', "/v1/libraries/{$libraryId}/documents", ['query' => $query]);
+        return MistralDocuments::fromArray($res['data'] ?? []);
+    }
+
+    public function upload(MistralLibrary|string $library, $file): MistralDocument
+    {
+        if(is_string($library)){
+            $libraryId = $library;
+        }else{
+            $libraryId = $library->getId();
+        }
+
         if (is_string($file)) {
             $resource = @fopen($file, 'rb');
             if (!$resource) {
@@ -31,18 +57,32 @@ final class MistralDocumentClient extends Client
         return MistralDocument::fromArray((array)$res);
     }
 
-    public function getDocument(string $libraryId, string $documentId): MistralDocument
+    public function get(string|MistralLibrary $library, string|MistralDocument $document): MistralDocument
     {
+        if(is_string($library)){
+            $libraryId = $library;
+        }else{
+            $libraryId = $library->getId();
+        }
+
+        if(is_string($document)){
+            $documentId = $document;
+        }else{
+            $documentId = $document->getId();
+        }
+
         $res = $this->request('GET', "/v1/libraries/{$libraryId}/documents/{$documentId}");
         return MistralDocument::fromArray((array)$res);
     }
 
-    public function updateDocument(MistralDocument $document): MistralDocument
+    public function update(MistralDocument $document): MistralDocument
     {
         if (!$document->getLibraryId() || !$document->getId()) {
             throw new MistralClientException("library_id et id sont requis pour update", 500);
         }
+
         $payload = ['name' => $document->getName()];
+
         $res = $this->request(
             'PUT',
             "/v1/libraries/{$document->getLibraryId()}/documents/{$document->getId()}",
@@ -51,7 +91,7 @@ final class MistralDocumentClient extends Client
         return MistralDocument::fromArray((array)$res);
     }
 
-    public function deleteDocument(MistralDocument $document): bool
+    public function delete(MistralDocument $document): bool
     {
         if (!$document->getLibraryId() || !$document->getId()) {
             throw new MistralClientException("library_id et id sont requis pour delete", 500);

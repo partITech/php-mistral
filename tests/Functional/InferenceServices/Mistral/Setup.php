@@ -3,6 +3,7 @@
 namespace Tests\Functional\InferenceServices\Mistral;
 
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Clients\Mistral\MistralDocumentClient;
 use Partitech\PhpMistral\Log\LoggerFactory;
 use PHPUnit\Framework\TestCase;
 use Tests\Traits\TestCleanupTrait;
@@ -24,6 +25,12 @@ class Setup extends TestCase
      * Responsible for handling API requests to Mistral.
      */
     protected MistralClient $client;
+
+    /**
+     * @var MistralDocumentClient $client
+     * Responsible for handling Documents API requests to Mistral.
+     */
+    protected MistralDocumentClient $documentClient;
 
     /**
      * @var string $model
@@ -48,6 +55,9 @@ class Setup extends TestCase
 
         // Initialize the MistralClient with the provided API key.
         $this->client = new MistralClient(apiKey: $apiKey);
+
+        // Initialize the MistralDocumentClient with the provided API key.
+        $this->documentClient = new MistralDocumentClient(apiKey: $apiKey);
 
         // Attach a logger to the MistralClient instance for logging purposes.
         $this->client->setLogger(LoggerFactory::create());

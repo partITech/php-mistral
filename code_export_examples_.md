@@ -22977,7 +22977,7 @@ try {
     foreach ($client->chat(messages: $messages, params: $params, stream: true) as $chunk) {
         echo $chunk->getChunk();
     }
-} catch (MistralClientException|DateMalformedStringException $e) {
+} catch (MistralClientException $e) {
     echo $e->getMessage();
     exit(1);
 }
@@ -23493,6 +23493,134 @@ try {
 }
 
 
+```
+
+## 📄 File: `examples/Clients/LaPlateforme/Conversation/tools.php`
+```
+<?php
+
+require_once __DIR__ . '/../../../../vendor/autoload.php';
+include('WeatherTool.php');
+
+use Partitech\PhpMistral\Clients\Mistral\MistralAgent;
+use Partitech\PhpMistral\Clients\Mistral\MistralAgentClient;
+use Partitech\PhpMistral\Clients\Mistral\MistralConversation;
+use Partitech\PhpMistral\Clients\Mistral\MistralConversationClient;
+use Partitech\PhpMistral\Clients\Response;
+
+
+$apiKey = getenv('MISTRAL_API_KEY');
+
+$conversation = (new MistralConversation())
+    ->setName('Demo Conversation')
+    ->setModel('mistral-medium-latest')
+    ->setDescription('Une conversation de test')
+    ->setInstructions(null)
+    ->setTools([new WeatherTool()])
+    ->setCompletionArgs(['temperature' => 0.3]);
+
+
+$client   = new MistralConversationClient($apiKey);
+$messages = $client->getMessages()->addUserMessage('What is the weather in paris today ? ');
+
+
+try {
+    $response = $client->conversation(
+        conversation: $conversation,
+        messages    : $messages,
+        store       : true
+    );
+
+    print_r($response->getToolCalls());
+
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+try {
+    /** @var Response $chunk */
+    foreach ($client->conversation(conversation: $conversation,
+                                   messages    : $messages,
+                                   stream      : true,
+    ) as $chunk) {
+
+        if($chunk->getToolCalls() !== null){
+            print_r($chunk->getToolCalls());
+        }
+
+
+    }
+
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+```
+
+## 📄 File: `examples/Clients/LaPlateforme/Conversation/WeatherTool.php`
+```
+<?php
+
+use \Partitech\PhpMistral\Tools\FunctionTool;
+use \Partitech\PhpMistral\Tools\Tool;
+use \Partitech\PhpMistral\Tools\Parameter;
+class WeatherTool extends Tool
+{
+    public function __construct(){
+        $this->type = 'function';
+
+        $this->function = new FunctionTool(
+            name: 'get_weather',
+            description: 'Get the weather in a city',
+            parameters: [
+                new Parameter(
+                    type: Parameter::STRING_TYPE,
+                    name: 'city',
+                    description: 'The city to get the weather for',
+                    required: true
+                )
+            ]
+        );
+    }
+}```
+
+## 📄 File: `examples/Clients/LaPlateforme/Documents/uploadDocument.php`
+```
+<?php
+require_once __DIR__ . '/../../../../vendor/autoload.php';
+
+use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+
+// export MISTRAL_API_KEY=your_api_key
+$apiKey = getenv('MISTRAL_API_KEY');
+
+$client = new MistralClient($apiKey);
+
+
+
+
+
+
+
+
+
+
+
+// from https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+$filePath = realpath("./dummy.pdf");
+try {
+    $result = $client->uploadDocument(path: $filePath, purpose: Client::FILE_PURPOSE_OCR);
+} catch (Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+print_r($result);
 ```
 
 ## 📄 File: `examples/Clients/LaPlateforme/document_understanding.php`
@@ -25217,11 +25345,77 @@ print_r($chatResponse->getMessage());
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\JsonSchema\JsonSchema;
 
 $apiKey = getenv('MISTRAL_API_KEY');
 $client = new MistralClient($apiKey);
+
+class ResponseObjectSchema extends ObjectSchema
+{
+    public function __construct()
+    {
+        $ingredient = JsonSchema::create(
+            'ingredient',
+            'ingredient',
+            ['sheep milk'],
+            [
+                'type' => 'object',
+                'properties' => [
+                    "name" => JsonSchema::text(),
+                    "origins" =>
+                        JsonSchema::collection(
+                            JsonSchema::create(
+                                'ingredient origin',
+                                'ingredient origin',
+                                ["France"],
+                                JsonSchema::text()
+                            )
+                        )
+                    ,
+                ],
+                'additionalProperties' => false,
+            ]
+        );
+
+        $this->addProperty(
+            'product',
+            JsonSchema::create(
+                'product name',
+                'product name',
+                [],
+                JsonSchema::text()
+            ),
+            true
+        );
+        $this->addProperty(
+            'product_location',
+            JsonSchema::create(
+                'product location',
+                'product location',
+                [],
+                JsonSchema::text()
+            ),
+            true
+        );
+        $this->addProperty(
+            'ingredients',
+            JsonSchema::collection($ingredient),
+            true
+        );
+    }
+
+    public function getTitle(): string
+    {
+        return 'best French cheese';
+    }
+    public function getDescription(): string
+    {
+        return 'best French cheese';
+    }
+}
 
 $messages = $client
     ->getMessages()
@@ -25236,7 +25430,8 @@ $params = [
     'random_seed' => null,
     'response_format' => [
         'type' => 'json_object'
-    ]
+    ],
+    'guided_json' => new ResponseObjectSchema(),
 ];
 
 try {
@@ -25251,7 +25446,7 @@ try {
 
 $auto = $chatResponse->getGuidedMessage();
 $object = $chatResponse->getGuidedMessage(associative: false);
-$array = $chatResponse->getGuidedMessage(associative:true);
+$array = $chatResponse->getGuidedMessage(associative: true);
 
 var_dump($auto);
 var_dump($object);
@@ -39227,6 +39422,127 @@ try {
     echo 'Idle timeout reached' . PHP_EOL;
 
 }
+```
+
+## 📄 File: `examples/tests/MealSchema.php`
+```
+<?php
+
+use Partitech\PhpMistral\JsonSchema\JsonSchema;
+
+class MealSchema extends \KnpLabs\JsonSchema\ObjectSchema
+{
+    public function getTitle(): string
+    {
+        return 'Meal';
+    }
+
+    public function getDescription(): string
+    {
+        return 'The meal composition';
+    }
+
+    public function __construct()
+    {
+        $this->addProperty(
+            'type',
+            JsonSchema::create(
+                'type',
+                'Hold the type of meal',
+                ['breakfast', 'lunch', 'dinner', 'snack'],
+                JsonSchema::text()
+            ),
+        );
+
+        $yearExample = (new \DateTimeImmutable())->format('Y');
+        $this->addProperty(
+            'date',
+            JsonSchema::create(
+                'date',
+                'Hold the date of the meal in the Y-M-D format, knowing that today is ' .
+                (new \DateTimeImmutable())->format('Y-m-d'),
+                [$yearExample . '-05-12', $yearExample . '-10-24', $yearExample . '-12-20'],
+                JsonSchema::text()
+            ),
+        );
+    }
+}```
+
+## 📄 File: `examples/tests/ticket_42.php`
+```
+<?php
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+include 'MealSchema.php';
+
+
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+
+
+$apiKey = getenv('MISTRAL_API_KEY');
+$client = new MistralClient($apiKey);
+
+$currentMeal =<<<DESC
+Here’s a balanced and nutritious breakfast meal composition for **August 13, 2025**, designed to provide energy, protein, fiber, and essential vitamins. This plan is adaptable to dietary preferences (vegetarian, vegan, gluten-free, etc.)—let me know if you’d like adjustments!
+
+---
+
+### **Breakfast Meal Composition**
+
+| **Component**         | **Suggestions**                                                                 | **Portion**               |
+|-----------------------|-------------------------------------------------------------------------------|---------------------------|
+| **Main Dish**         | Scrambled eggs with spinach and cherry tomatoes                              | 2 eggs + 1 cup veggies    |
+|                       | OR Greek yogurt with granola and fresh berries                               | 1 cup yogurt + ½ cup mix  |
+|                       | OR Avocado toast on whole-grain bread with a poached egg                     | 1 slice + ½ avocado       |
+| **Protein**           | Turkey or chicken sausage (lean)                                             | 2 small links             |
+|                       | OR Tofu scramble (for vegan)                                                 | ½ cup                     |
+| **Carbohydrates**     | Whole-grain toast or oatmeal with chia seeds                                 | 1 slice or ½ cup oats     |
+| **Fruits**            | Seasonal fruit (peaches, berries, or melon)                                  | 1 cup                     |
+| **Healthy Fats**      | Almond butter, walnuts, or flaxseeds                                         | 1 tbsp or small handful   |
+| **Beverage**          | Green tea, black coffee, or fresh orange juice                              | 1 cup                     |
+| **Optional Boosters** | Smoothie (spinach, banana, almond milk, protein powder)                      | 1 glass                   |
+
+---
+
+### **Why This Works**
+- **Protein** (eggs, yogurt, tofu) keeps you full and supports muscle health.
+- **Fiber** (oats, whole grains, fruits) aids digestion and stabilizes blood sugar.
+- **Healthy fats** (avocado, nuts) promote brain function and satiety.
+- **Seasonal fruits** add antioxidants and natural sweetness.
+DESC;
+
+
+$messages = $client ->getMessages()
+                    ->addSystemMessage(content: 'Extract composition of the following meal, answer in JSON format')
+                    ->addUserMessage(content: $currentMeal);
+
+try {
+    $result = $client->chat(
+        $messages,
+        [
+            'model' => 'ministral-3b-latest',
+            'temperature' => 0.7,
+            'top_p' => 1,
+            'max_tokens' => 250,
+            'safe_prompt' => false,
+            'random_seed' => 17,
+            'guided_json' => new MealSchema()
+        ]
+    );
+
+    print_r($result->getGuidedMessage());
+
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
+
+
+//stdClass Object
+//(
+//    [type] => breakfast
+//[date] => 2025-08-13
+//)
 ```
 
 ## 📄 File: `examples/Clients/Huggingface/docker-tgi-text.yaml`
