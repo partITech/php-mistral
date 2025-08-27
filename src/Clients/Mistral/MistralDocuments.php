@@ -7,23 +7,23 @@ use Countable;
 use IteratorAggregate;
 use OutOfBoundsException;
 
-class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
+class MistralDocuments implements IteratorAggregate, Countable, ArrayAccess
 {
-    /** @var MistralConversation[] */
+    /** @var MistralDocument[] */
     private array $items;
 
-    public function __construct(array $conversations)
+    public function __construct(array $documents)
     {
-        $this->items = $conversations;
+        $this->items = $documents;
     }
 
     public static function fromArray(array $data): self
     {
-        $conversations = array_map(
-            fn(array $c) => MistralConversation::fromArray($c),
+        $documents = array_map(
+            fn(array $c) => MistralDocument::fromArray($c),
             $data
         );
-        return new self($conversations);
+        return new self($documents);
     }
 
     public function getIterator(): ArrayIterator
@@ -36,17 +36,17 @@ class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
         return count($this->items);
     }
 
-    public function first(): ?MistralConversation
+    public function first(): ?MistralDocument
     {
         return $this->items[0] ?? null;
     }
 
-    public function last(): ?MistralConversation
+    public function last(): ?MistralDocument
     {
         return $this->items[count($this->items) - 1] ?? null;
     }
 
-    public function getItem(int $index): MistralConversation
+    public function getItem(int $index): MistralDocument
     {
         if (!isset($this->items[$index])) {
             throw new OutOfBoundsException("Index $index is out of bounds.");
@@ -61,7 +61,7 @@ class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
         return isset($this->items[$offset]);
     }
 
-    public function offsetGet($offset): MistralConversation
+    public function offsetGet($offset): MistralDocument
     {
         if (!isset($this->items[$offset])) {
             throw new OutOfBoundsException("Index $offset is out of bounds.");
@@ -84,14 +84,14 @@ class MistralConversations implements IteratorAggregate, Countable, ArrayAccess
     }
 
     /**
-     * Add a MistralLibrary to the collection.
+     * Add a MistralDocument to the collection.
      *
-     * @param MistralConversation $conversation The conversation to add.
+     * @param MistralDocument $document The document to add.
      * @return self
      */
-    public function add(MistralConversation $conversation): self
+    public function add(MistralDocument $document): self
     {
-        $this->items[] = $conversation;
+        $this->items[] = $document;
         return $this;
     }
 

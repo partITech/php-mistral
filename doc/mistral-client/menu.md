@@ -22,6 +22,7 @@
 - [Files](LaPlateforme/files.md)
 - [List models](LaPlateforme/list_models.md)
 - [Moderation](LaPlateforme/moderation.md)
+- [Libraries](LaPlateforme/libraries.md)
 
 ## Anthropic
 - [Count tokens](Anthropic/count_token.md)
