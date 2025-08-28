@@ -191,5 +191,18 @@ class Messages
         return $this;
     }
 
+    public function first(): ?Message
+    {
+        return $this->messages->offsetGet(0);
+    }
 
+    public function offset(int $key): ?Message
+    {
+        return $this->messages->offsetGet($key);
+    }
+
+    public function last(): ?Message
+    {
+        return $this->messages->offsetGet($this->messages->count() - 1);
+    }
 }

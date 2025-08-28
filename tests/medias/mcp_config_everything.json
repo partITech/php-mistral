@@ -1,0 +1,15 @@
+{
+  "mcp": {
+    "servers": {
+      "everything": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "mcp/everything"
+        ]
+      }
+    }
+  }
+}

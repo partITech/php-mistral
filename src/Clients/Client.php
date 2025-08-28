@@ -612,6 +612,9 @@ class Client extends Psr17Factory implements ClientInterface
         return $this;
     }
 
+
+
+
     public function downloadToTmp(string $url): string|false
     {
         $tmpDir = sys_get_temp_dir();

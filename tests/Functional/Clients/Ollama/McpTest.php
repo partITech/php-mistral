@@ -44,7 +44,7 @@ class McpTest extends Setup
         );
 
         // Retrieve tool list from the MCP configuration and encode as a JSON string for system messages.
-        $toolList = json_encode($mcpConfig->getList());
+        $toolList = json_encode($mcpConfig->getToolsList());
 
         // Create messages for the chat stream with specific instructions for the assistant.
         $messages = $this->client->getMessages()
