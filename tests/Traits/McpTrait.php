@@ -70,7 +70,7 @@ PROMPT);
         // Reading MCP configuration from the JSON file.
         // Using `realpath` ensures we get the absolute path and avoid potential issues.
         $configJson = file_get_contents(
-            realpath('./tests/medias/mcp_config.json')
+            realpath('./tests/medias/mcp_config_filesystem.json')
         );
 
         // Decoding JSON configuration into an associative array.

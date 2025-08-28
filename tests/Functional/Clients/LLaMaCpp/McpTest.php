@@ -48,7 +48,7 @@ class McpTest extends Setup
         );
 
         // Serialize the list of tools from the MCP configuration.
-        $toolList = json_encode($mcpConfig->getList());
+        $toolList = json_encode($mcpConfig->getToolsList());
 
         // Prepare the chat messages with system and user instructions.
         $messages = $this->client->getMessages()

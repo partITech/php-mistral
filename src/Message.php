@@ -41,7 +41,7 @@ class Message
     private ?DateTimeImmutable $completedAt=null;
     private ?string $type=null;
     private array $references = [];
-
+    private ?Resource $resource=null;
 
     public function __construct(string $type = Client::TYPE_OPENAI)
     {
@@ -582,5 +582,16 @@ class Message
     {
         $this->type = $type;
         return $this;
+    }
+
+    public function setResource(mixed $resource): Message
+    {
+        $this->resource = $resource;
+        return $this;
+    }
+
+    public function getResource(): ?Resource
+    {
+        return $this->resource;
     }
 }
