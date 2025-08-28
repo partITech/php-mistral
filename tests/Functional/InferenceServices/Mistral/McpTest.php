@@ -3,8 +3,12 @@
 namespace Tests\Functional\InferenceServices\Mistral;
 
 use Exception;
+use Mcp\Types\GetPromptResult;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Mcp\McpConfig;
+use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Resource;
 use Tests\Traits\McpTrait;
 
 /**
@@ -153,4 +157,50 @@ class McpTest extends Setup
             $this->consoleInfo($e->getMessage());
         }
     }
+
+    public function testMcpPrompts(): void
+    {
+        $configJson = file_get_contents(
+            realpath('./tests/medias/mcp_config_everything.json')
+        );
+
+        // Decoding JSON configuration into an associative array.
+        $configArray = json_decode(
+            $configJson,
+            true
+        );
+
+        $mcpConfig = new McpConfig($configArray,[]);
+        $promptsList = $mcpConfig->getPromptsList();
+        $this->assertNotEmpty($promptsList);
+        $this->assertCount(3, $promptsList);
+        $this->assertTrue(in_array('simple_prompt', $promptsList));
+        $this->assertTrue(in_array('complex_prompt', $promptsList));
+        $this->assertTrue(in_array('resource_prompt', $promptsList));
+
+        $simplePrompt = $mcpConfig->getPrompt('simple_prompt');
+        $this->assertInstanceOf(Messages::class, $simplePrompt);
+        $this->assertEquals('This is a simple prompt without arguments.', $simplePrompt->last()->getContent());
+
+        $complexPrompt = $mcpConfig->getPrompt('complex_prompt', ['temperature' => '1.0', 'style' => 'friendly']);
+        $this->assertInstanceOf(Messages::class, $complexPrompt);
+        $this->assertCount(3, $complexPrompt->getMessages());
+        $this->assertEquals("This is a complex prompt with arguments: temperature=1.0, style=friendly", $complexPrompt->first()->getContent());
+        $this->assertEquals("I understand. You've provided a complex prompt with temperature and style arguments. How would you like me to proceed?", $complexPrompt->offset(1)->getContent());
+        $this->assertEquals("image_url", $complexPrompt->last()->getContent()[0]['type']);
+        $this->assertTrue( str_contains($complexPrompt->last()->getContent()[0]['image_url']['url'], "data:image/png;base64,"));
+
+        $ressourcePrompt = $mcpConfig->getPrompt('resource_prompt', ['resourceId' =>  '55']);
+        $this->assertInstanceOf(Messages::class, $ressourcePrompt);
+        $this->assertCount(1, $ressourcePrompt->getMessages());
+        $this->assertEquals("This prompt includes Resource 55. Please analyze the following resource:", $ressourcePrompt->first()->getContent());
+        $this->assertNotEmpty($ressourcePrompt->first()->getResource());
+        $this->assertInstanceOf(Resource::class, $ressourcePrompt->first()->getResource());
+        $this->assertEquals('test://static/resource/55', $ressourcePrompt->first()->getResource()->getUri());
+        $this->assertEquals('text/plain', $ressourcePrompt->first()->getResource()->getMimeType());
+        $this->assertEquals('Resource 55: This is a plaintext resource', $ressourcePrompt->first()->getResource()->getText());
+
+        $test = $mcpConfig;
+    }
+
 }

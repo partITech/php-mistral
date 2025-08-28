@@ -12,18 +12,6 @@
           "mcp/filesystem",
           "/projects"
         ]
-      },
-      "everything": {
-        "command": "docker",
-        "args": [
-          "run",
-          "-i",
-          "--rm",
-          "--user", "${CURRENT_UID}:${CURRENT_GID}",
-          "--mount", "type=bind,src=${workspaceFolder},dst=/projects/workspace,readonly",
-          "mcp/everything",
-          "stdio"
-        ]
       }
     }
   }

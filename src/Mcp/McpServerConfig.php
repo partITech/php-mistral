@@ -5,6 +5,10 @@ namespace Partitech\PhpMistral\Mcp;
 use JsonSerializable;
 use Mcp\Client\Client;
 use Mcp\Client\ClientSession;
+use Mcp\Types\ServerCompletionsCapability;
+use Mcp\Types\ServerLoggingCapability;
+use Mcp\Types\ServerPromptsCapability;
+use Mcp\Types\ServerResourcesCapability;
 use Mcp\Types\ServerToolsCapability;
 use RuntimeException;
 
@@ -17,6 +21,10 @@ class McpServerConfig implements JsonSerializable
     private ?ClientSession $session = null;
     private mixed $tools;
     private array $toolsList=[];
+    private mixed $prompts;
+    private array $promptsList=[];
+
+
     public function __construct(string $name, array $definition, array $variables = [])
     {
         $this->name = $name;
@@ -90,6 +98,34 @@ class McpServerConfig implements JsonSerializable
             }
         }
 
+//        if($this->session->getInitializeResult()->capabilities->logging instanceof ServerLoggingCapability){
+//
+//        }
+
+//        if($this->session->getInitializeResult()->capabilities->completions instanceof ServerCompletionsCapability){
+//
+//        }
+
+        if($this->session->getInitializeResult()->capabilities->prompts instanceof ServerPromptsCapability){
+            $promptList = $this->session->listPrompts();
+            foreach($promptList->prompts as $prompt){
+                $this->promptsList[] = $prompt->name;
+                $this->prompts[] = [
+                    'type' => 'prompt',
+                    'prompt' => [
+                        'description' => $prompt->description,
+                        'name' => $prompt->name,
+                        'parameters' => $prompt->arguments
+                    ]
+                ];
+
+            }
+        }
+
+//        if($this->session->getInitializeResult()->capabilities->ressources instanceof ServerResourcesCapability){
+//
+//        }
+
         return $this;
     }
 
@@ -131,8 +167,23 @@ class McpServerConfig implements JsonSerializable
         return in_array($toolName, $this->toolsList);
     }
 
-    public function getList():array
+    public function getToolsList():array
     {
         return $this->toolsList;
+    }
+
+    public function getPrompts(): mixed
+    {
+        return $this->prompts;
+    }
+
+    public function getPromptsList():array
+    {
+        return $this->promptsList;
+    }
+
+    public function hasPrompt(string $promptName): bool
+    {
+        return in_array($promptName, $this->promptsList);
     }
 }
