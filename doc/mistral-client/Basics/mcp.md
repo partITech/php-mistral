@@ -64,9 +64,9 @@ Once your JSON config is configured properly, the following steps guide you thro
 3. Generate your parameters. Feed the `tool` key with your McpConfig object. Your client will use this object and create the JSON array needed to tell your LLM "Hey this is the tools you should use". 
 > [!TIP]
 > Some models will have a lot of pain to use your tools. Specifically the small ones. Depending on your context size, you can add in your prompt the list of tools the LLM can use. This can improve understanding in certain cases.
-> Simply use the getList() method to get the entire list of tools configured by your servers, and pass a list in JSON format :
+> Simply use the getToolsList() method to get the entire list of tools configured by your servers, and pass a list in JSON format :
 > ```php
-> $toolList = json_encode($mcpConfig->getList());
+> $toolList = json_encode($mcpConfig->getToolsList());
 > $messages = $this->client->getMessages()
 >                  ->addSystemMessage('You are Qwen, created by Alibaba Cloud. You are a helpful assistant. You have access to the directory /projects/workspace/ . here is the list of tools you can use : ' . $tools . '')
 > ```
@@ -164,4 +164,215 @@ $response = $client->chat(messages: $messages, params: $params);
 // Extract the message from the response.
 echo $response->getMessage();
 ```
-###
+### Using Prompt capabilities with MCP
+
+List the prompts : 
+
+```php
+
+$prompts = $mcpConfig->getPrompts();
+```
+
+```shell
+array(3) {
+  [0]=>
+  string(13) "simple_prompt"
+  [1]=>
+  string(14) "complex_prompt"
+  [2]=>
+  string(15) "resource_prompt"
+}
+```
+
+Get the prompts definitions : 
+
+
+```php
+$prompts = $mcpConfig->getPrompts();
+var_dump($prompts);
+```
+
+```shell
+array(3) {
+  ["simple_prompt"]=>
+  array(2) {
+    ["type"]=>
+    string(6) "prompt"
+    ["prompt"]=>
+    array(3) {
+      ["description"]=>
+      string(26) "A prompt without arguments"
+      ["name"]=>
+      string(13) "simple_prompt"
+      ["parameters"]=>
+      array(0) {
+      }
+    }
+  }
+  ["complex_prompt"]=>
+  array(2) {
+    ["type"]=>
+    string(6) "prompt"
+    ["prompt"]=>
+    array(3) {
+      ["description"]=>
+      string(23) "A prompt with arguments"
+      ["name"]=>
+      string(14) "complex_prompt"
+      ["parameters"]=>
+      array(2) {
+        [0]=>
+        object(Mcp\Types\PromptArgument)#89 (4) {
+          ["name"]=>
+          string(11) "temperature"
+          ["description"]=>
+          string(19) "Temperature setting"
+          ["required"]=>
+          bool(true)
+          ["extraFields":protected]=>
+          array(0) {
+          }
+        }
+        [1]=>
+        object(Mcp\Types\PromptArgument)#90 (4) {
+          ["name"]=>
+          string(5) "style"
+          ["description"]=>
+          string(12) "Output style"
+          ["required"]=>
+          bool(false)
+          ["extraFields":protected]=>
+          array(0) {
+          }
+        }
+      }
+    }
+  }
+  ["resource_prompt"]=>
+  array(2) {
+    ["type"]=>
+    string(6) "prompt"
+    ["prompt"]=>
+    array(3) {
+      ["description"]=>
+      string(53) "A prompt that includes an embedded resource reference"
+      ["name"]=>
+      string(15) "resource_prompt"
+      ["parameters"]=>
+      array(1) {
+        [0]=>
+        object(Mcp\Types\PromptArgument)#92 (4) {
+          ["name"]=>
+          string(10) "resourceId"
+          ["description"]=>
+          string(30) "Resource ID to include (1-100)"
+          ["required"]=>
+          bool(true)
+          ["extraFields":protected]=>
+          array(0) {
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+And finaly use the prompt : 
+
+`$mcpConfig->getPrompts()` will return a `Messages` with a list of `Message` object according to the MCP server response.
+
+If the MCP server reponds with a `resource` object, you can access it with the `getResource()` method.
+
+```php
+$ressourcePrompt = $mcpConfig->getPrompt('resource_prompt', ['resourceId' =>  '55']);
+var_dump($ressourcePrompt);
+var_dump($ressourcePrompt->getResource());
+```
+
+```shell
+object(Partitech\PhpMistral\Messages)#65 (3) {
+  ["messages":"Partitech\PhpMistral\Messages":private]=>
+  object(ArrayObject)#68 (1) {
+    ["storage":"ArrayObject":private]=>
+    array(1) {
+      [0]=>
+      object(Partitech\PhpMistral\Message)#67 (16) {
+        ["urlAsArray":"Partitech\PhpMistral\Message":private]=>
+        bool(false)
+        ["role":"Partitech\PhpMistral\Message":private]=>
+        string(4) "user"
+        ["id":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["content":"Partitech\PhpMistral\Message":private]=>
+        string(72) "This prompt includes Resource 55. Please analyze the following resource:"
+        ["chunk":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["toolCalls":"Partitech\PhpMistral\Message":private]=>
+        object(Partitech\PhpMistral\Tools\ToolCallCollection)#71 (1) {
+          ["calls":"Partitech\PhpMistral\Tools\ToolCallCollection":private]=>
+          array(0) {
+          }
+        }
+        ["partialToolCalls":"Partitech\PhpMistral\Message":private]=>
+        array(0) {
+        }
+        ["stopReason":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["toolCallId":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["name":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["clientType":"Partitech\PhpMistral\Message":private]=>
+        string(7) "Mistral"
+        ["createdAt":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["completedAt":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["type":"Partitech\PhpMistral\Message":private]=>
+        NULL
+        ["references":"Partitech\PhpMistral\Message":private]=>
+        array(0) {
+        }
+        ["resource":"Partitech\PhpMistral\Message":private]=>
+        object(Partitech\PhpMistral\Resource)#73 (4) {
+          ["uri":"Partitech\PhpMistral\Resource":private]=>
+          string(25) "test://static/resource/55"
+          ["mimeType":"Partitech\PhpMistral\Resource":private]=>
+          string(10) "text/plain"
+          ["extraFields":"Partitech\PhpMistral\Resource":private]=>
+          array(0) {
+          }
+          ["text":"Partitech\PhpMistral\Resource":private]=>
+          string(41) "Resource 55: This is a plaintext resource"
+        }
+      }
+    }
+  }
+  ["document":"Partitech\PhpMistral\Messages":private]=>
+  NULL
+  ["clientType":"Partitech\PhpMistral\Messages":private]=>
+  string(7) "Mistral"
+}
+```
+
+```shell
+object(Partitech\PhpMistral\Resource)#73 (4) {
+  ["uri":"Partitech\PhpMistral\Resource":private]=>
+  string(25) "test://static/resource/55"
+  ["mimeType":"Partitech\PhpMistral\Resource":private]=>
+  string(10) "text/plain"
+  ["extraFields":"Partitech\PhpMistral\Resource":private]=>
+  array(0) {
+  }
+  ["text":"Partitech\PhpMistral\Resource":private]=>
+  string(41) "Resource 55: This is a plaintext resource"
+}
+```
+
+To get the message compatible with your server you can add a third parameters to your getPrompt() method :
+```php
+$ressourcePrompt = $mcpConfig->getPrompt( promptName: 'resource_prompt', 
+                                          arguments:  ['resourceId' =>  '55'], 
+                                          clientType: Client::TYPE_MISTRAL);
+```
