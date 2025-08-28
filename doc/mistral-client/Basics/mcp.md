@@ -170,7 +170,7 @@ List the prompts :
 
 ```php
 
-$prompts = $client->getPrompts();
+$prompts = $mcpConfig->getPrompts();
 ```
 
 ```shell
