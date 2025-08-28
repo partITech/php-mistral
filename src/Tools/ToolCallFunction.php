@@ -60,7 +60,7 @@ final class ToolCallFunction implements JsonSerializable
             $data['function']['arguments'] = [$data['function']['arguments']];
         }
 
-        if(is_string($data['arguments']) && Json::validate($data['arguments'])){
+        if(isset($data['arguments']) && is_string($data['arguments']) && Json::validate($data['arguments'])){
             $data['function']['arguments'] = json_decode($data['arguments'], true);
         }
 
