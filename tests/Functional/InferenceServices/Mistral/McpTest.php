@@ -4,6 +4,7 @@ namespace Tests\Functional\InferenceServices\Mistral;
 
 use Exception;
 use Mcp\Types\GetPromptResult;
+use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Mcp\McpConfig;
@@ -172,6 +173,7 @@ class McpTest extends Setup
 
         $mcpConfig = new McpConfig($configArray,[]);
         $promptsList = $mcpConfig->getPromptsList();
+
         $this->assertNotEmpty($promptsList);
         $this->assertCount(3, $promptsList);
         $this->assertTrue(in_array('simple_prompt', $promptsList));
@@ -190,7 +192,7 @@ class McpTest extends Setup
         $this->assertEquals("image_url", $complexPrompt->last()->getContent()[0]['type']);
         $this->assertTrue( str_contains($complexPrompt->last()->getContent()[0]['image_url']['url'], "data:image/png;base64,"));
 
-        $ressourcePrompt = $mcpConfig->getPrompt('resource_prompt', ['resourceId' =>  '55']);
+        $ressourcePrompt = $mcpConfig->getPrompt(promptName: 'resource_prompt', arguments: ['resourceId' =>  '55'], clientType: Client::TYPE_MISTRAL);
         $this->assertInstanceOf(Messages::class, $ressourcePrompt);
         $this->assertCount(1, $ressourcePrompt->getMessages());
         $this->assertEquals("This prompt includes Resource 55. Please analyze the following resource:", $ressourcePrompt->first()->getContent());
@@ -199,8 +201,6 @@ class McpTest extends Setup
         $this->assertEquals('test://static/resource/55', $ressourcePrompt->first()->getResource()->getUri());
         $this->assertEquals('text/plain', $ressourcePrompt->first()->getResource()->getMimeType());
         $this->assertEquals('Resource 55: This is a plaintext resource', $ressourcePrompt->first()->getResource()->getText());
-
-        $test = $mcpConfig;
     }
 
 }

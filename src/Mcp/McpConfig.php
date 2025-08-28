@@ -147,6 +147,18 @@ class McpConfig implements JsonSerializable
         return $prompts;
     }
 
+    public function getPrompts():array
+    {
+        $prompts = [];
+        foreach ($this->getServers() as $serverConfig) {
+            foreach($serverConfig->getPrompts() as $prompt){
+                $prompts[$prompt['prompt']['name']] = $prompt;
+            }
+        }
+
+        return $prompts;
+    }
+
     public function jsonSerialize(): array
     {
         return $this->getTools();
