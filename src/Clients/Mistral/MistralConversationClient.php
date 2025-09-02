@@ -13,7 +13,6 @@ use Partitech\PhpMistral\Messages;
 
 class MistralConversationClient extends MistralClient
 {
-
     /**
      * @throws MaximumRecursionException
      * @throws MistralClientException
@@ -72,7 +71,7 @@ class MistralConversationClient extends MistralClient
 
         // 2. On ajoute les inputs
         if ($messages instanceof Messages) {
-            $payload['inputs'] = $messages->format();
+            $payload['inputs'] = $this->formatMessages($messages);
         } else {
             $payload['inputs'] = $messages;
         }
@@ -111,12 +110,16 @@ class MistralConversationClient extends MistralClient
         $payload = [
             'stream'            => $stream,
             'store'             => $store,
-            'completion_args'   => $conversation->getCompletionArgs()
         ];
+
+        if(count($conversation->getCompletionArgs()) > 0){
+            $payload['completion_args'] = $conversation->getCompletionArgs();
+        }
+
 
         // 2. On ajoute les inputs
         if ($messages instanceof Messages) {
-            $payload['inputs'] = $messages->format();
+            $payload['inputs'] = $this->formatMessages($messages);
         } else {
             $payload['inputs'] = $messages;
         }
@@ -276,6 +279,23 @@ class MistralConversationClient extends MistralClient
         );
 
         return MistralConversation::fromArray($response);
+    }
+
+    private function formatMessages(Messages $messages): array
+    {
+        $formattedMessages = $messages->format();
+        foreach ($formattedMessages as &$message) {
+            if($message['role'] === 'tool'){
+                unset($message['role']);
+                unset($message['name']);
+                $message['result'] = $message['content'];
+                unset($message['content']);
+                $message['object'] = 'entry';
+                $message['type'] = 'function.result';
+
+            }
+        }
+        return $formattedMessages;
     }
 
 }
