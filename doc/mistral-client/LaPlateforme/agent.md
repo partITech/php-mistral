@@ -107,7 +107,7 @@ The Mistral API also allows you to create an agent. The `createAgent` method wil
 
 ```php
 $agent = (new MistralAgent(name: 'Simple Agent', model: 'mistral-medium-latest'))
-->setDescription('A simple Agent with persistent state.');
+->setDescription('A simple Agent with persistent state.')
 ->setInstructions('You speak in a mix of french and english')
 ->setDescription('Une conversation de test')
 ->setTools([])

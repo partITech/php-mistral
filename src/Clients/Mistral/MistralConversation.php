@@ -9,11 +9,11 @@ class MistralConversation
 {
     private ?string $agentId = null;
     private ?string $id      = null;
-    private ?string $instructions;
-    private array   $tools;
+    private ?string $instructions = null;
+    private array   $tools = [];
 
     // Store full completion_args as an array
-    private array $completionArgs;
+    private array $completionArgs = [];
 
     // Completion arguments broken out
     private null|array|string $stop;
