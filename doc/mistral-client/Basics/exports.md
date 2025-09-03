@@ -43,9 +43,10 @@ Each export produces one JSON line per Messages conversation. Here’s a recap o
     - Mapping:
         - question: first user message,
         - context: first associated assistant response.
-> Notes
+> [!NOTE]
 > - Exporters validate the presence of the minimal required messages (e.g., at least user + assistant).
 > - The exact returned fields are normalized to limit downstream errors.
+
 ---
 ## Standard workflow
 1) Prepare the content
@@ -190,8 +191,7 @@ To support an external tool, implement a dedicated exporter:
 - Use ChunkExporter as you would for existing formats.
 - Each Messages becomes an encodable JSON line.
 Minimal example:
-```
-php
+```php
 <?php
 use Partitech\PhpMistral\Interfaces\FormatExporterInterface;
 use Partitech\PhpMistral\Messages;
