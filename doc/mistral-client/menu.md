@@ -7,6 +7,8 @@
 - [MCP](Basics/mcp.md)
 - [Socket timeout](Basics/socket_timeout.md)
 - [Guided JSON output](Basics/guided_json.md)
+- [Chunks](Basics/chunks.md)
+- [Exports](Basics/exports.md)
 
 ---
 

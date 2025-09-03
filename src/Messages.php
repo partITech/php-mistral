@@ -15,7 +15,8 @@ class Messages
 
     private ArrayObject $messages;
     private ?array $document=null;
-
+    private string $context='';
+    private array $metadata = [];
     private string $clientType;
 
     public function __construct(string $type = Client::TYPE_OPENAI)
@@ -204,5 +205,28 @@ class Messages
     public function last(): ?Message
     {
         return $this->messages->offsetGet($this->messages->count() - 1);
+    }
+
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    public function setMetadata(array $metadata): self
+    {
+        $this->metadata = $metadata;
+        return $this;
+    }
+
+    public function setContext(string $context): self
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    public function getContext(): string
+    {
+        return $this->context;
     }
 }
