@@ -4,13 +4,14 @@ namespace Partitech\PhpMistral\Clients\Mistral;
 
 use DateTimeImmutable;
 use Exception;
+use Partitech\PhpMistral\Mcp\McpConfig;
 
 class MistralConversation
 {
     private ?string $agentId = null;
     private ?string $id      = null;
     private ?string $instructions = null;
-    private array   $tools = [];
+    private array|McpConfig   $tools = [];
 
     // Store full completion_args as an array
     private array $completionArgs = [];
@@ -169,7 +170,7 @@ class MistralConversation
         return $this;
     }
 
-    public function getTools(): array
+    public function getTools(): array|McpConfig
     {
         return $this->tools;
     }
@@ -178,7 +179,7 @@ class MistralConversation
      * @param array $tools
      * @return MistralConversation
      */
-    public function setTools(array $tools): MistralConversation
+    public function setTools(array|McpConfig $tools): MistralConversation
     {
         $this->tools = $tools;
         return $this;

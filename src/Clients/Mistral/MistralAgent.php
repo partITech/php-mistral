@@ -2,6 +2,8 @@
 
 namespace Partitech\PhpMistral\Clients\Mistral;
 
+use Partitech\PhpMistral\Mcp\McpConfig;
+
 class MistralAgent
 {
     protected ?string $id             = null;
@@ -9,7 +11,7 @@ class MistralAgent
     protected string  $model;
     protected ?string $description    = null;
     protected ?string $instructions   = null;
-    protected ?array  $tools          = null;
+    protected null|array|McpConfig  $tools          = null;
     protected ?array  $handoffs       = null;
     protected ?array  $completionArgs = null;
     protected ?string $createdAt      = null;
@@ -116,7 +118,7 @@ class MistralAgent
         return $this->tools;
     }
 
-    public function setTools(?array $tools): self
+    public function setTools(null|array|McpConfig $tools): self
     {
         $this->tools = $tools;
         return $this;

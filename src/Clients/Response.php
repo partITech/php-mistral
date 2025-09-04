@@ -303,6 +303,7 @@ class Response
                         ]
                     );
                     $message->addToolCall($toolCallFunction);
+                    $message->setStopReason('tool_calls');
                 }
 
 
