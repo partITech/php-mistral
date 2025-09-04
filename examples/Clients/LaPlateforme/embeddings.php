@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 // export MISTRAL_API_KEY=your_api_key
@@ -10,9 +11,24 @@ $client = new MistralClient($apiKey);
 
 $inputs = [];
 
-for($i=0; $i<1; $i++) {
-    $inputs[] = "What is the best French cheese?";
+for($i=0; $i<10; $i++) {
+    $inputs[] = "$i : What is the best French cheese?";
 }
+
+$result = $client->embedText(text: 'test', model: 'mistral-embed');
+$test = $result;
+
+
+$result = $client->embedTexts(texts: $inputs, model: 'mistral-embed', batch: 3);
+$test = $result;
+
+
+$embeddingCollection = (new EmbeddingCollection())
+    ->setModel('mistral-embed')
+    ->fromList($inputs)
+    ->setBatchSize(3);
+$result = $client->createEmbeddings($embeddingCollection);
+$test = $result;
 
 try {
     $embeddingsBatchResponse = $client->embeddings($inputs);
@@ -1078,3 +1094,5 @@ Array
 
 )
  */
+
+
