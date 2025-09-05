@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Mcp\McpConfig;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Tools\ToolCallCollection;
 use Partitech\PhpMistral\Tools\ToolCallFunction;
@@ -533,8 +534,12 @@ class Response
         return $this;
     }
 
-    public function shouldTriggerMcp(): bool
+    public function shouldTriggerMcp(?McpConfig $mcpConfig): bool
     {
+        if($mcpConfig === null){
+            return false;
+        }
+
         $stopReasons = ['tool_calls', 'tool_use', 'stop'];
         $toolCalls   = $this->getToolCalls();
 

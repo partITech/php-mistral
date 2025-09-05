@@ -358,23 +358,16 @@ class Client extends Psr17Factory implements ClientInterface
 
     protected function handleTools(array &$return, array $params): void
     {
-        if (!isset($params['tools'])) {
-            return;
+        if (isset($params['tools'])) {
+            if (is_string($params['tools'])) {
+                $return['tools'] = json_decode($params['tools'], true);
+            } elseif ($params['tools'] instanceof McpConfig) {
+                $this->mcpConfig = $params['tools'];
+                $return['tools'] = $params['tools']->getTools();
+            } elseif (is_array($params['tools'])) {
+                $return['tools'] = $params['tools'];
+            }
         }
-
-        if (is_string($params['tools'])) {
-            $return['tools'] = json_decode($params['tools'], true);
-        }
-
-        if ($params['tools'] instanceof McpConfig) {
-            $this->mcpConfig = $params['tools'];
-            $return['tools'] = $params['tools']->getTools();
-        }
-
-        if (is_array($params['tools'])) {
-            $return['tools'] = $params['tools'];
-        }
-
     }
 
     protected function handleResponseFormat(array &$return, array $params): void
@@ -515,7 +508,7 @@ class Client extends Psr17Factory implements ClientInterface
     {
         /** @var Response $chunk */
         foreach ($generator as $chunk) {
-            if ($chunk->shouldTriggerMcp()) {
+            if ($chunk->shouldTriggerMcp($this->mcpConfig)) {
                 $this->triggerMcp($chunk);
                 $this->mcpCurrentRecursion++;
                 yield from  $this->chatStream(messages: $this->getMessages(), params: $this->currentParams);
@@ -753,7 +746,7 @@ class Client extends Psr17Factory implements ClientInterface
             return  (new SSEClient($this->responseClass, $this->clientType))->getStream($result);
         }else{
             $response = ($this->responseClass)::createFromArray($result, $this->clientType);
-            if($response->shouldTriggerMcp()){
+            if($response->shouldTriggerMcp($this->mcpConfig)){
                 $this->triggerMcp($response);
                 $this->mcpCurrentRecursion++;
                 return $this->chat(messages:  $this->messages, params: $params, stream: $stream);

@@ -14,7 +14,7 @@ class MistralConversation
     private array|McpConfig   $tools = [];
 
     // Store full completion_args as an array
-    private array $completionArgs = [];
+    private ?array $completionArgs = [];
 
     // Completion arguments broken out
     private null|array|string $stop;
@@ -188,8 +188,15 @@ class MistralConversation
     /**
      * Return the full completion_args payload.
      */
-    public function getCompletionArgs(): array
+    public function getCompletionArgs(): ?array
     {
+        if(is_array($this->completionArgs) && count($this->completionArgs) == 0 ){
+            return null;
+        }
+
+        if(!is_array($this->completionArgs)){
+            return null;
+        }
         return $this->completionArgs;
     }
 

@@ -54,9 +54,12 @@ class MistralConversationClient extends MistralClient
             'description'       => $conversation->getDescription(),
             'instructions'      => $conversation->getInstructions(),
             'tools'             => $conversation->getTools(),
-            'completion_args'   => $conversation->getCompletionArgs(),
+
 
         ];
+        if(!is_null($conversation->getCompletionArgs())){
+            $payload['completion_args'] = $conversation->getCompletionArgs();
+        }
 
         $this->handleTools($payload, $payload);
 
@@ -97,7 +100,7 @@ class MistralConversationClient extends MistralClient
             return  $this->getStream(stream: $response);
         }else{
             $response = Response::createFromArray($response, $this->clientType);
-            if($response->shouldTriggerMcp()){
+            if($response->shouldTriggerMcp($this->mcpConfig)){
                 $this->triggerMcp($response);
                 $this->mcpCurrentRecursion++;
                 $toolMessage = $this->getMessages()->last();
@@ -130,7 +133,7 @@ class MistralConversationClient extends MistralClient
             'store'             => $store,
         ];
 
-        if(count($conversation->getCompletionArgs()) > 0){
+        if(is_array($conversation->getCompletionArgs()) && count($conversation->getCompletionArgs()) > 0){
             $payload['completion_args'] = $conversation->getCompletionArgs();
         }
 
@@ -161,7 +164,7 @@ class MistralConversationClient extends MistralClient
             return  $this->getStream(stream: $response);
         }else{
             $response = Response::createFromArray($response, $this->clientType);
-            if($response->shouldTriggerMcp()){
+            if($response->shouldTriggerMcp($this->mcpConfig)){
                 $this->triggerMcp($response);
                 $this->mcpCurrentRecursion++;
                 $toolMessage = $this->getMessages()->last();
