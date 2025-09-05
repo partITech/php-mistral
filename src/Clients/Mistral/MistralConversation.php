@@ -29,7 +29,7 @@ class MistralConversation
     private ?string           $name;
     private ?string           $description;
     private ?string           $object;
-    private string            $model;
+    private ?string            $model;
     private string $handoffExecution = 'server';
     private DateTimeImmutable $createdAt;
     private DateTimeImmutable $updatedAt;
@@ -68,7 +68,7 @@ class MistralConversation
         $conv->name        = $data['name'] ?? null;
         $conv->description = $data['description'] ?? null;
         $conv->object      = $data['object'] ?? null;
-        $conv->model       = $data['model'];
+        $conv->model       = $data['model'] ?? null;
         $conv->createdAt   = new DateTimeImmutable($data['created_at']);
         $conv->updatedAt   = new DateTimeImmutable($data['updated_at']);
         return $conv;
