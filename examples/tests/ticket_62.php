@@ -46,13 +46,12 @@ try {
     exit(1);
 }
 
-// Create an agent to store your tools
+// Create an agent
 
 $agent = (new MistralAgent(name: 'Simple Agent', model: 'mistral-small-latest'))
     ->setDescription('A simple Agent with persistent state.')
     ->setInstructions('You speak in a mix of french and english')
     ->setDescription('Une conversation de test')
-    ->setTools($mcpConfig)
     ->setCompletionArgs(['temperature' => 0.3]);
 
 $agentClient = new MistralAgentClient(apiKey: $apiKey);
@@ -63,7 +62,8 @@ try {
 } catch (\Throwable $e) {
     echo $e->getMessage();
 }
-
+// Mcp tool should be set on the Conversation unless php-mistral won't know there is an mcp 
+// to handle. The MistralConversation isn't aware of the agent's specs once it's stored on mistral's services
 $conversation = (new MistralConversation())
     ->setAgent($myPersonalAgent)
     ->setName('Conversation')
