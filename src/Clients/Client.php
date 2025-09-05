@@ -358,16 +358,23 @@ class Client extends Psr17Factory implements ClientInterface
 
     protected function handleTools(array &$return, array $params): void
     {
-        if (isset($params['tools'])) {
-            if (is_string($params['tools'])) {
-                $return['tools'] = json_decode($params['tools'], true);
-            } elseif ($params['tools'] instanceof McpConfig) {
-                $this->mcpConfig = $params['tools'];
-                $return['tools'] = $params['tools']->getTools();
-            } elseif (is_array($params['tools'])) {
-                $return['tools'] = $params['tools'];
-            }
+        if (!isset($params['tools'])) {
+            return;
         }
+
+        if (is_string($params['tools'])) {
+            $return['tools'] = json_decode($params['tools'], true);
+        }
+
+        if ($params['tools'] instanceof McpConfig) {
+            $this->mcpConfig = $params['tools'];
+            $return['tools'] = $params['tools']->getTools();
+        }
+
+        if (is_array($params['tools'])) {
+            $return['tools'] = $params['tools'];
+        }
+
     }
 
     protected function handleResponseFormat(array &$return, array $params): void
