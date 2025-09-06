@@ -119,7 +119,7 @@ class TgiClient extends Client
         }else{
             $response =  TgiResponse::createFromArray($result, $this->clientType);
 
-            if($response->shouldTriggerMcp()){
+            if($response->shouldTriggerMcp($this->mcpConfig)){
                 $this->triggerMcp($response);
                 $this->mcpCurrentRecursion++;
                 return $this->chat(messages:  $this->messages, params: $params, stream: $stream, prependUrl: $prependUrl);
