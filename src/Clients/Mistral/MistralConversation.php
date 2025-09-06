@@ -4,16 +4,17 @@ namespace Partitech\PhpMistral\Clients\Mistral;
 
 use DateTimeImmutable;
 use Exception;
+use Partitech\PhpMistral\Mcp\McpConfig;
 
 class MistralConversation
 {
     private ?string $agentId = null;
     private ?string $id      = null;
     private ?string $instructions = null;
-    private array   $tools = [];
+    private array|McpConfig   $tools = [];
 
     // Store full completion_args as an array
-    private array $completionArgs = [];
+    private ?array $completionArgs = [];
 
     // Completion arguments broken out
     private null|array|string $stop;
@@ -29,7 +30,7 @@ class MistralConversation
     private ?string           $name;
     private ?string           $description;
     private ?string           $object;
-    private string            $model;
+    private ?string            $model;
     private string $handoffExecution = 'server';
     private DateTimeImmutable $createdAt;
     private DateTimeImmutable $updatedAt;
@@ -68,7 +69,7 @@ class MistralConversation
         $conv->name        = $data['name'] ?? null;
         $conv->description = $data['description'] ?? null;
         $conv->object      = $data['object'] ?? null;
-        $conv->model       = $data['model'];
+        $conv->model       = $data['model'] ?? null;
         $conv->createdAt   = new DateTimeImmutable($data['created_at']);
         $conv->updatedAt   = new DateTimeImmutable($data['updated_at']);
         return $conv;
@@ -169,7 +170,7 @@ class MistralConversation
         return $this;
     }
 
-    public function getTools(): array
+    public function getTools(): array|McpConfig
     {
         return $this->tools;
     }
@@ -178,7 +179,7 @@ class MistralConversation
      * @param array $tools
      * @return MistralConversation
      */
-    public function setTools(array $tools): MistralConversation
+    public function setTools(array|McpConfig $tools): MistralConversation
     {
         $this->tools = $tools;
         return $this;
@@ -187,8 +188,15 @@ class MistralConversation
     /**
      * Return the full completion_args payload.
      */
-    public function getCompletionArgs(): array
+    public function getCompletionArgs(): ?array
     {
+        if(is_array($this->completionArgs) && count($this->completionArgs) == 0 ){
+            return null;
+        }
+
+        if(!is_array($this->completionArgs)){
+            return null;
+        }
         return $this->completionArgs;
     }
 

@@ -5,6 +5,7 @@ namespace Partitech\PhpMistral\Clients\Mistral;
 use Exception;
 use Generator;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Clients\SSEClient;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Message;
@@ -53,9 +54,15 @@ class MistralConversationClient extends MistralClient
             'description'       => $conversation->getDescription(),
             'instructions'      => $conversation->getInstructions(),
             'tools'             => $conversation->getTools(),
-            'completion_args'   => $conversation->getCompletionArgs(),
+
 
         ];
+        if(!is_null($conversation->getCompletionArgs())){
+            $payload['completion_args'] = $conversation->getCompletionArgs();
+        }
+
+        $this->handleTools($payload, $payload);
+
 
         // Si l'objet Conversation stocke également l'agentId
         if (method_exists($conversation, 'getAgentId') && $conversation->getAgentId()) {
@@ -89,9 +96,23 @@ class MistralConversationClient extends MistralClient
             stream:     $stream
         );
 
-        return $stream
-            ? $this->getStream(stream: $response)
-            : Response::createFromArray($response, $this->clientType);
+        if($stream){
+            return  $this->getStream(stream: $response);
+        }else{
+            $response = Response::createFromArray($response, $this->clientType);
+            if($response->shouldTriggerMcp($this->mcpConfig)){
+                $this->triggerMcp($response);
+                $this->mcpCurrentRecursion++;
+                $toolMessage = $this->getMessages()->last();
+                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL))->addMessage($toolMessage);
+                $conversation->setId($response->getId());
+                return $this->appendConversation($conversation, $messages, $store, $stream);
+            }else{
+                $this->messages->addMessage($response->getChoices()->getIterator()->current());
+            }
+
+            return $response;
+        }
     }
 
     /**
@@ -112,10 +133,11 @@ class MistralConversationClient extends MistralClient
             'store'             => $store,
         ];
 
-        if(count($conversation->getCompletionArgs()) > 0){
+        if(is_array($conversation->getCompletionArgs()) && count($conversation->getCompletionArgs()) > 0){
             $payload['completion_args'] = $conversation->getCompletionArgs();
         }
 
+        $this->handleTools($payload, $payload);
 
         // 2. On ajoute les inputs
         if ($messages instanceof Messages) {
@@ -138,9 +160,23 @@ class MistralConversationClient extends MistralClient
             stream:     $stream
         );
 
-        return $stream
-            ? $this->getStream(stream: $response)
-            : Response::createFromArray($response, $this->clientType);
+        if($stream){
+            return  $this->getStream(stream: $response);
+        }else{
+            $response = Response::createFromArray($response, $this->clientType);
+            if($response->shouldTriggerMcp($this->mcpConfig)){
+                $this->triggerMcp($response);
+                $this->mcpCurrentRecursion++;
+                $toolMessage = $this->getMessages()->last();
+                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL))->addMessage($toolMessage);
+                $conversation->setId($response->getId());
+                return $this->appendConversation($conversation, $messages, $store, $stream);
+            }else{
+                $this->messages->addMessage($response->getChoices()->getIterator()->current());
+            }
+
+            return $response;
+        }
     }
 
 
