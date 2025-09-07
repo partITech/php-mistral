@@ -8,7 +8,7 @@ This document explains the unified embeddings API exposed by the application. It
 The goal is to keep a consistent developer experience across providers while returning a normalized in-memory representation of embeddings.
 
 Here is a list of compatible clients: 
-- [Mistral AI La plateforme](../LaPlateforme/embeddings.md)
+- Mistral AI La plateforme
 - HuggingFace TEI (Text Embeddings Inference)
 - LlamaCPP
 - Ollama
