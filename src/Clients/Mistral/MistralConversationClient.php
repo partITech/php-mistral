@@ -120,7 +120,7 @@ class MistralConversationClient extends MistralClient
      * @throws MistralClientException
      */
     public function appendConversation(
-        MistralConversation|string$conversation,
+        MistralConversation|string $conversation,
         Messages $messages,
         bool $store = false,
         bool $stream = false,
