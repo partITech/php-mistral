@@ -1,7 +1,7 @@
 services:
   embeddings:
     image: ghcr.io/huggingface/text-embeddings-inference:cuda-latest
-    command: --model-id Alibaba-NLP/gte-large-en-v1.5 --api-key testKey
+    command: --model-id Qwen/Qwen3-Embedding-0.6B --api-key testKey
     env_file:
       - .env
     volumes:

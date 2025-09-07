@@ -1,4 +1,8 @@
-## Embed
+## Embeddings
+
+> [!IMPORTANT]
+> This method is specific to this service inference.
+> You should consider using the [Unified embedding documentation](../Basics/embeddings.md) for more information.
 
 ### Code
 

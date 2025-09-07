@@ -3,19 +3,25 @@
 namespace Partitech\PhpMistral\Clients\Mistral;
 
 use Generator;
+use GuzzleHttp\Exception\ClientException;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Embeddings\Embedding;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollectionTrait;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\File;
 use Partitech\PhpMistral\Files;
+use Partitech\PhpMistral\Interfaces\EmbeddingModelInterface;
 use Partitech\PhpMistral\Messages;
 use Ramsey\Uuid\UuidInterface;
 use Throwable;
 
-class MistralClient extends Client
+class MistralClient extends Client  implements EmbeddingModelInterface
 {
+    use EmbeddingCollectionTrait;
     protected string $clientType = self::TYPE_MISTRAL;
     protected string $finishedToolCallReason = 'tool_calls';
 
@@ -299,6 +305,41 @@ class MistralClient extends Client
         $request = ['model' => $model, 'input' => $datas,];
         return $this->request('POST', 'v1/embeddings', $request);
     }
+
+    public function createEmbeddings(EmbeddingCollection $collection):EmbeddingCollection
+    {
+        $batchedCollection = new EmbeddingCollection();
+        $batchedCollection->setModel($collection->getModel());
+        $batchedCollection->setBatchSize($collection->getBatchSize());
+
+        /** @var EmbeddingCollection $chunk */
+        foreach ($collection->chunk($collection->getBatchSize()) as $chunk) {
+            $textArray = [];
+            /** @var Embedding $embedding */
+            foreach ($chunk as $embedding) {
+                $textArray[] = $embedding->getText();
+            }
+
+            try {
+                $result = $this->embeddings($textArray, $batchedCollection->getModel());
+            } catch (\Throwable $exception) {
+                throw new MistralClientException($exception->getMessage(), $exception->getCode());
+            }
+
+            if (isset($result['data'])) {
+                foreach ($result['data'] as $index => $data) {
+                    if (isset($data['embedding'])) {
+                        $embedding = $chunk->getByPos($index);
+                        $embedding->setVector($data['embedding']);
+                        $batchedCollection->add($embedding);
+                    }
+                }
+            }
+        }
+
+        return $batchedCollection;
+    }
+
 
     /**
      * @throws MistralClientException|MaximumRecursionException

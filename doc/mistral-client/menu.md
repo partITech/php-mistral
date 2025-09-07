@@ -9,6 +9,7 @@
 - [Guided JSON output](Basics/guided_json.md)
 - [Chunks](Basics/chunks.md)
 - [Exports](Basics/exports.md)
+- [Embeddings](Basics/embeddings.md)
 
 ---
 
@@ -59,7 +60,7 @@
 - [Statistics](HuggingFaceDataset/statistics.md)
 
 ## Hugging Face TEI
-- [Embed](TextEmbeddingInference/embed.md)
+- [Embeddings](TextEmbeddingInference/embeddings.md)
 - [Embed sparse](TextEmbeddingInference/embed_sparse.md)
 - [Predict](TextEmbeddingInference/predict.md)
 - [Rerank](TextEmbeddingInference/rerank.md)
@@ -92,7 +93,7 @@
 ## Ollama
 - [Copy](Ollama/copy.md)
 - [Delete](Ollama/delete.md)
-- [Embed](Ollama/embed.md)
+- [Embeddings](Ollama/embeddings.md)
 - [List](Ollama/list.md)
 - [Multimodal](Ollama/multimodal.md)
 - [Pull](Ollama/pull.md)
@@ -121,4 +122,9 @@
 - [List models](Xai/list_models.md)
 - [Multimodal](Xai/multimodal.md)
 - [Tokenize text](Xai/tokenize.md)
+- [Embeddings](Basics/embeddings.md)
+
+## Voyage 
+- [Embeddings](Voyage/embeddings.md)
+- [Rerank](Voyage/rerank.md)
 

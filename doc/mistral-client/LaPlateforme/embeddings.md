@@ -1,7 +1,12 @@
 ## Embeddings
 
-This section demonstrates how to **generate embeddings** for an array of sentences using the `PhpMistral` library with the **Mistral Platform**.
+> [!IMPORTANT]
+> This method is specific to this service inference.
+> You should consider using the [Unified embedding documentation](../Basics/embeddings.md) for more information.
 
+
+
+This section demonstrates how to **generate embeddings** for an array of sentences using the `PhpMistral` library with the **Mistral Platform**.
 Embeddings are numerical representations of text, often used for tasks like semantic search, clustering, or similarity comparison.
 
 > [!TIP]

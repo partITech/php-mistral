@@ -1,5 +1,9 @@
 ## Generate Embeddings
 
+> [!IMPORTANT]
+> This method is specific to this service inference.
+> You should consider using the [Unified embedding documentation](../Basics/embeddings.md) for more information.
+
 The `TeiClient` provides an `embed()` method to **generate embeddings** for input text. Embeddings are vector representations of text that capture semantic meaning, making them useful for tasks like semantic search, clustering, recommendation systems, and more.
 
 > [!TIP]

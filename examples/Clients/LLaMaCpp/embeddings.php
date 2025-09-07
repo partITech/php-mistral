@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\LlamaCpp\LlamaCppClient;
-use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
 
 $llamacppUrl = getenv('LLAMACPP_EMBEDDING_URL');
 $llamacppApiKey = getenv('LLAMACPP_API_KEY');
@@ -11,18 +11,32 @@ $client = new LlamaCppClient(apiKey: $llamacppApiKey, url: $llamacppUrl);
 
 $inputs = [];
 
-for($i=0; $i<1; $i++) {
-    $inputs[] = "What is the best French cheese?";
+for($i=0; $i<10; $i++) {
+    $inputs[] = "$i : What is the best French cheese?";
 }
 
-try {
-    $embeddingsBatchResponse = $client->embeddings($inputs);
-} catch (MistralClientException $e) {
-    echo $e->getMessage();
-    exit(1);
-}
+//$result = $client->embedText(text: 'test');
+//$test = $result;
 
-print_r($embeddingsBatchResponse);
+
+//$result = $client->embedTexts(texts: $inputs, model:null, batch: 3);
+//$test = $result;
+//
+//
+$embeddingCollection = (new EmbeddingCollection())
+    ->fromList($inputs)
+    ->setBatchSize(3);
+$result = $client->createEmbeddings($embeddingCollection);
+$test = $result;
+
+//try {
+//    $embeddingsBatchResponse = $client->embeddings($inputs);
+//} catch (MistralClientException $e) {
+//    echo $e->getMessage();
+//    exit(1);
+//}
+//
+//print_r($embeddingsBatchResponse);
 
 
 /*
