@@ -69,6 +69,31 @@ foreach ($collection as $embedding) {
     // ...
 }
 ```
+
+### Embeddings from with an EmbeddingCollection object
+```php
+<?php
+use Partitech\PhpMistral\Clients\Mistral\MistralClient;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
+
+// export MISTRAL_API_KEY=your_api_key
+$apiKey = getenv('MISTRAL_API_KEY');
+$client = new MistralClient($apiKey);
+
+$inputs = [];
+
+for($i=0; $i<10; $i++) {
+    $inputs[] = "$i : What is the best French cheese?";
+}
+
+$embeddingCollection = (new EmbeddingCollection())
+    ->setModel('mistral-embed')
+    ->fromList($inputs)
+    ->setBatchSize(3);
+$result = $client->createEmbeddings($embeddingCollection);
+
+```
 ---
 
 ## Public API (unified methods)
