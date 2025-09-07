@@ -1,0 +1,32 @@
+services:
+  embedding:
+    image: vllm/vllm-openai:v0.10.1.1
+    command: |
+      --model BAAI/bge-m3
+      --enforce-eager
+      --task embedding
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=hf_****
+      - MODEL
+      - SERVED_MODEL_NAME
+      - MAX_MODEL_LEN
+      - VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+      #- NVIDIA_VISIBLE_DEVICES=0,1
+      - NVIDIA_VISIBLE_DEVICES=0
+    volumes:
+      - /llm:/llm
+      - /Data:/Data
+      - .cache/huggingface:/data
+    env_file:
+      - .env
+    ports:
+      - "40002:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    runtime: nvidia
+    ipc: host

@@ -1,5 +1,10 @@
 # Llama.cpp Embeddings API
 
+> [!IMPORTANT]
+> This method is specific to this service inference.
+> You should consider using the [Unified embedding documentation](../Basics/embeddings.md) for more information.
+
+
 The **Embeddings API** allows you to convert input text into high-dimensional vector representations (embeddings). These embeddings are useful for various tasks such as semantic search, clustering, recommendation systems, or as input for other machine learning models.
 
 ---

@@ -4,11 +4,17 @@ namespace Partitech\PhpMistral\Clients\Tei;
 // https://github.com/huggingface/text-embeddings-inference
 
 use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Embeddings\Embedding;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollectionTrait;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Interfaces\EmbeddingModelInterface;
 
-class TeiClient extends Client
+class TeiClient extends Client implements EmbeddingModelInterface
 {
+    use EmbeddingCollectionTrait;
+
     protected string $clientType = Client::TYPE_TEI;
     protected const ENDPOINT = 'http://localhost:8080';
 
@@ -24,6 +30,38 @@ class TeiClient extends Client
     {
         return $this->request(method: 'POST', path: '/embed', parameters: ['inputs' => $inputs ]);
 
+    }
+
+    public function createEmbeddings(EmbeddingCollection $collection):EmbeddingCollection
+    {
+        $batchedCollection = new EmbeddingCollection();
+        $batchedCollection->setModel($collection->getModel());
+        $batchedCollection->setBatchSize($collection->getBatchSize());
+
+        /** @var EmbeddingCollection $chunk */
+        foreach ($collection->chunk($collection->getBatchSize()) as $chunk) {
+            $textArray = [];
+            /** @var Embedding $embedding */
+            foreach ($chunk as $embedding) {
+                $textArray[] = $embedding->getText();
+            }
+
+            try {
+                $result = $this->embed($textArray);
+            } catch (\Throwable $exception) {
+                throw new MistralClientException($exception->getMessage(), $exception->getCode());
+            }
+
+            if (is_array($result) && count($result) > 0) {
+                foreach ($result as $index => $data) {
+                    $embedding = $chunk->getByPos($index);
+                    $embedding->setVector($data);
+                    $batchedCollection->add($embedding);
+                }
+            }
+        }
+
+        return $batchedCollection;
     }
 
 

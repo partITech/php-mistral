@@ -7,14 +7,20 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Embeddings\Embedding;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollectionTrait;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Interfaces\EmbeddingModelInterface;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Tokens;
 
-class LlamaCppClient extends Client
+class LlamaCppClient extends Client implements EmbeddingModelInterface
 {
+    use EmbeddingCollectionTrait;
+
     protected string $clientType = Client::TYPE_LLAMACPP;
     protected string $responseClass = LlamaCppResponse::class;
     protected array $chatParametersDefinition = [
@@ -263,5 +269,38 @@ class LlamaCppClient extends Client
         }
 
         $return['temperature'] = 0;
+    }
+
+
+    public function createEmbeddings(EmbeddingCollection $collection):EmbeddingCollection
+    {
+        $batchedCollection = new EmbeddingCollection();
+        $batchedCollection->setModel($collection->getModel());
+        $batchedCollection->setBatchSize($collection->getBatchSize());
+
+        /** @var EmbeddingCollection $chunk */
+        foreach ($collection->chunk($collection->getBatchSize()) as $chunk) {
+            $textArray = [];
+            /** @var Embedding $embedding */
+            foreach ($chunk as $embedding) {
+                $textArray[] = $embedding->getText();
+            }
+
+            try {
+                $result = $this->embeddings($textArray);
+            } catch (\Throwable $exception) {
+                throw new MistralClientException($exception->getMessage(), $exception->getCode());
+            }
+
+            if (is_array($result['data']) && count($result['data']) > 0) {
+                foreach ($result['data'] as $index => $data) {
+                    $embedding = $chunk->getByPos($index);
+                    $embedding->setVector($data['embedding']);
+                    $batchedCollection->add($embedding);
+                }
+            }
+        }
+
+        return $batchedCollection;
     }
 }

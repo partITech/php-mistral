@@ -65,28 +65,29 @@ This ensures **flexibility**, **interoperability**, and **future-proofing** of y
 
 ### Core Features
 
-| Provider              | Chat (stream) | Chat (non-stream) | Embeddings | Sparse Embeddings |
-|-----------------------|---------------|-------------------|------------|-------------------|
-| Mistral Platform      | ✅             | ✅                 | ✅          |                   |
-| Hugging Face TGI      | ✅             | ✅                 | ✅          |                   |
-| vLLM                  | ✅             | ✅                 | ✅          |                   |
-| Ollama                | ✅             | ✅                 | ✅          |                   |
-| llama.cpp             | ✅             | ✅                 | ✅          |                   |
-| xAI                   | ✅             | ✅                 | ✅          |                   |
+| Provider                 | Chat (stream) | Chat (non-stream) | Embeddings | Sparse Embeddings |
+|--------------------------|---------------|-------------------|------------|-------------------|
+| Mistral Platform         | ✅             | ✅                 | ✅          |                   |
+| Hugging Face TGI         | ✅             | ✅                 | ✅          |                   |
+| vLLM                     | ✅             | ✅                 | ✅          |                   |
+| Ollama                   | ✅             | ✅                 | ✅          |                   |
+| llama.cpp                | ✅             | ✅                 | ✅          |                   |
+| xAI                      | ✅             | ✅                 | ✅          |                   |
 | Text Embedding Inference |           |                   | ✅          | ✅                 |
+| Voyage                   |           |                   | ✅          |                   |
 
 ### Advanced Features
 
-| Provider              | Rerank | Guided JSON | Documents | Pooling | HF Datasets |
-|-----------------------|--------|-------------|-----------|---------|-------------|
-| Mistral Platform      | ✅      | ✅           | ✅         |         |             |
-| Hugging Face TGI      | ✅      | ✅           |           |         | ✅           |
-| vLLM                  | ✅      | ✅           |           | ✅       |             |
-| Ollama                | ✅      | ✅           |           |         |             |
-| llama.cpp             | ✅      | ✅           |           |         |             |
-| xAI                   | ✅      | ✅           |           |         |             |
-| Text Embedding Inference |    |             |           |         |             |
-
+| Provider                 | Rerank | Guided JSON | Documents | Pooling | HF Datasets |
+|--------------------------|--------|-------------|-----------|---------|-------------|
+| Mistral Platform         | ✅      | ✅           | ✅         |         |             |
+| Hugging Face TGI         | ✅      | ✅           |           |         | ✅           |
+| vLLM                     | ✅      | ✅           |           | ✅       |             |
+| Ollama                   | ✅      | ✅           |           |         |             |
+| llama.cpp                | ✅      | ✅           |           |         |             |
+| xAI                      | ✅      | ✅           |           |         |             |
+| Text Embedding Inference | ✅    |             |           |         |             |
+| Voyage                   | ✅    |             |           |         |             |
 ---
 
 ## Installation

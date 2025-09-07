@@ -3,18 +3,57 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use Partitech\PhpMistral\Clients\Ollama\OllamaClient;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 $ollamaUrl = getenv('OLLAMA_URL');
 
-$client = new OllamaClient(url: $ollamaUrl);
+$client = new OllamaClient(url: 'http://localhost:11434');
 
-try {
-   $result = $client->embeddings(model: 'mistral', input: ['Why is the sky blue?', 'test array']);
-    print_r($result);
-} catch (MistralClientException $e) {
-    echo $e->getMessage();
+$inputs = [];
+
+for($i=0; $i<10; $i++) {
+    $inputs[] = "$i : What is the best French cheese?";
 }
+
+//$result = $client->embedText(text: 'test', model: 'mistral');
+//$test = $result;
+
+
+$result = $client->embedTexts(texts: $inputs, model: 'mistral', batch: 3);
+$test = $result;
+//
+//
+$embeddingCollection = (new EmbeddingCollection())
+    ->fromList($inputs)
+    ->setModel('mistral')
+    ->setBatchSize(3);
+$result = $client->createEmbeddings($embeddingCollection);
+$test = $result;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//try {
+//   $result = $client->embeddings(model: 'mistral', input: ['Why is the sky blue?', 'test array']);
+//    print_r($result);
+//} catch (MistralClientException $e) {
+//    echo $e->getMessage();
+//}
 
 /*
 Array

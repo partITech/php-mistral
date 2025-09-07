@@ -1,6 +1,7 @@
 <?php
 
 use Partitech\PhpMistral\Clients\Tei\TeiClient;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 
 require_once __DIR__ . '/../../../../vendor/autoload.php';
@@ -10,6 +11,29 @@ $teiUrl = getenv('TEI_EMBEDDINGS_URI');
 $apiKey = getenv('TEI_API_KEY');
 
 $client = new TeiClient(apiKey: (string) $apiKey, url: $teiUrl);
+
+
+$inputs = [];
+
+for($i=0; $i<10; $i++) {
+    $inputs[] = "$i : What is the best French cheese?";
+}
+
+//$result = $client->embedText(text: 'test', model:null);
+//$test = $result;
+
+
+$result = $client->embedTexts(texts: $inputs, model:null, batch: 3);
+$test = $result;
+
+
+$embeddingCollection = (new EmbeddingCollection())
+    ->fromList($inputs)
+    ->setBatchSize(3);
+$result = $client->createEmbeddings($embeddingCollection);
+$test = $result;
+
+
 try {
     $tokens = $client->embed(inputs: "My name is Olivier and I");
     var_dump($tokens);

@@ -1,5 +1,10 @@
 ## Embeddings
 
+> [!IMPORTANT]
+> This method is specific to this service inference.
+> You should consider using the [Unified embedding documentation](../Basics/embeddings.md) for more information.
+
+
 The **embeddings** method allows you to generate vector representations of text inputs. These embeddings are numerical representations capturing the semantic meaning of the input text and are commonly used for tasks like semantic search, clustering, or as input features for machine learning models.
 
 > [!NOTE]

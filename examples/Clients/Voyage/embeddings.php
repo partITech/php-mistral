@@ -1,17 +1,12 @@
 <?php
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Partitech\PhpMistral\Clients\Vllm\VllmClient;
+use Partitech\PhpMistral\Clients\Voyage\VoyageClient;
 use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 
-$apiKey = getenv('VLLM_API_KEY');   // "personal_token"
-$model  = getenv('VLLM_API_MODEL'); // "Mistral-Nemo-Instruct-2407"
-$url    =  getenv('VLLM_API_URL');  // "http://localhost:40001"
-$urlApiEmbedding    =  getenv('VLLM_API_EMBEDDING_URL');  // "http://localhost:40002"
-$embeddingModel = getenv('VLLM_API_EMBEDDING_MODEL'); // BAAI/bge-m3
-
-$client = new VllmClient(apiKey: (string) $apiKey, url:  'http://localhost:40002');
+$apiKey = getenv('VOYAGE_API_KEY');
+$client = new VoyageClient(apiKey: (string) $apiKey);
 
 $inputs = [];
 
@@ -19,17 +14,16 @@ for($i=0; $i<10; $i++) {
     $inputs[] = "$i : What is the best French cheese?";
 }
 
+$result = $client->embedText(text: 'test', model:'voyage-law-2');
+$test = $result;
 
-//$result = $client->embedText(text: 'test', model:'BAAI/bge-m3');
-//$test = $result;
-
-//$result = $client->embedTexts(texts: $inputs, model:'BAAI/bge-m3', batch: 3);
-//$test = $result;
+$result = $client->embedTexts(texts: $inputs, model:'voyage-law-2', batch: 3);
+$test = $result;
 
 
 $embeddingCollection = (new EmbeddingCollection())
     ->fromList($inputs)
-    ->setModel('BAAI/bge-m3')
+    ->setModel('voyage-law-2')
     ->setBatchSize(3);
 $result = $client->createEmbeddings($embeddingCollection);
 $test = $result;
@@ -37,7 +31,7 @@ $test = $result;
 
 
 try {
-    $embeddingsBatchResponse = $client->embeddings($inputs, $embeddingModel);
+    $embeddingsBatchResponse = $client->embeddings($inputs, 'voyage-law-2');
     print_r($embeddingsBatchResponse);
 } catch (MistralClientException $e) {
     echo $e->getMessage();

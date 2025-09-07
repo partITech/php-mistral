@@ -77,6 +77,7 @@ class Client extends Psr17Factory implements ClientInterface
     public const TYPE_OLLAMA      = 'OLLAMA';
     public const TYPE_LLAMACPP    = 'LLAMACPP';
     public const TYPE_VLLM        = 'VLLM';
+    public const TYPE_VOYAGE        = 'Voyage';
     public const TYPE_MISTRAL     = 'Mistral';
     public const TYPE_HUGGINGFACE = 'HuggingFace';
 

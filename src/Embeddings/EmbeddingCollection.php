@@ -152,7 +152,7 @@ class EmbeddingCollection implements IteratorAggregate
         return $this->model;
     }
 
-    public function setModel(string $model): EmbeddingCollection
+    public function setModel(?string $model): EmbeddingCollection
     {
         $this->model = $model;
         return $this;

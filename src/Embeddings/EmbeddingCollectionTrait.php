@@ -8,14 +8,17 @@ trait EmbeddingCollectionTrait
 {
     private ?int $batchSize = null;
 
-    public function embedText(string $text, string $model): EmbeddingCollection
+    public function embedText(string $text, ?string $model=null): EmbeddingCollection
     {
         if(empty($text)){
             throw new MistralClientException("Missing text", 500);
         }
 
         $collection = new EmbeddingCollection();
-        $collection->setModel($model);
+        if(!is_null($model)){
+            $collection->setModel($model);
+        }
+
         $collection->add(new Embedding(text: $text));
         return $this->createEmbeddings($collection);
     }
@@ -23,14 +26,17 @@ trait EmbeddingCollectionTrait
     /**
      * @throws MistralClientException
      */
-    public function embedTexts(array $texts, string $model, int $batch=null): EmbeddingCollection
+    public function embedTexts(array $texts, ?string $model=null, int $batch=null): EmbeddingCollection
     {
         if(count($texts) < 1 || empty($texts[0])) {
             throw new MistralClientException("Missing texts", 500);
         }
 
         $collection = new EmbeddingCollection();
-        $collection->setModel($model);
+        if(!is_null($model)){
+            $collection->setModel($model);
+        }
+
         $collection->setBatchSize($batch);
         foreach ($texts as $text) {
             $collection->add(new Embedding(text: $text));

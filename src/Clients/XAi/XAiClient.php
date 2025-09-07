@@ -6,15 +6,21 @@ use ArrayObject;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Embeddings\Embedding;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollectionTrait;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Interfaces\EmbeddingModelInterface;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Tokens;
 use Psr\Http\Message\ResponseInterface;
 
 
-class XAiClient extends Client
+class XAiClient extends Client implements EmbeddingModelInterface
 {
+    use EmbeddingCollectionTrait;
+
     protected string $clientType = Client::TYPE_XAI;
     protected string $responseClass = XAIResponse::class;
 
@@ -148,5 +154,56 @@ class XAiClient extends Client
         $tokens->setPrompt(prompt:$prompt);
         $tokens->setModel($model);
         return $tokens;
+    }
+
+    // List all embedding models available to the authenticating API key with full information.
+    // Additional information compared to /v1/models includes modalities, pricing, fingerprint and alias(es).
+    public function listEmbeddingModels():array
+    {
+        return $this->request('GET', '/v1/embedding-models');
+    }
+
+    //Get full information about an embedding model with its model_id.
+    public function getEmbeddingModels(string $modelId):array
+    {
+        return $this->request('GET', '/v1/embedding-models/'.$modelId);
+    }
+
+    public function embeddings(array $input, string $model = 'grok-3'): array
+    {
+        $request = ['model' => $model, 'input' => $input, 'encoding_format' => 'float'];
+        return $this->request('POST', 'v1/embeddings', $request);
+    }
+
+    public function createEmbeddings(EmbeddingCollection $collection):EmbeddingCollection
+    {
+        $batchedCollection = new EmbeddingCollection();
+        $batchedCollection->setModel($collection->getModel());
+        $batchedCollection->setBatchSize($collection->getBatchSize());
+
+        /** @var EmbeddingCollection $chunk */
+        foreach ($collection->chunk($collection->getBatchSize()) as $chunk) {
+            $textArray = [];
+            /** @var Embedding $embedding */
+            foreach ($chunk as $embedding) {
+                $textArray[] = $embedding->getText();
+            }
+
+            try {
+                $result = $this->embeddings(input: $textArray, model: $collection->getModel());
+            } catch (\Throwable $exception) {
+                throw new MistralClientException($exception->getMessage(), $exception->getCode());
+            }
+
+            if (is_array($result) && isset($result['data']) && count($result['data']) > 0) {
+                foreach ($result['data'] as $index => $data) {
+                    $embedding = $chunk->getByPos($index);
+                    $embedding->setVector($data['embedding']);
+                    $batchedCollection->add($embedding);
+                }
+            }
+        }
+
+        return $batchedCollection;
     }
 }

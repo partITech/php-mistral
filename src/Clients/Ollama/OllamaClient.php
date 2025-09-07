@@ -5,13 +5,18 @@ use Generator;
 use KnpLabs\JsonSchema\ObjectSchema;
 use Partitech\PhpMistral\Clients\Client;
 use Partitech\PhpMistral\Clients\Response;
+use Partitech\PhpMistral\Embeddings\Embedding;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollection;
+use Partitech\PhpMistral\Embeddings\EmbeddingCollectionTrait;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Interfaces\EmbeddingModelInterface;
 use Partitech\PhpMistral\Messages;
 use Throwable;
 
-class OllamaClient extends Client
+class OllamaClient extends Client implements EmbeddingModelInterface
 {
+    use EmbeddingCollectionTrait;
     protected string $clientType = Client::TYPE_OLLAMA;
     protected string $responseClass = OllamaResponse::class;
     protected array $chatParametersDefinition = [
@@ -197,4 +202,35 @@ class OllamaClient extends Client
         }
     }
 
+    public function createEmbeddings(EmbeddingCollection $collection):EmbeddingCollection
+    {
+        $batchedCollection = new EmbeddingCollection();
+        $batchedCollection->setModel($collection->getModel());
+        $batchedCollection->setBatchSize($collection->getBatchSize());
+
+        /** @var EmbeddingCollection $chunk */
+        foreach ($collection->chunk($collection->getBatchSize()) as $chunk) {
+            $textArray = [];
+            /** @var Embedding $embedding */
+            foreach ($chunk as $embedding) {
+                $textArray[] = $embedding->getText();
+            }
+
+            try {
+                $result = $this->embeddings(input: $textArray, model: $collection->getModel());
+            } catch (\Throwable $exception) {
+                throw new MistralClientException($exception->getMessage(), $exception->getCode());
+            }
+
+            if (is_array($result) && isset($result['embeddings']) && count($result['embeddings']) > 0) {
+                foreach ($result['embeddings'] as $index => $data) {
+                    $embedding = $chunk->getByPos($index);
+                    $embedding->setVector($data);
+                    $batchedCollection->add($embedding);
+                }
+            }
+        }
+
+        return $batchedCollection;
+    }
 }

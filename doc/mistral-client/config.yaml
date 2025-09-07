@@ -6,8 +6,8 @@ projectSource: "https://github.com/partITech/php-mistral"
 jumbotronSourceLinkCodeLink: "https://github.com/partITech/php-mistral"
 enableSearch: false
 jumbotron: true
-jumbotronHeader: "Mistral API, Vllm, Ollama, llama.cpp, HuggingFace inference client, Anthropic, Xai"
-jumbotronTextLine: "Connect with or without streaming, FIM, function calling, Mixed content, Json format"
+jumbotronHeader: "Mistral API, Vllm, Ollama, llama.cpp, HuggingFace inference client, Anthropic, Xai, Voyage"
+jumbotronTextLine: "Connect with or without streaming, FIM, function calling, Mixed content, Json format, Mcp and more..."
 jumbotronGetStartedLabel: "Get started"
 jumbotronGetStartedLink: "#main-content"
 jumbotronSourceLinkCodeLabel: "View on GitHub"
