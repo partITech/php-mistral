@@ -33,6 +33,23 @@ class MistralConversationClient extends MistralClient
         }
     }
 
+
+    public function wrapStreamConversationGenerator(Generator $generator, MistralConversation $conversation, bool $store): Generator
+    {
+        /** @var Response $chunk */
+        foreach ($generator as $chunk) {
+            if ($chunk->shouldTriggerMcp($this->mcpConfig)) {
+                $this->triggerMcp($chunk);
+                $toolMessage = $this->getMessages()->last();
+                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL))->addMessage($toolMessage);
+                $conversation->setId($chunk->getId());
+                $this->mcpCurrentRecursion++;
+                yield from  $this->appendConversation(conversation: $conversation, messages: $messages, store: $store, stream: true);
+            }elseif($chunk->getChunk() !== null){
+                yield $chunk;
+            }
+        }
+    }
     /**
      * Crée une conversation à partir d'un objet Conversation
      *
@@ -97,7 +114,8 @@ class MistralConversationClient extends MistralClient
         );
 
         if($stream){
-            return  $this->getStream(stream: $response);
+            $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($response);
+            return $this->wrapStreamConversationGenerator($streamResult, $conversation, $store);
         }else{
             $response = Response::createFromArray($response, $this->clientType);
             if($response->shouldTriggerMcp($this->mcpConfig)){
@@ -161,7 +179,8 @@ class MistralConversationClient extends MistralClient
         );
 
         if($stream){
-            return  $this->getStream(stream: $response);
+            $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($response);
+            return $this->wrapStreamConversationGenerator($streamResult, $conversation, $store);
         }else{
             $response = Response::createFromArray($response, $this->clientType);
             if($response->shouldTriggerMcp($this->mcpConfig)){
