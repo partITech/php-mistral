@@ -88,6 +88,14 @@ class Message
      */
     public function setContent(null|string|array $content): self
     {
+        if(is_null($content)){
+            $content = '';
+        }
+
+        if(is_string($content)){
+            $content = trim($content);
+        }
+
         $this->content = $content;
         return $this;
     }

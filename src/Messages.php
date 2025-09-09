@@ -128,7 +128,7 @@ class Messages
     {
         $message = new Message($this->clientType);
         $message->setRole(self::ROLE_ASSISTANT);
-        $message->setContent(trim($content ?? ''));
+        $message->setContent($content);
         $message->setToolCalls($toolCalls);
         $this->addMessage($message);
         return $this;
