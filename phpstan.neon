@@ -24,4 +24,4 @@ parameters:
   # baseline: phpstan-baseline.neon
   featureToggles:
     # nécessaire si bleedingEdge.neon écrase checkMissingIterableValueType
-    disableCheckMissingIterableValueType: false
+    #disableCheckMissingIterableValueType: false
