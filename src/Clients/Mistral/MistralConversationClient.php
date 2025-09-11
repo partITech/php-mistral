@@ -121,8 +121,10 @@ class MistralConversationClient extends MistralClient
             if($response->shouldTriggerMcp($this->mcpConfig)){
                 $this->triggerMcp($response);
                 $this->mcpCurrentRecursion++;
-                $toolMessage = $this->getMessages()->last();
-                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL))->addMessage($toolMessage);
+                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL));
+                foreach($response->getToolCalls() as $toolCall){
+                    $messages->addMessage($this->getMessages()->getMessageByToolCallId($toolCall->getId()));
+                }
                 $conversation->setId($response->getId());
                 return $this->appendConversation($conversation, $messages, $store, $stream);
             }else{
@@ -138,7 +140,7 @@ class MistralConversationClient extends MistralClient
      * @throws MistralClientException
      */
     public function appendConversation(
-        MistralConversation|string$conversation,
+        MistralConversation|string $conversation,
         Messages $messages,
         bool $store = false,
         bool $stream = false,
