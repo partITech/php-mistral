@@ -239,8 +239,8 @@ class Response
         }
 
         if(isset($data['outputs'])) {
-            foreach ($data['outputs'] as $output) {
-                $message = new Message($response->clientType);
+            $message = new Message($response->clientType);
+            foreach ($data['outputs'] as $numOutput => $output) {
 
                 if(isset($output['role'])){
                     $message->setRole($output['role']);
@@ -304,7 +304,9 @@ class Response
                         ]
                     );
                     $message->addToolCall($toolCallFunction);
-                    $message->setStopReason('tool_calls');
+                    if($numOutput == count($data['outputs'])-1){
+                        $message->setStopReason('tool_calls');
+                    }
                 }
 
 

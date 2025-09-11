@@ -33,6 +33,23 @@ class MistralConversationClient extends MistralClient
         }
     }
 
+
+    public function wrapStreamConversationGenerator(Generator $generator, MistralConversation $conversation, bool $store): Generator
+    {
+        /** @var Response $chunk */
+        foreach ($generator as $chunk) {
+            if ($chunk->shouldTriggerMcp($this->mcpConfig)) {
+                $this->triggerMcp($chunk);
+                $toolMessage = $this->getMessages()->last();
+                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL))->addMessage($toolMessage);
+                $conversation->setId($chunk->getId());
+                $this->mcpCurrentRecursion++;
+                yield from  $this->appendConversation(conversation: $conversation, messages: $messages, store: $store, stream: true);
+            }elseif($chunk->getChunk() !== null){
+                yield $chunk;
+            }
+        }
+    }
     /**
      * Crée une conversation à partir d'un objet Conversation
      *
@@ -97,14 +114,17 @@ class MistralConversationClient extends MistralClient
         );
 
         if($stream){
-            return  $this->getStream(stream: $response);
+            $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($response);
+            return $this->wrapStreamConversationGenerator($streamResult, $conversation, $store);
         }else{
             $response = Response::createFromArray($response, $this->clientType);
             if($response->shouldTriggerMcp($this->mcpConfig)){
                 $this->triggerMcp($response);
                 $this->mcpCurrentRecursion++;
-                $toolMessage = $this->getMessages()->last();
-                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL))->addMessage($toolMessage);
+                $messages = (new Messages(type: MistralClient::TYPE_MISTRAL));
+                foreach($response->getToolCalls() as $toolCall){
+                    $messages->addMessage($this->getMessages()->getMessageByToolCallId($toolCall->getId()));
+                }
                 $conversation->setId($response->getId());
                 return $this->appendConversation($conversation, $messages, $store, $stream);
             }else{
@@ -161,7 +181,8 @@ class MistralConversationClient extends MistralClient
         );
 
         if($stream){
-            return  $this->getStream(stream: $response);
+            $streamResult =  (new SSEClient($this->responseClass, $this->clientType))->getStream($response);
+            return $this->wrapStreamConversationGenerator($streamResult, $conversation, $store);
         }else{
             $response = Response::createFromArray($response, $this->clientType);
             if($response->shouldTriggerMcp($this->mcpConfig)){
