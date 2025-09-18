@@ -69,7 +69,7 @@ class SSEClient
 //                    LoggerFactory::info('Event', $event);
                     // Process the event and yield the results.
                     yield from $this->processEvent($event);
-                } catch (SSEParseException) {
+                } catch (SSEParseException $e) {
                     // Ignore invalid events.
                     continue;
                 }
@@ -218,8 +218,19 @@ class SSEClient
      */
     private function isTypedEvent(array $event): bool
     {
+        $typeList = [
+            'message_start', 
+            'content_block_delta', 
+            'content_block_start', 
+            'message_delta', 
+            'conversation.response.started', 
+            'function.call.delta', 
+            'conversation.response.done',
+            'message.output.delta'
+        ];
+
         return isset($event['data']['type']) &&
-            in_array($event['data']['type'], ['message_start', 'content_block_delta', 'content_block_start', 'message_delta']);
+            in_array($event['data']['type'], $typeList);
     }
 
     /**

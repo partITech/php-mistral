@@ -24,7 +24,6 @@ try {
     echo $e->getMessage();
 }
 
-die();
 
 $conversation = (new MistralConversation())
     ->setAgent($newAgent)
