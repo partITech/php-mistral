@@ -65,9 +65,7 @@ $conversation = (new MistralConversation())
 
 $conversationClient = new MistralConversationClient($apiKey);
 
-// Start the conversation with the first message :
 $messages = $conversationClient->getMessages()->addUserMessage('Add the numbers 1 and 2. Also add the numbers 3 and 4.');
-//$messages = $conversationClient->getMessages()->addUserMessage('Add the numbers 1 and 2');
 
 $result = $conversationClient->startConversation(
         conversation: $conversation,
@@ -78,28 +76,42 @@ $result = $conversationClient->startConversation(
 
 
 echo $result->getMessage();
-//try {
-//    /** @var \Partitech\PhpMistral\Clients\Response $chunk */
-//    foreach ($conversationClient->startConversation(
-//        conversation: $conversation,
-//        messages    : $messages,
-//        store       : true,
-//        stream      : true
-//    ) as $chunk) {
-//
-//        if ($chunk->getType() !== 'conversation.response.done') {
-//            echo $chunk->getChunk();
-//        }
-//
+
+echo PHP_EOL . '____________________________________________' . PHP_EOL;
+
+
+$conversationClient = new MistralConversationClient($apiKey);
+
+$messages = $conversationClient->getMessages()->addUserMessage('Add the numbers 1 and 2. Also add the numbers 3 and 4.');
+$conversation = (new MistralConversation())
+    //    ->setAgent($myPersonalAgent)
+    ->setModel($model)
+    ->setName('Conversation')
+    ->setInstructions('Do as the user requests')
+    ->setTools($mcpConfig)
+    ->setDescription('Une conversation');
+try {
+    /** @var \Partitech\PhpMistral\Clients\Response $chunk */
+    foreach ($conversationClient->conversation(
+        conversation: $conversation,
+        messages    : $messages,
+        store       : true,
+        stream      : true
+    ) as $chunk) {
+
+        if ($chunk->getType() !== 'conversation.response.done') {
+            echo $chunk->getChunk();
+        }
+
 //        if ($chunk->getType() === 'conversation.response.done') {
 //            print_r($chunk->getUsage());
 //            print_r($chunk->getId());
 //            $conversation->setId($chunk->getId());
 //        }
-//    }
-//
-//} catch (\Throwable $e) {
-//    echo $e->getMessage();
-//    exit(1);
-//}
+    }
+
+} catch (\Throwable $e) {
+    echo $e->getMessage();
+    exit(1);
+}
 
