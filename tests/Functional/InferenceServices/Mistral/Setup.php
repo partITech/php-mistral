@@ -38,6 +38,8 @@ class Setup extends TestCase
      */
     protected string $model;
 
+    protected string $apiKey;
+
     /**
      * setUp method
      * Automatically executed before each test case.
@@ -64,5 +66,7 @@ class Setup extends TestCase
 
         // Set the model for use in the tests.
         $this->model = $chatModel;
+
+        $this->apiKey = $apiKey;
     }
 }

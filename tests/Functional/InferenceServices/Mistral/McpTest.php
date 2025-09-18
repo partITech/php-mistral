@@ -5,8 +5,11 @@ namespace Tests\Functional\InferenceServices\Mistral;
 use Exception;
 use Mcp\Types\GetPromptResult;
 use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Mistral\MistralConversation;
+use Partitech\PhpMistral\Clients\Mistral\MistralConversationClient;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Mcp\McpConfig;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Resource;
@@ -201,6 +204,71 @@ class McpTest extends Setup
         $this->assertEquals('test://static/resource/55', $ressourcePrompt->first()->getResource()->getUri());
         $this->assertEquals('text/plain', $ressourcePrompt->first()->getResource()->getMimeType());
         $this->assertEquals('Resource 55: This is a plaintext resource', $ressourcePrompt->first()->getResource()->getText());
+    }
+
+
+    /**
+     * @throws MaximumRecursionException
+     * @throws MistralClientException
+     * @throws Exception
+     */
+    public function testPhpMistralToolStreaming(): void
+    {
+        $apiKey = $this->apiKey;
+        $model = $this->model;
+
+        $configArray = [
+            'mcp' => [
+                'servers' => [
+                    'test' => [
+                        'command' => 'docker',
+                        'args' => [
+                            'run',
+                            '-i',
+                            '--rm',
+                            'mcp/everything',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $mcpConfig = new McpConfig(
+            $configArray
+        );
+        $this->assertIsArray($mcpConfig->getToolsList());
+        $this->assertCount(8, $mcpConfig->getToolsList());
+
+        $conversation = (new MistralConversation())
+            ->setModel($model)
+            ->setName('Conversation')
+            ->setDescription('Description')
+            ->setTools($mcpConfig);
+
+        $conversationClient = new MistralConversationClient($apiKey);
+
+        $messages = $conversationClient
+            ->getMessages()
+            ->addAssistantMessage('Do as the user requests')
+            ->addUserMessage('Give me a table view of all your available tools');
+
+        /** @var Response $chunk */
+        $texts = null;
+        foreach ($conversationClient->conversation(     conversation: $conversation,
+                                                        messages    : $messages,
+                                                        store       : true,
+                                                        stream      : true
+        ) as $chunk) {
+
+            if ($chunk->getType() !== 'conversation.response.done') {
+                $texts .= $chunk->getChunk();
+            }
+        }
+
+        $this->assertNotEmpty($texts);
+        foreach($mcpConfig->getToolsList() as $tool) {
+            $this->assertStringContainsString($tool, $texts);
+        }
+
     }
 
 }

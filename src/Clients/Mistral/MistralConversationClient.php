@@ -87,7 +87,7 @@ class MistralConversationClient extends MistralClient
         $payload = $this->processInputs(
             conversation: $conversation,
             messages    : $messages,
-            startMode   : false,
+            startMode   : true,
             store       : $store,
             stream      : $stream
         );
@@ -157,7 +157,7 @@ class MistralConversationClient extends MistralClient
      *
      * @return array Payload ready to be sent to the API.
      */
-    private function processInputs(MistralConversation|string $conversation,
+    private function processInputs(array|MistralConversation|string $conversation,
                                    Messages                   $messages,
                                    bool                       $startMode = false,
                                    bool                       $store = false,
@@ -188,14 +188,17 @@ class MistralConversationClient extends MistralClient
         );
 
         // Agent mode: prefer agent_id + handoff_execution and strip model/tools/instructions
-        if (method_exists(
-                $conversation,
-                'getAgentId'
-            ) && $conversation->getAgentId()) {
+        if (method_exists($conversation,'getAgentId') && $conversation->getAgentId()) {
             $payload['agent_id']          = $conversation->getAgentId();
             $payload['handoff_execution'] = $conversation->getHandoffExecution();
 
-            unset($payload['model'], $payload['tools'], $payload['completion_args'], $payload['instructions']);
+            unset(
+                $payload['model'],
+                $payload['tools'],
+                $payload['completion_args'],
+                $payload['instructions']
+            );
+
         } else {
             // Model mode: require model
             $payload['model'] = $conversation->getModel();
@@ -315,7 +318,7 @@ class MistralConversationClient extends MistralClient
      * Supports optional restart from a specific entry and both streaming/non-streaming flows.
      * Handles MCP tool-call follow-ups when needed (non-streaming flow).
      *
-     * @param MistralConversation|string $conversation Conversation instance (with ID) or its ID string.
+     * @param array|MistralConversation|string $conversation Conversation instance (with ID) or its ID string.
      * @param Messages $messages Messages to append (must be Messages here).
      * @param bool $store Persist the conversation on the server if true.
      * @param bool $stream Stream the response via SSE if true.
@@ -326,7 +329,7 @@ class MistralConversationClient extends MistralClient
      * @throws MaximumRecursionException
      * @throws MistralClientException
      */
-    public function appendConversation(MistralConversation|string $conversation,
+    public function appendConversation(array|MistralConversation|string $conversation,
                                        Messages                   $messages,
                                        bool                       $store = false,
                                        bool                       $stream = false,
