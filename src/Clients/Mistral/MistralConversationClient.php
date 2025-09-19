@@ -199,7 +199,7 @@ class MistralConversationClient extends MistralClient
                 $payload['instructions']
             );
 
-        } else {
+        } elseif($startMode === true) {
             // Model mode: require model
             $payload['model'] = $conversation->getModel();
         }
@@ -339,7 +339,7 @@ class MistralConversationClient extends MistralClient
         $payload = $this->processInputs(
             conversation: $conversation,
             messages    : $messages,
-            startMode   : true,
+            startMode   : false,
             store       : $store,
             stream      : $stream
         );

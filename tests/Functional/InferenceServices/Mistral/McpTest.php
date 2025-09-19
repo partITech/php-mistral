@@ -271,4 +271,66 @@ class McpTest extends Setup
 
     }
 
+    public function testPhpMistralStreamingCallToolOnce(): void
+    {
+        $apiKey = $this->apiKey;
+        $model = $this->model;
+        $number1 = rand(1, 100);
+        $number2 = rand(1, 100);
+
+        $configArray = [
+            'mcp' => [
+                'servers' => [
+                    'test' => [
+                        'command' => 'docker',
+                        'args' => [
+                            'run',
+                            '-i',
+                            '--rm',
+                            'mcp/everything',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $mcpConfig = new McpConfig(
+            $configArray
+        );
+
+        $conversation = (new MistralConversation)
+            ->setModel($model)
+            ->setName('Test')
+            ->setDescription('Conversation used for testing')
+            ->setTools($mcpConfig);
+
+        $conversationClient = new MistralConversationClient($apiKey);
+
+        $messages = $conversationClient
+            ->getMessages()
+            ->addAssistantMessage('Do as the user requests')
+            ->addUserMessage("Use the tool 'add' to add the numbers $number1 and $number2 and only return the result with nothing else");
+
+        /** @var Response $chunk */
+        $text = null;
+        foreach ($conversationClient->conversation(
+            conversation: $conversation,
+            messages    : $messages,
+            store       : true,
+            stream      : true
+        ) as $chunk) {
+
+            if ($chunk->getType() !== 'conversation.response.done') {
+                $text .= $chunk->getChunk();
+            }
+
+            if ($chunk->getType() === 'conversation.response.done') {
+                $conversation->setId($chunk->getId());
+            }
+        }
+
+        $this->assertNotEmpty($text);
+        $this->assertEquals($number1 + $number2, (int) $text);
+    }
+
 }

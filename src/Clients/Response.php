@@ -320,10 +320,26 @@ class Response
 
         if(isset($data['type']) && in_array($data['type'], ['function.call.delta'])){
             if ($message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']) === null) {
-
+                $firstArg = null;
                 $message->setType($data['type']);
+                // create th toolCall, add it to the message
+                // if argument is incomplete. remove arg, create the toolCall,
+                // after update the tooCall with the new argument
+                if(isset($data['arguments']) && !empty($data['arguments'])){
+                    $firstArg = $data['arguments'];
+                    $data['arguments'] = null;
+                }
                 $toolCallFunction = ToolCallFunction::fromArray($data);
                 $message->addToolCall($toolCallFunction);
+
+                // Now let's upodate arg:
+                if(!is_null($firstArg)){
+                    $toolCall = $message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']);
+                    $message->updateToolCalls(
+                        $firstArg,
+                        $toolCall->getIndex()
+                    );
+                }
 
             } else {
                 $toolCall = $message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']);
