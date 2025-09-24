@@ -239,8 +239,8 @@ class Response
         }
 
         if(isset($data['outputs'])) {
-            foreach ($data['outputs'] as $output) {
-                $message = new Message($response->clientType);
+            $message = new Message($response->clientType);
+            foreach ($data['outputs'] as $numOutput => $output) {
 
                 if(isset($output['role'])){
                     $message->setRole($output['role']);
@@ -304,7 +304,9 @@ class Response
                         ]
                     );
                     $message->addToolCall($toolCallFunction);
-                    $message->setStopReason('tool_calls');
+                    if($numOutput == count($data['outputs'])-1){
+                        $message->setStopReason('tool_calls');
+                    }
                 }
 
 
@@ -318,10 +320,26 @@ class Response
 
         if(isset($data['type']) && in_array($data['type'], ['function.call.delta'])){
             if ($message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']) === null) {
-
+                $firstArg = null;
                 $message->setType($data['type']);
+                // create th toolCall, add it to the message
+                // if argument is incomplete. remove arg, create the toolCall,
+                // after update the tooCall with the new argument
+                if(isset($data['arguments']) && !empty($data['arguments'])){
+                    $firstArg = $data['arguments'];
+                    $data['arguments'] = null;
+                }
                 $toolCallFunction = ToolCallFunction::fromArray($data);
                 $message->addToolCall($toolCallFunction);
+
+                // Now let's upodate arg:
+                if(!is_null($firstArg)){
+                    $toolCall = $message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']);
+                    $message->updateToolCalls(
+                        $firstArg,
+                        $toolCall->getIndex()
+                    );
+                }
 
             } else {
                 $toolCall = $message->getToolCallByIdOrIndex($data['tool_call_id'], $data['output_index']);

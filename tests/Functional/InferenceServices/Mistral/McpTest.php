@@ -5,8 +5,13 @@ namespace Tests\Functional\InferenceServices\Mistral;
 use Exception;
 use Mcp\Types\GetPromptResult;
 use Partitech\PhpMistral\Clients\Client;
+use Partitech\PhpMistral\Clients\Mistral\MistralAgent;
+use Partitech\PhpMistral\Clients\Mistral\MistralAgentClient;
+use Partitech\PhpMistral\Clients\Mistral\MistralConversation;
+use Partitech\PhpMistral\Clients\Mistral\MistralConversationClient;
 use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
+use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Mcp\McpConfig;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Resource;
@@ -203,4 +208,203 @@ class McpTest extends Setup
         $this->assertEquals('Resource 55: This is a plaintext resource', $ressourcePrompt->first()->getResource()->getText());
     }
 
+
+    /**
+     * @throws MaximumRecursionException
+     * @throws MistralClientException
+     * @throws Exception
+     */
+    public function testPhpMistralToolStreaming(): void
+    {
+        $apiKey = $this->apiKey;
+        $model = $this->model;
+
+        $configArray = [
+            'mcp' => [
+                'servers' => [
+                    'test' => [
+                        'command' => 'docker',
+                        'args' => [
+                            'run',
+                            '-i',
+                            '--rm',
+                            'mcp/everything',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $mcpConfig = new McpConfig(
+            $configArray
+        );
+        $this->assertIsArray($mcpConfig->getToolsList());
+        $this->assertCount(8, $mcpConfig->getToolsList());
+
+        $conversation = (new MistralConversation())
+            ->setModel($model)
+            ->setName('Conversation')
+            ->setDescription('Description')
+            ->setTools($mcpConfig);
+
+        $conversationClient = new MistralConversationClient($apiKey);
+
+        $messages = $conversationClient
+            ->getMessages()
+            ->addAssistantMessage('Do as the user requests')
+            ->addUserMessage('Give me a table view of all your available tools');
+
+        /** @var Response $chunk */
+        $texts = null;
+        foreach ($conversationClient->conversation(     conversation: $conversation,
+                                                        messages    : $messages,
+                                                        store       : true,
+                                                        stream      : true
+        ) as $chunk) {
+
+            if ($chunk->getType() !== 'conversation.response.done') {
+                $texts .= $chunk->getChunk();
+            }
+        }
+
+        $this->assertNotEmpty($texts);
+        foreach($mcpConfig->getToolsList() as $tool) {
+            $this->assertStringContainsString($tool, $texts);
+        }
+
+    }
+
+    public function testPhpMistralStreamingCallToolOnce(): void
+    {
+        $apiKey = $this->apiKey;
+        $model = $this->model;
+        $number1 = rand(1, 100);
+        $number2 = rand(1, 100);
+
+        $configArray = [
+            'mcp' => [
+                'servers' => [
+                    'test' => [
+                        'command' => 'docker',
+                        'args' => [
+                            'run',
+                            '-i',
+                            '--rm',
+                            'mcp/everything',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $mcpConfig = new McpConfig(
+            $configArray
+        );
+
+        $conversation = (new MistralConversation)
+            ->setModel($model)
+            ->setName('Test')
+            ->setDescription('Conversation used for testing')
+            ->setTools($mcpConfig);
+
+        $conversationClient = new MistralConversationClient($apiKey);
+
+        $messages = $conversationClient
+            ->getMessages()
+            ->addAssistantMessage('Do as the user requests')
+            ->addUserMessage("Use the tool 'add' to add the numbers $number1 and $number2 and only return the result with nothing else");
+
+        /** @var Response $chunk */
+        $text = null;
+        foreach ($conversationClient->conversation(
+            conversation: $conversation,
+            messages    : $messages,
+            store       : true,
+            stream      : true
+        ) as $chunk) {
+
+            if ($chunk->getType() !== 'conversation.response.done') {
+                $text .= $chunk->getChunk();
+            }
+
+            if ($chunk->getType() === 'conversation.response.done') {
+                $conversation->setId($chunk->getId());
+            }
+        }
+
+        $this->assertNotEmpty($text);
+        $this->assertEquals($number1 + $number2, (int) $text);
+    }
+
+
+    public function testStreamingCanCallToolsWithAgent(): void
+    {
+
+        $apiKey = $this->apiKey;
+        $model = $this->model;
+        $agentName = 'MyPersonalTestAgent';
+        $number1 = rand(1, 100);
+        $number2 = rand(1, 100);
+
+        $configArray = [
+            'mcp' => [
+                'servers' => [
+                    'test' => [
+                        'command' => 'docker',
+                        'args' => [
+                            'run',
+                            '-i',
+                            '--rm',
+                            'mcp/everything',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $mcpConfig = new McpConfig(
+            $configArray
+        );
+
+        $agent = new MistralAgent(name: $agentName, model: $model);
+        $agent->setDescription('Agent created during testing');
+        $agent->setInstructions('You are a helpful assistant that helps the user with his tasks. You have access to multiple tools. Use them when needed.');
+        $agent->setTools($mcpConfig->getTools());
+        $agentClient = new MistralAgentClient(apiKey: $apiKey);
+        $newAgent = $agentClient->createAgent($agent);
+
+        $conversation = (new MistralConversation)
+            ->setAgent($newAgent)
+            ->setModel($model)
+            ->setName('Test')
+            ->setDescription('Conversation used for testing')
+            ->setTools($mcpConfig);
+
+        $conversationClient = new MistralConversationClient($apiKey);
+
+        $messages = $conversationClient
+            ->getMessages()
+            ->addAssistantMessage('Do as the user requests')
+            ->addUserMessage("Use the tool 'add' to add the numbers {$number1} and {$number2} and only return the result with nothing else");
+
+        /** @var Response $chunk */
+        $text = null;
+        foreach ($conversationClient->conversation(
+            conversation: $conversation,
+            messages    : $messages,
+            store       : true,
+            stream      : true
+        ) as $chunk) {
+
+            if ($chunk->getType() !== 'conversation.response.done') {
+                $text .= $chunk->getChunk();
+            }
+
+            if ($chunk->getType() === 'conversation.response.done') {
+                $conversation->setId($chunk->getId());
+            }
+        }
+
+        $this->assertNotEmpty($text);
+        $this->assertEquals($number1 + $number2, (int) $text);
+    }
 }

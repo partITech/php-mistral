@@ -57,6 +57,12 @@ class McpServerConfig implements JsonSerializable
         }, $args);
     }
 
+    public function sessionRefresh():self
+    {
+        $this->session = null;
+        return $this->setSession();
+    }
+
     public function setSession():self
     {
         if(is_null($this->session)){

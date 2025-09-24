@@ -229,4 +229,14 @@ class Messages
     {
         return $this->context;
     }
+
+    public function getMessageByToolCallId(int|string $id): ?Message
+    {
+        foreach ($this->messages as $index => $message) {
+            if ($message instanceof Message && $message->getRole() === self::ROLE_TOOL && $message->getToolCallId() === $id) {
+                return $message;
+            }
+        }
+        return null;
+    }
 }

@@ -111,7 +111,7 @@ class McpConfig implements JsonSerializable
     {
         foreach ($this->getServers() as $serverConfig) {
              if($serverConfig->hasTool($functionName)) {
-                 return $serverConfig->getSession();
+                 return $serverConfig->sessionRefresh()->getSession();
              }
         }
 
