@@ -188,7 +188,7 @@ class MistralConversationClient extends MistralClient
         );
 
         // Agent mode: prefer agent_id + handoff_execution and strip model/tools/instructions
-        if (method_exists($conversation,'getAgentId') && $conversation->getAgentId()) {
+        if ($startMode === true && method_exists($conversation,'getAgentId') && $conversation->getAgentId()) {
             $payload['agent_id']          = $conversation->getAgentId();
             $payload['handoff_execution'] = $conversation->getHandoffExecution();
 
