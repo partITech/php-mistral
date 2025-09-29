@@ -131,7 +131,7 @@ class MistralConversation
     }
 
     /**
-     * @param string|null $agentId
+     * @param MistralAgent $agent
      * @return MistralConversation
      */
     public function setAgent(MistralAgent $agent): MistralConversation
