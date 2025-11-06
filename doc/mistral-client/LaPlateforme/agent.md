@@ -134,3 +134,14 @@ foreach ($agents as $agent) {
 ```
 
 
+**Delete an agent entity**
+
+Return a boolean, true if succesfully deleted, false otherwise.
+deleteAgent() accept the agent id (string) or an MistralAgent object.
+```php
+$client = new MistralAgentClient(apiKey: getenv('MISTRAL_API_KEY'));
+$agents = $client->deleteAgent($agent->getId());
+```
+
+
+

@@ -48,6 +48,29 @@ class MistralAgentClient extends MistralClient
      * @throws MaximumRecursionException
      * @throws MistralClientException
      */
+    public function deleteAgent(MistralAgent|string $agent): bool
+    {
+        $agentId = $agent instanceof MistralAgent ? $agent->getId() : $agent;
+
+        if (!$agentId) {
+            throw new \InvalidArgumentException('Missing agent ID.');
+        }
+        try{
+            $response = $this->request(
+                method: 'DELETE',
+                path  : "/v1/agents/{$agentId}"
+            );
+        }catch(\Throwable $e){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws MaximumRecursionException
+     * @throws MistralClientException
+     */
     public function updateAgent(MistralAgent $agent): MistralAgent
     {
         $agentId = $agent->getId();

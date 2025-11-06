@@ -40,6 +40,8 @@ print_r($updated);
 $updated = $client->updateAgentVersion($agent, 1);
 print_r($updated);
 
+
+
 //Partitech\PhpMistral\Clients\Mistral\MistralAgent Object
 //(
 //    [id:protected] => ag_01982d85718d7607928e2b21e1ddd4b8
@@ -70,3 +72,12 @@ print_r($updated);
 //    [updatedAt:protected] => 2025-07-21T15:06:17.106661Z
 //    [version:protected] => 1
 //)
+
+
+$client->deleteAgent($newAgent->getId());
+
+echo PHP_EOL;
+echo "******************************************************";
+echo PHP_EOL;
+$agent = $client->getAgent($newAgent->getId());
+print_r($agent);
