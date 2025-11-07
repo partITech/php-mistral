@@ -354,6 +354,21 @@ try {
     exit(1);
 }
 ```
+### Delete a conversation
 
+Permanently delete a conversation by its ID. Returns `true` if the deletion was successful, `false` otherwise.
 
+The `delete()` method accepts either a conversation ID (string) or a `MistralConversation` object.
 
+**Parameters:**
+- `$conversation` (string|MistralConversation): The conversation ID or conversation object to delete
+
+**Returns:**
+- `bool`: `true` if successfully deleted, `false` if an error occurred
+
+**Example:**
+```php
+$client = new MistralConversationClient(apiKey: getenv('MISTRAL_API_KEY'));
+$conversations = $client->listConversations(page: 0, pageSize: 500);
+$client->delete($conversations->first());
+```

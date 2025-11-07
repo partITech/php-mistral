@@ -8,6 +8,12 @@ use Partitech\PhpMistral\Clients\Mistral\MistralConversationClient;
 $apiKey  = getenv('MISTRAL_API_KEY');
 
 $client = new MistralConversationClient(apiKey: getenv('MISTRAL_API_KEY'));
-$conversations = $client->listConversations(page: 0, pageSize: 100);
+$conversations = $client->listConversations(page: 0, pageSize: 500);
+$count = $conversations->count();
 
-print_r($conversations);
+
+$client->delete($conversations->first());
+
+$conversations = $client->listConversations(page: 0, pageSize: 500);
+$count = $conversations->count();
+print_r($count);
