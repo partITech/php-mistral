@@ -11,6 +11,7 @@ use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
+use Partitech\PhpMistral\Tools\ToolCallFunction;
 
 /**
  * Client responsible for creating, appending to, and retrieving Mistral conversations.
@@ -169,8 +170,13 @@ class MistralConversationClient extends MistralClient
         ];
 
         // Include conversation metadata only when starting
-        if ($startMode === true && $conversation instanceof MistralConversation) {
+        if ($conversation instanceof MistralConversation &&  $conversation->getTools() !== null && $messages->last()->getRole()=='user') {
             $payload['tools']        = $conversation->getTools();
+
+        }
+
+        if ($startMode === true && $conversation instanceof MistralConversation) {
+
             $payload['name']         = $conversation->getName();
             $payload['description']  = $conversation->getDescription();
             $payload['instructions'] = $conversation->getInstructions();
@@ -473,14 +479,15 @@ class MistralConversationClient extends MistralClient
 
         foreach ($response[$key] as $entry) {
             $msg = new Message($this->clientType);
-
+            $type = $entry['type'] ?? '';
             // Derive role from explicit 'role' or fallback to 'type'
             if (isset($entry['role'])) {
                 $msg->setRole($entry['role']);
             } else {
-                $type = $entry['type'] ?? '';
+
                 $msg->setRole(
                     match ($type) {
+                        'function.call' => Messages::ROLE_TOOL,
                         'message.input' => Messages::ROLE_USER,
                         'message.output' => Messages::ROLE_ASSISTANT,
                         default => Messages::ROLE_SYSTEM,
@@ -510,6 +517,19 @@ class MistralConversationClient extends MistralClient
             }
             if ($entry['completed_at']) {
                 $msg->setCompletedAt(new DateTimeImmutable($entry['completed_at']));
+            }
+
+            if ($type === 'function.call' && isset($entry['arguments']) && is_string($entry['arguments']) && json_validate($entry['arguments'])) {
+                $toolCallFunction = ToolCallFunction::fromArray(
+                    [
+                        'type' => 'tool_use',
+                        'id' => $entry['tool_call_id'],
+                        'name' => $entry['name'],
+                        'arguments' =>  $entry['arguments'],
+                        'input' => [],
+                    ]
+                );
+                $msg->addToolCall($toolCallFunction);
             }
 
             $messages->addMessage($msg);
@@ -561,5 +581,28 @@ class MistralConversationClient extends MistralClient
         );
 
         return MistralConversation::fromArray($response);
+    }
+
+    /**
+     * Delete a conversation by ID.
+     *
+     * @param string|MistralConversation $conversation Conversation or its ID.
+     *
+     * @return bool True if deletion was successful, false otherwise.
+     */
+    public function delete(string|MistralConversation $conversation): bool
+    {
+        $conversationId = $conversation instanceof MistralConversation ? $conversation->getId() : $conversation;
+
+        try{
+            $response = $this->request(
+                method: 'DELETE',
+                path  : "/v1/conversations/{$conversationId}"
+            );
+        }catch (\Exception $e){
+            return false;
+        }
+
+        return true;
     }
 }

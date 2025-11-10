@@ -32,12 +32,18 @@ try {
         store       : true
     );
 
-    print_r($response->getToolCalls());
+     print_r($response->getToolCalls());
 
 } catch (\Throwable $e) {
     echo $e->getMessage();
     exit(1);
 }
+
+
+$conversation = $client->getConversationHistory($client->getConversation($response->getId()));
+print_r($conversation->last()->getToolCalls());
+
+
 
 try {
     /** @var Response $chunk */
