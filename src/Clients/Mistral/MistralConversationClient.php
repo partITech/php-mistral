@@ -12,6 +12,7 @@ use Partitech\PhpMistral\Exceptions\MistralClientException;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Tools\ToolCallFunction;
+use Partitech\PhpMistral\Utils\Json;
 
 /**
  * Client responsible for creating, appending to, and retrieving Mistral conversations.
@@ -519,7 +520,7 @@ class MistralConversationClient extends MistralClient
                 $msg->setCompletedAt(new DateTimeImmutable($entry['completed_at']));
             }
 
-            if ($type === 'function.call' && isset($entry['arguments']) && is_string($entry['arguments']) && json_validate($entry['arguments'])) {
+            if ($type === 'function.call' && isset($entry['arguments']) && is_string($entry['arguments']) && Json::validate($entry['arguments'])) {
                 $toolCallFunction = ToolCallFunction::fromArray(
                     [
                         'type' => 'tool_use',
