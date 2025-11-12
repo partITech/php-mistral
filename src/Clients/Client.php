@@ -99,6 +99,9 @@ class Client extends Psr17Factory implements ClientInterface
     protected int           $mcpCurrentRecursion = 0;
     private LoggerInterface $logger;
 
+    private mixed $contents = null;
+    private mixed $payload = null;
+
     public function __construct(?string $apiKey = null, string $url = self::ENDPOINT)
     {
         parent::__construct();
@@ -176,10 +179,13 @@ class Client extends Psr17Factory implements ClientInterface
             return $response;
         }
 
+
+
         // Non - stream response handling.
         // if is valid JSON response, return as an array.
         $contents = $response->getBody()->getContents();
-
+        $this->contents = $contents;
+        $this->payload = $parameters;
         if (Json::validate($contents)) {
             return json_decode($contents, true);
         }
@@ -763,5 +769,15 @@ class Client extends Psr17Factory implements ClientInterface
     {
         $this->logger = $logger;
         return $this;
+    }
+
+    public function getPayload(): mixed
+    {
+        return $this->payload;
+    }
+
+    public function getContents(): mixed
+    {
+        return $this->contents;
     }
 }
