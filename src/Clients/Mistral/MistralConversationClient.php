@@ -9,6 +9,7 @@ use Partitech\PhpMistral\Clients\Response;
 use Partitech\PhpMistral\Clients\SSEClient;
 use Partitech\PhpMistral\Exceptions\MaximumRecursionException;
 use Partitech\PhpMistral\Exceptions\MistralClientException;
+use Partitech\PhpMistral\Mcp\McpConfig;
 use Partitech\PhpMistral\Message;
 use Partitech\PhpMistral\Messages;
 use Partitech\PhpMistral\Tools\ToolCallFunction;
@@ -171,8 +172,15 @@ class MistralConversationClient extends MistralClient
         ];
 
         // Include conversation metadata only when starting
-        if ($conversation instanceof MistralConversation &&  $conversation->getTools() !== null && $messages->last()->getRole()=='user') {
-            $payload['tools']        = $conversation->getTools();
+        if ($conversation instanceof MistralConversation && $messages->last()->getRole()=='user') {
+
+            if(is_array($conversation->getTools()) && count($conversation->getTools()) > 0){
+                $payload['tools'] = $conversation->getTools();
+            }
+
+            if($conversation->getTools() instanceof McpConfig){
+                $payload['tools'] = $conversation->getTools();
+            }
 
         }
 
