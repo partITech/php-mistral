@@ -3,7 +3,7 @@
 namespace Partitech\PhpMistral\Clients\Mistral;
 
 use Partitech\PhpMistral\Mcp\McpConfig;
-
+use DateTimeImmutable;
 class MistralAgent
 {
     protected ?string $id             = null;
@@ -14,8 +14,8 @@ class MistralAgent
     protected null|array|McpConfig  $tools          = null;
     protected ?array  $handoffs       = null;
     protected ?array  $completionArgs = null;
-    protected ?string $createdAt      = null;
-    protected ?string $updatedAt      = null;
+    protected ?DateTimeImmutable $createdAt = null;
+    protected ?DateTimeImmutable $updatedAt = null;
     protected ?int $version = null;
 
     public function __construct(string $name, string $model)
@@ -34,8 +34,8 @@ class MistralAgent
         $agent->tools          = $data['tools'] ?? null;
         $agent->handoffs       = $data['handoffs'] ?? null;
         $agent->completionArgs = $data['completion_args'] ?? null;
-        $agent->createdAt      = $data['created_at'] ?? null;
-        $agent->updatedAt      = $data['updated_at'] ?? null;
+        $agent->createdAt      = new DateTimeImmutable($data['created_at']) ?? null;
+        $agent->updatedAt      = new DateTimeImmutable($data['updated_at']) ?? null;
         $agent->version = $data['version'] ?? null;
 
         return $agent;
@@ -146,12 +146,12 @@ class MistralAgent
         return $this;
     }
 
-    public function getCreatedAt(): ?string
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): ?string
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

@@ -76,8 +76,8 @@ print_r($updated);
 
 $client->deleteAgent($newAgent->getId());
 
-echo PHP_EOL;
-echo "******************************************************";
-echo PHP_EOL;
-$agent = $client->getAgent($newAgent->getId());
-print_r($agent);
+//echo PHP_EOL;
+//echo "******************************************************";
+//echo PHP_EOL;
+//$agent = $client->getAgent($newAgent->getId());
+//print_r($agent);

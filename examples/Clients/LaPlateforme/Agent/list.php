@@ -10,5 +10,6 @@ $apiKey  = getenv('MISTRAL_API_KEY');
 $client = new MistralAgentClient(apiKey: getenv('MISTRAL_API_KEY'));
 $agents = $client->listAgents(page: 0, pageSize: 100);
 foreach ($agents as $agent) {
+    var_dump($agent);
     echo "#{$agent->getId()} - {$agent->getName()} - {$agent->getVersion()}" . PHP_EOL;
 }
