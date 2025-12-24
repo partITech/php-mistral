@@ -13,20 +13,6 @@ class JsonSchema extends \KnpLabs\JsonSchema\JsonSchema
         ];
     }
 
-    public static function string(?string $format = null): array
-    {
-        $result = [
-            ...self::text()
-            // maxLength is unsupported on Mistral "La plateforme".
-            // 'maxLength' => 255,
-        ];
-
-        if (null !== $format) {
-            $result['format'] = $format;
-        }
-
-        return $result;
-    }
     //https://json-schema.org/understanding-json-schema/reference/enum
     public static function enum(iterable $enum): array
     {
