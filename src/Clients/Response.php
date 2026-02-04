@@ -25,12 +25,12 @@ class Response
 
     private ?string     $id     = null;
     private string      $object = 'chat.completion';
-    private int         $created;
-    private string      $model;
-    private string      $fingerPrint;
+    private int         $created = 0;
+    private string      $model = '';
+    private string      $fingerPrint = '';
     private ArrayObject $choices;
-    private ?array      $pages;
-    private ?string      $clientType;
+    private ?array      $pages = null;
+    private ?string     $clientType;
 
     private array $usage = [];
 
