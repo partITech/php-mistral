@@ -17,20 +17,20 @@ class MistralConversation
     private ?array $completionArgs = [];
 
     // Completion arguments broken out
-    private null|array|string $stop;
-    private null|float        $presencePenalty;
-    private null|float        $frequencyPenalty;
-    private float             $temperature;
-    private null|float        $topP;
-    private null|int          $maxTokens;
-    private null|int          $randomSeed;
-    private null|array        $prediction;
-    private null|array        $responseFormat;
-    private string            $toolChoice;
-    private ?string           $name;
-    private ?string           $description;
-    private ?string           $object;
-    private ?string            $model;
+    private null|array|string $stop = null;
+    private null|float        $presencePenalty = null;
+    private null|float        $frequencyPenalty = null;
+    private float             $temperature = 0.3;
+    private null|float        $topP = null;
+    private null|int          $maxTokens = null;
+    private null|int          $randomSeed = null;
+    private null|array        $prediction = null;
+    private null|array        $responseFormat = null;
+    private string            $toolChoice = 'auto';
+    private ?string           $name = null;
+    private ?string           $description = null;
+    private ?string           $object = null;
+    private ?string            $model = null;
     private string $handoffExecution = 'server';
     private DateTimeImmutable $createdAt;
     private DateTimeImmutable $updatedAt;
