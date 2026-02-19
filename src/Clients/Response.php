@@ -276,6 +276,10 @@ class Response
                         if($content['type'] === 'tool_reference'){
                             $message->addReference($content);
                         }
+
+                        if($content['type'] === 'tool_file'){
+                            $message->addReference($content);
+                        }
                     }
                 }
 
@@ -380,7 +384,7 @@ class Response
                 $message->setChunk($data['content']);
             }
 
-            if(isset($data['content']) && is_array($data['content']) && isset($data['content']['type']) && $data['content']['type'] === 'tool_reference' ){
+            if(isset($data['content']) && is_array($data['content']) && isset($data['content']['type']) && in_array($data['content']['type'], ['tool_reference', 'tool_file']) ){
                 $message->addReference($data['content']);
             }
 
