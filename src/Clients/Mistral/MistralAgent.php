@@ -14,7 +14,7 @@ class MistralAgent
     protected null|array|McpConfig  $tools          = null;
     protected ?array  $handoffs       = null;
     protected ?array  $completionArgs = null;
-    protected ?array  $metadatas = null;
+    protected ?array  $metadata = null;
     protected ?DateTimeImmutable $createdAt = null;
     protected ?DateTimeImmutable $updatedAt = null;
     protected ?int $version = null;
@@ -35,7 +35,7 @@ class MistralAgent
         $agent->tools          = $data['tools'] ?? null;
         $agent->handoffs       = $data['handoffs'] ?? null;
         $agent->completionArgs = $data['completion_args'] ?? null;
-        $agent->metadatas      = $data['metadatas'] ?? null;
+        $agent->metadata       = $data['metadata'] ?? null;
         $agent->createdAt      = new DateTimeImmutable($data['created_at']) ?? null;
         $agent->updatedAt      = new DateTimeImmutable($data['updated_at']) ?? null;
         $agent->version = $data['version'] ?? null;
@@ -53,7 +53,7 @@ class MistralAgent
             'tools'           => $this->tools,
             'handoffs'        => $this->handoffs,
             'completion_args' => $this->completionArgs,
-            'metadatas'       => $this->metadatas,
+            'metadata'        => $this->metadata,
         ], fn($v) => $v !== null);
     }
 
@@ -149,14 +149,14 @@ class MistralAgent
         return $this;
     }
 
-    public function getMetadatas(): ?array
+    public function getMetadata(): ?array
     {
-        return $this->metadatas;
+        return $this->metadata;
     }
 
-    public function setMetadatas(?array $args): self
+    public function setMetadata(?array $args): self
     {
-        $this->metadatas = $args;
+        $this->metadata = $args;
         return $this;
     }
 
