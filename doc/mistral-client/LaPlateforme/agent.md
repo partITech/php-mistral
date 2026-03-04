@@ -110,6 +110,7 @@ $agent = (new MistralAgent(name: 'Simple Agent', model: 'mistral-medium-latest')
 ->setDescription('A simple Agent with persistent state.')
 ->setInstructions('You speak in a mix of french and english')
 ->setDescription('Une conversation de test')
+->setMetadata(['RANDOM_VAR' => 'test'])
 ->setTools([])
 ->setCompletionArgs(['temperature' => 0.3]);
 
@@ -120,6 +121,19 @@ try {
 } catch (\Throwable $e) {
     echo $e->getMessage();
 }
+```
+
+**Update an Agent**
+The `updateAgent` method will return a `MistralAgent` object that you can use in `MistralClient::agent()` or `MistralConversation::setAgent()`.
+
+```php
+$agent->setDescription('Updated desc')
+->setInstructions('New instructions')
+->setMetadata(['RANDOM_VAR' => 'test updated'])
+->setCompletionArgs(['temperature' => 0.2]);
+
+$updated = $agentClient->updateAgent($agent);
+
 ```
 
 **List agents**

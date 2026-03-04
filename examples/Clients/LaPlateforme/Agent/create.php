@@ -11,7 +11,7 @@ $agentId = getenv('MISTRAL_AGENT_ID');
 
 $agent = new MistralAgent(name: 'Simple Agent', model: 'mistral-medium-latest');
 $agent->setDescription('A simple Agent with persistent state.');
-
+$agent->setMetadata(['TEST_metadata' => 'test']);
 $client = new MistralAgentClient(apiKey: getenv('MISTRAL_API_KEY'));
 $newAgent = null;
 try {
@@ -31,6 +31,7 @@ print_r($agent);
 
 $agent->setDescription('Updated desc')
       ->setInstructions('New instructions')
+      ->setMetadata(['TEST_metadata' => 'test updated'])
       ->setCompletionArgs(['temperature' => 0.1]);
 
 $updated = $client->updateAgent($agent);
